@@ -1,0 +1,103 @@
+services:
+  # Nginx Reverse Proxy con SSL
+  nginx:
+    container_name: cashly-nginx
+    image: nginx:alpine
+    ports:
+      - "80:80"       # Necessaria per Let's Encrypt
+      - "5000:5000"   # Porta per il frontend
+      - "5001:5001"   # Porta per il backend
+      - "5002:5002"   # Porta per fortil-excel-timesheet
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/certbot/conf:/etc/letsencrypt
+      - ./nginx/certbot/www:/var/www/certbot
+    depends_on:
+      - back-end
+      - front-end
+      - fortil-excel-timesheet
+    networks:
+      - common-network
+    restart: always
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  # Certbot per Let's Encrypt
+  certbot:
+    container_name: cashly-certbot
+    image: certbot/certbot
+    volumes:
+      - ./nginx/certbot/conf:/etc/letsencrypt
+      - ./nginx/certbot/www:/var/www/certbot
+    networks:
+      - common-network
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  back-end:
+    image: cashly-back-end
+    container_name: cashly-back-end
+    build:
+      context: ./cashly/back-end
+      dockerfile: dockerfile
+    expose:
+      - "80"
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings:DefaultConnection=Server=db;Port=5432;Database=cashly_prod;User Id=user;Password=Your_Password_123;
+    networks:
+      - common-network
+    restart: always
+
+  db:
+    container_name: cashly-db
+    image: postgres:18rc1
+    expose:
+      - "5432"
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=Your_Password_123
+      - POSTGRES_DB=cashly_prod
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - common-network
+    restart: always
+
+  front-end:
+    build:
+      context: ./cashly/front-end
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=https://roberto-ingenito.ddns.net:5001
+    image: cashly-front-end
+    container_name: cashly-front-end
+    expose:
+      - "3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=https://roberto-ingenito.ddns.net:5001
+    networks:
+      - common-network
+    restart: always
+
+  fortil-excel-timesheet:
+    build:
+      context: ./fortil-excel-timesheet
+      dockerfile: Dockerfile
+    image: fortil-excel-timesheet
+    container_name: fortil-excel-timesheet-app
+    expose:
+      - "5002"
+    networks:
+      - common-network
+    restart: unless-stopped
+
+networks:
+  common-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    name: cashly-db_postgres_data

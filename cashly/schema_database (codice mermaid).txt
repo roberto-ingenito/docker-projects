@@ -1,0 +1,41 @@
+erDiagram
+    USERS {
+        int UserID PK
+        varchar Email
+        varchar HashedPassword
+        datetime CreatedAt
+    }
+
+    ACCOUNTS {
+        int AccountID PK
+        int UserID FK
+        varchar AccountName
+        decimal InitialBalance
+        decimal CurrentBalance "nel backend, inserimento_transazione+aggiornamento_saldo 
+        va fatto in una transaction"
+        varchar Currency
+        datetime CreatedAt
+    }
+
+    CATEGORIES {
+        int CategoryID PK
+        int UserID FK
+        varchar CategoryName
+        varchar IconName
+        varchar ColorHex
+    }
+
+    TRANSACTIONS {
+        int TransactionID PK
+        int AccountID FK
+        int CategoryID FK
+        decimal Amount
+        varchar Type "expense or income"
+        datetime TransactionDate
+        varchar Description
+    }
+
+    USERS ||--o{ ACCOUNTS : "has"
+    USERS ||--o{ CATEGORIES : "creates"
+    ACCOUNTS ||--o{ TRANSACTIONS : "has"
+    CATEGORIES ||--o{ TRANSACTIONS : "classifies"
