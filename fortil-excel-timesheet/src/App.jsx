@@ -170,47 +170,95 @@ function MonthExcelForm() {
       };
     }
 
-    // Funzione per generare e stilizzare le righe dati
-    const createDataRow = (label, tipo, rowNum) => {
-      const row = ["", label];
-      const dayColLetters = [];
-
-      for (let d = 1; d <= nDays; d++) {
-        const val = presenze[d]?.[tipo] || "0";
-        row.push(parseInt(val, 10)); // Valore numerico
-        dayColLetters.push(getColumnLetter(d + 2)); // Lettera colonna giorno (C, D, ...)
-      }
-
-      // Colonna nDays + 3 (Separatore)
-      row.push("");
-
-      // Colonne Totali (nDays + 4, nDays + 5, nDays + 6)
-      row.push({ formula: `SUM(${dayColLetters[0]}${rowNum}:${dayColLetters[dayColLetters.length - 1]}${rowNum})` }); // Totale ORE 
-      row.push({ formula: `SUM(${dayColLetters[0]}${rowNum}:${dayColLetters[dayColLetters.length - 1]}${rowNum})` }); // Totale ORE Lavorate 
-      row.push(0); // Totale Euro (lasciato a 0 per ora)
-
-      const excelRow = sheet.addRow(row);
-
-      // Styling e bordi
-      excelRow.eachCell((cell, colNum) => {
-        if (colNum > 2 && colNum !== separatorColIndex) {
-          cell.border = {
-            top: { style: "thin" }, bottom: { style: "thin" },
-            left: { style: "thin" }, right: { style: "thin" },
-          };
-        }
-      });
-      return excelRow;
-    };
-
     // Riga 8: Ore ordinarie
-    createDataRow("Ore ordinarie", "ordinarie", 8);
+    let row = ["", "Ore ordinarie"];
+    let dayColLetters = [];
+
+    for (let d = 1; d <= nDays; d++) {
+      const val = presenze[d]?.["ordinarie"] || "0";
+      row.push(parseInt(val, 10)); // Valore numerico
+      dayColLetters.push(getColumnLetter(d + 2)); // Lettera colonna giorno (C, D, ...)
+    }
+
+    // Colonna nDays + 3 (Separatore)
+    row.push("");
+
+    // Colonne Totali (nDays + 4, nDays + 5, nDays + 6)
+    row.push({ formula: `SUM(${dayColLetters[0]}8:${dayColLetters[dayColLetters.length - 1]}8)` }); // Totale ORE 
+    row.push({ formula: `SUM(${dayColLetters[0]}8:${dayColLetters[dayColLetters.length - 1]}8)` }); // Totale ORE Lavorate 
+    row.push(null); // Totale Euro (lasciato vuoto)
+
+    let excelRow = sheet.addRow(row);
+
+    // Styling e bordi
+    excelRow.eachCell({ includeEmpty: true }, (cell, colNum) => {
+      if (colNum > 2 && colNum !== separatorColIndex) {
+        cell.border = {
+          top: { style: "thin" }, bottom: { style: "thin" },
+          left: { style: "thin" }, right: { style: "thin" },
+        };
+      }
+    });
 
     // Riga 9: Ore straordinarie
-    createDataRow("Ore straordinarie", "straordinarie", 9);
+    row = ["", "Ore straordinarie"];
+    dayColLetters = [];
+
+    for (let d = 1; d <= nDays; d++) {
+      const val = presenze[d]?.["straordinarie"] || "0";
+      row.push(parseInt(val, 10)); // Valore numerico
+      dayColLetters.push(getColumnLetter(d + 2)); // Lettera colonna giorno (C, D, ...)
+    }
+
+    // Colonna nDays + 3 (Separatore)
+    row.push("");
+
+    // Colonne Totali (nDays + 4, nDays + 5, nDays + 6)
+    row.push({ formula: `SUM(${dayColLetters[0]}9:${dayColLetters[dayColLetters.length - 1]}9)` }); // Totale ORE 
+    row.push(null); // Totale ORE Lavorate 
+    row.push(null); // Totale Euro
+
+    excelRow = sheet.addRow(row);
+
+    // Styling e bordi
+    excelRow.eachCell({ includeEmpty: true }, (cell, colNum) => {
+      if (colNum > 2 && colNum !== separatorColIndex) {
+        cell.border = {
+          top: { style: "thin" }, bottom: { style: "thin" },
+          left: { style: "thin" }, right: { style: "thin" },
+        };
+      }
+    });
 
     // Riga 10: Ferie
-    createDataRow("Ferie", "ferie", 10);
+    row = ["", "Ferie"];
+    dayColLetters = [];
+
+    for (let d = 1; d <= nDays; d++) {
+      const val = presenze[d]?.["ferie"] || "0";
+      row.push(parseInt(val, 10)); // Valore numerico
+      dayColLetters.push(getColumnLetter(d + 2)); // Lettera colonna giorno (C, D, ...)
+    }
+
+    // Colonna nDays + 3 (Separatore)
+    row.push("");
+
+    // Colonne Totali (nDays + 4, nDays + 5, nDays + 6)
+    row.push({ formula: `SUM(${dayColLetters[0]}10:${dayColLetters[dayColLetters.length - 1]}10)` }); // Totale ORE 
+    row.push(null); // Totale ORE Lavorate 
+    row.push(null); // Totale Euro
+
+    excelRow = sheet.addRow(row);
+
+    // Styling e bordi
+    excelRow.eachCell({ includeEmpty: true }, (cell, colNum) => {
+      if (colNum > 2 && colNum !== separatorColIndex) {
+        cell.border = {
+          top: { style: "thin" }, bottom: { style: "thin" },
+          left: { style: "thin" }, right: { style: "thin" },
+        };
+      }
+    });
 
     // Riga 11 e 12: vuote (per spostare i totali alla Riga 13)
     sheet.addRow([]); // Riga 11: Vuota
@@ -245,18 +293,22 @@ function MonthExcelForm() {
     const totalsRow = sheet.addRow(rowTotals); // Riga 13
 
     // Styling per Riga 13 (Totali Giornalieri)
-    totalsRow.eachCell((cell, colNum) => {
+    totalsRow.eachCell({ includeEmpty: true }, (cell, colNum) => {
       // Applica bordi ai totali giornalieri (Col 3 fino a Col nDays + 2)
       if (colNum >= 3 && colNum <= nDays + 2) {
-        cell.border = {
-          top: { style: "thin" }, bottom: { style: "thin" },
-          left: { style: "thin" }, right: { style: "thin" },
-        };
         cell.font = { bold: true };
       }
       // Colonna finale per "€"
       if (colNum === nDays + 6) {
         cell.font = { bold: true };
+        cell.numFmt = `_-* #,##0.00" €"_-;-* #,##0.00" €"_-;_-* -??" €"_-;_-@_-`
+      }
+
+      if (colNum >= 3 && colNum <= nDays + 6 && colNum !== nDays + 3) {
+        cell.border = {
+          top: { style: "medium" }, bottom: { style: "medium" },
+          left: { style: "medium" }, right: { style: "medium" },
+        };
       }
     });
 
@@ -265,7 +317,8 @@ function MonthExcelForm() {
     // Larghezza colonne
     sheet.getColumn("A").width = 14;
     sheet.getColumn("B").width = 24;
-    for (let i = 3; i <= nDays + 6; i++) sheet.getColumn(i).width = 9; // Colonne C fino ad AH
+    for (let i = 3; i <= nDays; i++) sheet.getColumn(i).width = 9; // Colonne C fino ad AH
+    for (let i = nDays; i <= nDays + 6; i++) sheet.getColumn(i).width = 9; // Colonne C fino ad AH
 
     // Allineamento per le prime 13 righe
     for (let c = 1; c <= nDays + 6; c++) {
@@ -296,7 +349,7 @@ function MonthExcelForm() {
 
     // Dopo aver creato tutte le righe, itera su di esse
     sheet.eachRow((row) => {
-      row.eachCell((cell) => {
+      row.eachCell({ includeEmpty: true }, (cell) => {
         cell.font = { ...cell.font, name: 'Arial', size: 10 };
       });
     });
