@@ -1,20 +1,33 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import Providers from "./providers";
+import "@/styles/globals.css";
+import { Metadata, Viewport } from "next";
+
+import { siteConfig } from "@/config/site";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "Cashly - Personal Finance Management",
-  description: "Track your income and expenses with ease",
+  title: {
+    default: siteConfig.name,
+    template: `%s`,
+  },
+  description: siteConfig.description,
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ],
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="manifest" href="/manifest.json" />
-      </head>
+    <html suppressHydrationWarning lang="en">
+      <head />
       <body>
-        <Providers>{children}</Providers>
+        <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>{children}</Providers>
       </body>
     </html>
   );

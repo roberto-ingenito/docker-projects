@@ -1,15 +1,41 @@
 "use client";
 
-import store from "@/lib/redux/store";
-import React from "react";
-import { Provider } from "react-redux";
-import { Toaster } from "sonner";
+import type { ThemeProviderProps } from "next-themes";
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+import * as React from "react";
+import { HeroUIProvider } from "@heroui/system";
+import { useRouter } from "next/navigation";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { ToastProvider } from "@heroui/toast";
+import { Provider as ReduxProvider } from "react-redux";
+import store from "@/lib/redux/store";
+
+export interface ProvidersProps {
+  children: React.ReactNode;
+  themeProps?: ThemeProviderProps;
+}
+
+declare module "@react-types/shared" {
+  interface RouterConfig {
+    routerOptions: NonNullable<Parameters<ReturnType<typeof useRouter>["push"]>[1]>;
+  }
+}
+
+export function Providers({ children, themeProps }: ProvidersProps) {
+  const router = useRouter();
+
   return (
-    <Provider store={store}>
-      {children}
-      <Toaster richColors position="top-right" closeButton />
-    </Provider>
+    <HeroUIProvider navigate={router.push}>
+      <ToastProvider
+        toastProps={{
+          timeout: 3000,
+          shouldShowTimeoutProgress: true,
+        }}
+        placement="top-right"
+      />
+      <NextThemesProvider {...themeProps}>
+        <ReduxProvider store={store}>{children}</ReduxProvider>
+      </NextThemesProvider>
+    </HeroUIProvider>
   );
 }

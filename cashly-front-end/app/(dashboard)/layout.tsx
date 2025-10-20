@@ -1,22 +1,22 @@
-"use client";
+import "@/styles/globals.css";
+import { Viewport } from "next";
+import clsx from "clsx";
 
-import React from "react";
-import MobileBottomNav from "./(components)/mobileBottomNav";
-import DesktopSidebar from "./(components)/desktopSideBar";
+import { fontSans } from "@/config/fonts";
+import { Navbar } from "@/components/navbar";
 
-export default function DashboardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ],
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="h-screen overflow-hidden bg-gray-50">
-      {/* Desktop Sidebar */}
-      <DesktopSidebar />
-
-      {/* Mobile Bottom Navigation */}
-      <MobileBottomNav />
-
-      {/* Main content */}
-      <main className="h-full overflow-y-auto lg:ml-72">
-        <div className="px-4 py-8 pb-24 sm:px-6 lg:px-8 lg:py-10 lg:pb-10">{children}</div>
-      </main>
+    <div className={clsx("min-h-screen text-foreground bg-background font-sans antialiased relative flex flex-col h-screen", fontSans.variable)}>
+      <Navbar />
+      <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">{children}</main>
     </div>
   );
 }
