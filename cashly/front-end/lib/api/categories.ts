@@ -1,12 +1,12 @@
 import { apiClient } from './client';
-import { Category, CategoryCreateDto } from '@/lib/types/category';
+import { CategoryCreateDto, CategoryResponseDto } from '@/lib/types/category';
 
-export const getCategories = async (): Promise<Category[]> => {
-    return apiClient.get<Category[]>('/api/Categories');
+export const getCategories = async (): Promise<CategoryResponseDto[]> => {
+    return apiClient.get<CategoryResponseDto[]>('/api/Categories');
 };
 
-export const createCategory = async (data: CategoryCreateDto): Promise<Category> => {
-    return apiClient.post<Category>('/api/Categories', data);
+export const createCategory = async (data: CategoryCreateDto): Promise<CategoryResponseDto> => {
+    return apiClient.post<CategoryResponseDto>('/api/Categories', data);
 };
 
 export const deleteCategory = async (categoryId: number): Promise<void> => {

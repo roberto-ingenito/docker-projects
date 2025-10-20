@@ -12,8 +12,16 @@ export interface CategoryCreateDto {
     colorHex?: string;
 }
 
+export interface CategoryResponseDto {
+    categoryId: number;
+    categoryName: string;
+    iconName?: string;
+    colorHex?: string;
+}
+
 export interface CategoriesState {
-    categories: Category[];
+    categories: CategoryResponseDto[];
     isLoading: boolean;
+    firstLoadDone: boolean;
     error: string | null;
 }
