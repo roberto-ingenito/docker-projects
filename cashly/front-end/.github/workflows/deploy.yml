@@ -1,0 +1,21 @@
+name: Deploy to Self-Hosted
+
+on:
+  push:
+    branches: [main, front-end]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy with Docker Compose
+        run: |
+          docker compose up --build -d
+
+      - name: Clean old images
+        run: |
+          docker image prune -f
