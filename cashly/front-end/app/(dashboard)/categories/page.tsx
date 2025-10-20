@@ -33,7 +33,7 @@ export default function CategoriesPage() {
 
   const [formData, setFormData] = useState<CategoryCreateDto>({
     categoryName: "",
-    iconName: "home",
+    iconName: "heart",
     colorHex: "#3B82F6",
   });
 
@@ -47,7 +47,7 @@ export default function CategoriesPage() {
     if (result.meta.requestStatus === "fulfilled") {
       setFormData({
         categoryName: "",
-        iconName: "home",
+        iconName: "heart",
         colorHex: "#3B82F6",
       });
       onOpenChange();
