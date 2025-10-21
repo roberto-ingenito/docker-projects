@@ -3,19 +3,55 @@ name: Deploy to Self-Hosted
 on:
   push:
     branches: [main, front-end]
+    paths:
+      - 'cashly/front-end/**'
+      - 'cashly/back-end/**'
+      - 'docker-compose.yml'
 
 jobs:
-  deploy:
+  check-changes:
     runs-on: self-hosted
-
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'cashly/front-end/**'
+            backend:
+              - 'cashly/back-end/**'
 
-      - name: Deploy with Docker Compose
+  deploy-frontend:
+    needs: check-changes
+    if: needs.check-changes.outputs.frontend == 'true'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy frontend
         run: |
-          docker compose up --build -d
+          docker compose up --build -d front-end
+      
+      - name: Clean old images
+        run: |
+          docker image prune -f
 
+  deploy-backend:
+    needs: check-changes
+    if: needs.check-changes.outputs.backend == 'true'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy backend
+        run: |
+          docker compose up --build -d back-end
+      
       - name: Clean old images
         run: |
           docker image prune -f
