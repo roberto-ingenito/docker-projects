@@ -39,7 +39,7 @@ export default function CategoriesPage() {
 
   useEffect(() => {
     if (!firstLoadDone) dispatch(getCategories());
-  }, [firstLoadDone]);
+  }, []);
 
   const handleCreateCategorySubmit = async (e: React.FormEvent) => {
     e.preventDefault();

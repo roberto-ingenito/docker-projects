@@ -19,6 +19,7 @@ class ApiClient {
         this.client.interceptors.request.use(
             async (config) => {
                 const token = await getJwtToken();
+
                 if (token) {
                     config.headers.Authorization = `Bearer ${token}`;
                 }

@@ -7,6 +7,10 @@ const PROTECTED_ROUTES = ['/dashboard', '/accounts', '/transactions', '/categori
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
+    if (pathname === "/") {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+
     // Check route type con un singolo controllo
     const isAuthPage = AUTH_ROUTES.some(route => pathname.startsWith(route));
     const isProtectedPage = PROTECTED_ROUTES.some(route => pathname.startsWith(route));
@@ -33,6 +37,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
+        '/',
         '/dashboard/:path*',
         '/accounts/:path*',
         '/transactions/:path*',
