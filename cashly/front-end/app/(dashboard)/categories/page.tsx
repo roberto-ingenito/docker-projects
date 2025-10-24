@@ -94,10 +94,10 @@ export default function CategoriesPage() {
             <CardBody className="py-20">
               <div className="text-center">
                 <TagIcon className="w-16 h-16 mx-auto text-default-300 mb-4" />
-                <h3 className="text-xl font-semibold text-default-600 mb-2">Nessuna categoria ancora</h3>
+                <h3 className="text-xl font-semibold text-default-600 mb-2">Nessuna categoria</h3>
                 <p className="text-default-500 mb-6">Crea la tua prima categoria per iniziare a organizzare le transazioni</p>
                 <Button color="primary" variant="flat" startContent={<PlusIcon className="w-5 h-5" />} onPress={onOpen}>
-                  Crea Prima Categoria
+                  Nuova Categoria
                 </Button>
               </div>
             </CardBody>
