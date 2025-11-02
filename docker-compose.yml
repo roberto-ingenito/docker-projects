@@ -4,10 +4,10 @@ services:
     container_name: cashly-nginx
     image: nginx:alpine
     ports:
-      - "80:80"       # Necessaria per Let's Encrypt
-      - "5000:5000"   # Porta per il frontend
-      - "5001:5001"   # Porta per il backend
-      - "5002:5002"   # Porta per fortil-excel-timesheet
+      - "80:80" # Necessaria per Let's Encrypt
+      - "5000:5000" # Porta per il frontend
+      - "5001:5001" # Porta per il backend
+      - "5002:5002" # Porta per fortil-excel-timesheet
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./nginx/certbot/conf:/etc/letsencrypt
@@ -19,7 +19,7 @@ services:
     networks:
       - common-network
     restart: always
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    command: '/bin/sh -c ''while :; do sleep 6h & wait 324138{!}; nginx -s reload; done & nginx -g "daemon off;"'''
 
   # Certbot per Let's Encrypt
   certbot:
@@ -30,7 +30,7 @@ services:
       - ./nginx/certbot/www:/var/www/certbot
     networks:
       - common-network
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait 324138{!}; done;'"
 
   back-end:
     image: cashly-back-end
@@ -53,8 +53,8 @@ services:
   db:
     container_name: cashly-db
     image: postgres:18rc1
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=Your_Password_123
@@ -94,6 +94,21 @@ services:
       - common-network
     restart: unless-stopped
 
+  github-runner:
+    image: myoung34/github-runner:latest
+    container_name: github-runner
+    environment:
+      - REPO_URL=https://github.com/roberto-ingenito/docker-projects
+      - RUNNER_NAME=docker-runner
+      - ACCESS_TOKEN=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
+      - RUNNER_WORKDIR=/tmp/runner/work
+      - RUNNER_GROUP=default
+      - LABELS=linux,docker,self-hosted
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - runner-data:/tmp/runner
+    restart: unless-stopped
+
 networks:
   common-network:
     driver: bridge
@@ -101,4 +116,5 @@ networks:
 volumes:
   postgres_data:
     name: cashly-db_postgres_data
-    external: true
+  runner-data:
+
