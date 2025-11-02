@@ -1,37 +1,55 @@
+version: "3.8"
+
 services:
-  # Nginx Reverse Proxy con SSL
-  nginx:
-    container_name: cashly-nginx
-    image: nginx:alpine
+  # Traefik Reverse Proxy con HTTPS automatico
+  traefik:
+    image: traefik:latest
+    container_name: cashly-traefik
+    command:
+      # API e Dashboard
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+
+      # Provider Docker
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=common-network"
+
+      # Entrypoints (una per ogni servizio)
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.frontend.address=:5000"
+      - "--entrypoints.backend.address=:5001"
+      - "--entrypoints.timesheet.address=:5002"
+
+      # Redirect HTTP -> HTTPS automatico solo per porta 80
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+
+      # Certificati Let's Encrypt
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=robe.ingenito@gmail.com
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      # - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"  # Decommentare per test
+
+      # Logs
+      - "--log.level=INFO"
+      - "--accesslog=true"
     ports:
-      - "80:80" # Necessaria per Let's Encrypt
-      - "5000:5000" # Porta per il frontend
-      - "5001:5001" # Porta per il backend
-      - "5002:5002" # Porta per fortil-excel-timesheet
+      - "80:80" # HTTP (redirect automatico a HTTPS)
+      - "443:443" # HTTPS principale
+      - "5000:5000" # Frontend
+      - "5001:5001" # Backend
+      - "5002:5002" # Timesheet
+      - "8080:8080" # Dashboard Traefik
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/certbot/conf:/etc/letsencrypt
-      - ./nginx/certbot/www:/var/www/certbot
-    depends_on:
-      - back-end
-      - front-end
-      - fortil-excel-timesheet
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik/letsencrypt:/letsencrypt"
     networks:
       - common-network
-    restart: always
-    command: '/bin/sh -c ''while :; do sleep 6h & wait 324138{!}; nginx -s reload; done & nginx -g "daemon off;"'''
+    restart: unless-stopped
 
-  # Certbot per Let's Encrypt
-  certbot:
-    container_name: cashly-certbot
-    image: certbot/certbot
-    volumes:
-      - ./nginx/certbot/conf:/etc/letsencrypt
-      - ./nginx/certbot/www:/var/www/certbot
-    networks:
-      - common-network
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait 324138{!}; done;'"
-
+  # Backend API
   back-end:
     image: cashly-back-end
     container_name: cashly-back-end
@@ -45,26 +63,36 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings:DefaultConnection=Server=db;Port=5432;Database=cashly_prod;User Id=user;Password=Your_Password_123;
     networks:
       - common-network
-    restart: always
+    restart: unless-stopped
+    labels:
+      # Abilita Traefik per questo servizio
+      - "traefik.enable=true"
 
+      # Router sulla porta 5001
+      - "traefik.http.routers.backend.rule=Host(`roberto-ingenito.ddns.net`)"
+      - "traefik.http.routers.backend.entrypoints=backend"
+      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
+
+      # Servizio
+      - "traefik.http.services.backend.loadbalancer.server.port=80"
+
+  # Database PostgreSQL
   db:
     container_name: cashly-db
-    image: postgres:18rc1
+    image: postgres:18-alpine3.22
     expose:
       - "5432"
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=Your_Password_123
-      - POSTGRES_DB=cashly_prod
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - common-network
-    restart: always
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
 
+  # Frontend Next.js
   front-end:
     build:
       context: ./cashly/front-end
@@ -80,8 +108,20 @@ services:
       - NEXT_PUBLIC_API_URL=https://roberto-ingenito.ddns.net:5001
     networks:
       - common-network
-    restart: always
+    restart: unless-stopped
+    labels:
+      # Abilita Traefik
+      - "traefik.enable=true"
 
+      # Router sulla porta 5000
+      - "traefik.http.routers.frontend.rule=Host(`roberto-ingenito.ddns.net`)"
+      - "traefik.http.routers.frontend.entrypoints=frontend"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+
+      # Servizio
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+
+  # Fortil Excel Timesheet
   fortil-excel-timesheet:
     build:
       context: ./fortil-excel-timesheet
@@ -93,21 +133,36 @@ services:
     networks:
       - common-network
     restart: unless-stopped
+    labels:
+      # Abilita Traefik
+      - "traefik.enable=true"
 
+      # Router sulla porta 5002
+      - "traefik.http.routers.timesheet.rule=Host(`roberto-ingenito.ddns.net`)"
+      - "traefik.http.routers.timesheet.entrypoints=timesheet"
+      - "traefik.http.routers.timesheet.tls.certresolver=letsencrypt"
+
+      # Servizio
+      - "traefik.http.services.timesheet.loadbalancer.server.port=5002"
+
+  # GitHub Actions Runner
   github-runner:
     image: myoung34/github-runner:latest
     container_name: github-runner
     environment:
       - REPO_URL=https://github.com/roberto-ingenito/docker-projects
       - RUNNER_NAME=docker-runner
-      - ACCESS_TOKEN=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
       - RUNNER_WORKDIR=/tmp/runner/work
       - RUNNER_GROUP=default
       - LABELS=linux,docker,self-hosted
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - runner-data:/tmp/runner
+    networks:
+      - common-network
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
 
 networks:
   common-network:
@@ -117,4 +172,3 @@ volumes:
   postgres_data:
     name: cashly-db_postgres_data
   runner-data:
-
