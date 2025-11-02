@@ -8,7 +8,8 @@ import { ThemeSwitch } from "./theme-switch";
 import { ArrowRightStartOnRectangleIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/lib/redux/hooks";
-import { logout } from "@/lib/redux/slices/authSlice";
+import * as authSlice from "@/lib/redux/slices/authSlice";
+import * as categoriesSlice from "@/lib/redux/slices/categoriesSlice";
 import { siteConfig } from "@/config/site";
 
 export const Navbar = () => {
@@ -19,8 +20,10 @@ export const Navbar = () => {
 
   const dispatch = useAppDispatch();
 
-  async function _logout() {
-    await dispatch(logout());
+  async function logout() {
+    await dispatch(authSlice.logout());
+    dispatch(categoriesSlice.clear())
+
     router.replace("/login");
   }
 
@@ -43,10 +46,9 @@ export const Navbar = () => {
                 href={item.href}
                 className={`
                   transition-all duration-150
-                  ${
-                    isActive
-                      ? "font-semibold border-b-2 border-primary pb-1"
-                      : "hover:text-primary hover:border-b-2 hover:border-primary/30 hover:pb-1"
+                  ${isActive
+                    ? "font-semibold border-b-2 border-primary pb-1"
+                    : "hover:text-primary hover:border-b-2 hover:border-primary/30 hover:pb-1"
                   }
                 `}>
                 {item.label}
@@ -61,7 +63,7 @@ export const Navbar = () => {
         <ArrowRightStartOnRectangleIcon
           strokeWidth={2}
           className="size-6 transition-opacity hover:opacity-80 cursor-pointer !text-default-500"
-          onClick={_logout}
+          onClick={logout}
         />
       </NavbarContent>
 

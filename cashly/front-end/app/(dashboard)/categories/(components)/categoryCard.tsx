@@ -28,7 +28,7 @@ export default function CategoryCard({
 
   return (
     <>
-      <Card className="border-2 border-default-200 hover:border-primary transition-colors">
+      <Card className="border-2 border-default-300 hover:border-primary transition-colors">
         <CardBody className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 flex-1">
