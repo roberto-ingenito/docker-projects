@@ -1,7 +1,5 @@
-version: "3.8"
-
 services:
-  # Traefik Reverse Proxy con HTTPS automatico
+  # Traefik Reverse Proxy con SSL automatico
   traefik:
     image: traefik:latest
     container_name: cashly-traefik
@@ -9,91 +7,78 @@ services:
       # API e Dashboard
       - "--api.dashboard=true"
       - "--api.insecure=true"
-
       # Provider Docker
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=common-network"
-
-      # Entrypoints (una per ogni servizio)
+      # Entrypoints
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.frontend.address=:5000"
       - "--entrypoints.backend.address=:5001"
       - "--entrypoints.timesheet.address=:5002"
-
-      # Redirect HTTP -> HTTPS automatico solo per porta 80
-      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
-
       # Certificati Let's Encrypt
-      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.email=robe.ingenito@gmail.com
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.email=robe.ingenito@gmail.com"
       - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
-      # - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"  # Decommentare per test
-
-      # Logs
-      - "--log.level=INFO"
-      - "--accesslog=true"
+      # Redirect HTTP to HTTPS
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
     ports:
-      - "80:80" # HTTP (redirect automatico a HTTPS)
-      - "443:443" # HTTPS principale
-      - "5000:5000" # Frontend
-      - "5001:5001" # Backend
-      - "5002:5002" # Timesheet
+      - "80:80"
+      - "443:443"
+      - "5000:5000"
+      - "5001:5001"
+      - "5002:5002"
       - "8080:8080" # Dashboard Traefik
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./traefik/letsencrypt:/letsencrypt"
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-certificates:/letsencrypt
     networks:
       - common-network
-    restart: unless-stopped
+    restart: always
 
-  # Backend API
-  back-end:
-    image: cashly-back-end
-    container_name: cashly-back-end
+  cashly-back-end:
     build:
       context: ./cashly/back-end
       dockerfile: dockerfile
+    image: cashly-back-end
+    container_name: cashly-back-end
     expose:
       - "80"
     depends_on:
-      - db
+      - cashly-database
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
-    networks:
-      - common-network
-    restart: unless-stopped
+      - ConnectionStrings__DefaultConnection=Host=cashly-database;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
     labels:
-      # Abilita Traefik per questo servizio
       - "traefik.enable=true"
-
-      # Router sulla porta 5001
       - "traefik.http.routers.backend.rule=Host(`roberto-ingenito.ddns.net`)"
       - "traefik.http.routers.backend.entrypoints=backend"
+      - "traefik.http.routers.backend.tls=true"
       - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
-
-      # Servizio
       - "traefik.http.services.backend.loadbalancer.server.port=80"
+    networks:
+      - common-network
+    restart: always
 
-  # Database PostgreSQL
-  db:
-    container_name: cashly-db
+  cashly-database:
+    container_name: cashly-database
     image: postgres:18-alpine3.22
     expose:
       - "5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - common-network
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
+    restart: always
 
-  # Frontend Next.js
-  front-end:
+  cashly-front-end:
     build:
       context: ./cashly/front-end
       dockerfile: Dockerfile
@@ -106,22 +91,17 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=https://roberto-ingenito.ddns.net:5001
-    networks:
-      - common-network
-    restart: unless-stopped
     labels:
-      # Abilita Traefik
       - "traefik.enable=true"
-
-      # Router sulla porta 5000
       - "traefik.http.routers.frontend.rule=Host(`roberto-ingenito.ddns.net`)"
       - "traefik.http.routers.frontend.entrypoints=frontend"
+      - "traefik.http.routers.frontend.tls=true"
       - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
-
-      # Servizio
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+    networks:
+      - common-network
+    restart: always
 
-  # Fortil Excel Timesheet
   fortil-excel-timesheet:
     build:
       context: ./fortil-excel-timesheet
@@ -130,39 +110,31 @@ services:
     container_name: fortil-excel-timesheet-app
     expose:
       - "5002"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.timesheet.rule=Host(`roberto-ingenito.ddns.net`)"
+      - "traefik.http.routers.timesheet.entrypoints=timesheet"
+      - "traefik.http.routers.timesheet.tls=true"
+      - "traefik.http.routers.timesheet.tls.certresolver=letsencrypt"
+      - "traefik.http.services.timesheet.loadbalancer.server.port=5002"
     networks:
       - common-network
     restart: unless-stopped
-    labels:
-      # Abilita Traefik
-      - "traefik.enable=true"
 
-      # Router sulla porta 5002
-      - "traefik.http.routers.timesheet.rule=Host(`roberto-ingenito.ddns.net`)"
-      - "traefik.http.routers.timesheet.entrypoints=timesheet"
-      - "traefik.http.routers.timesheet.tls.certresolver=letsencrypt"
-
-      # Servizio
-      - "traefik.http.services.timesheet.loadbalancer.server.port=5002"
-
-  # GitHub Actions Runner
   github-runner:
     image: myoung34/github-runner:latest
     container_name: github-runner
     environment:
       - REPO_URL=https://github.com/roberto-ingenito/docker-projects
       - RUNNER_NAME=docker-runner
+      - ACCESS_TOKEN=${GITHUB_TOKEN}
       - RUNNER_WORKDIR=/tmp/runner/work
       - RUNNER_GROUP=default
       - LABELS=linux,docker,self-hosted
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - runner-data:/tmp/runner
-    networks:
-      - common-network
     restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
 
 networks:
   common-network:
@@ -172,3 +144,4 @@ volumes:
   postgres_data:
     name: cashly-db_postgres_data
   runner-data:
+  traefik-certificates:
