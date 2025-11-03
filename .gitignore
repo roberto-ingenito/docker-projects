@@ -1,0 +1,8 @@
+# File: .gitignore
+
+# Certificati SSL e chiavi private
+nginx/certbot/conf/
+
+# Environment files
+.env
+*.env

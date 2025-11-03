@@ -1,41 +1,32 @@
 services:
-  # Traefik Reverse Proxy con SSL automatico
-  traefik:
-    image: traefik:latest
-    container_name: cashly-traefik
-    command:
-      # API e Dashboard
-      - "--api.dashboard=true"
-      - "--api.insecure=true"
-      # Provider Docker
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      # Entrypoints
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.frontend.address=:5000"
-      - "--entrypoints.backend.address=:5001"
-      - "--entrypoints.timesheet.address=:5002"
-      # Certificati Let's Encrypt
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.letsencrypt.acme.email=robe.ingenito@gmail.com"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
-      # Redirect HTTP to HTTPS
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+  nginx:
+    image: nginx:alpine
+    container_name: cashly-nginx
     ports:
       - "80:80"
       - "443:443"
       - "5000:5000"
       - "5001:5001"
       - "5002:5002"
-      - "8080:8080" # Dashboard Traefik
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - traefik-certificates:/letsencrypt
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/certbot/conf:/etc/letsencrypt:ro
+      - ./nginx/certbot/www:/var/www/certbot:ro
     networks:
       - common-network
+    restart: always
+    depends_on:
+      - cashly-back-end
+      - cashly-front-end
+      - fortil-excel-timesheet
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./nginx/certbot/conf:/etc/letsencrypt
+      - ./nginx/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     restart: always
 
   cashly-back-end:
@@ -52,13 +43,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Host=cashly-database;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`roberto-ingenito.ddns.net`)"
-      - "traefik.http.routers.backend.entrypoints=backend"
-      - "traefik.http.routers.backend.tls=true"
-      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
-      - "traefik.http.services.backend.loadbalancer.server.port=80"
     networks:
       - common-network
     restart: always
@@ -91,13 +75,6 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=https://roberto-ingenito.ddns.net:5001
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`roberto-ingenito.ddns.net`)"
-      - "traefik.http.routers.frontend.entrypoints=frontend"
-      - "traefik.http.routers.frontend.tls=true"
-      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
-      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
     networks:
       - common-network
     restart: always
@@ -110,13 +87,6 @@ services:
     container_name: fortil-excel-timesheet-app
     expose:
       - "5002"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.timesheet.rule=Host(`roberto-ingenito.ddns.net`)"
-      - "traefik.http.routers.timesheet.entrypoints=timesheet"
-      - "traefik.http.routers.timesheet.tls=true"
-      - "traefik.http.routers.timesheet.tls.certresolver=letsencrypt"
-      - "traefik.http.services.timesheet.loadbalancer.server.port=5002"
     networks:
       - common-network
     restart: unless-stopped
@@ -144,4 +114,3 @@ volumes:
   postgres_data:
     name: cashly-db_postgres_data
   runner-data:
-  traefik-certificates:
