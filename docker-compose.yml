@@ -97,7 +97,7 @@ services:
     environment:
       - REPO_URL=https://github.com/roberto-ingenito/docker-projects
       - RUNNER_NAME=docker-runner
-      - ACCESS_TOKEN=${GITHUB_TOKEN}
+      - RUNNER_TOKEN=${RUNNER_TOKEN}
       - RUNNER_WORKDIR=/tmp/runner/work
       - RUNNER_GROUP=default
       - LABELS=linux,docker,self-hosted
