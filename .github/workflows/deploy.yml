@@ -35,7 +35,7 @@ jobs:
       
       - name: Deploy frontend
         run: |
-          docker compose up --build -d front-end
+          docker compose up --build -d cashly-front-end
       
       - name: Clean old images
         run: |
@@ -50,7 +50,7 @@ jobs:
       
       - name: Deploy backend
         run: |
-          docker compose up --build -d back-end
+          docker compose up --build -d cashly-back-end
       
       - name: Clean old images
         run: |
