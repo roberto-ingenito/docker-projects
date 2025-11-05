@@ -1,4 +1,4 @@
-name: Deploy to Self-Hosted
+name: Self-Hosted Workflow
 
 on:
   push:
