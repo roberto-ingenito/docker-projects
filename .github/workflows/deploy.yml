@@ -6,6 +6,7 @@ on:
     paths:
       - 'cashly/front-end/**'
       - 'cashly/back-end/**'
+      - 'nginx/**'
       - 'docker-compose.yml'
 
 jobs:
@@ -14,6 +15,7 @@ jobs:
     outputs:
       frontend: ${{ steps.filter.outputs.frontend }}
       backend: ${{ steps.filter.outputs.backend }}
+      nginx: ${{ steps.filter.outputs.nginx }}
     steps:
       - uses: actions/checkout@v4
       
@@ -25,6 +27,8 @@ jobs:
               - 'cashly/front-end/**'
             backend:
               - 'cashly/back-end/**'
+            nginx:
+              - 'nginx/**'
 
   deploy-frontend:
     needs: check-changes
@@ -35,7 +39,8 @@ jobs:
       
       - name: Deploy frontend
         run: |
-          docker compose up --build --no-cache -d cashly-front-end
+          docker compose build --no-cache cashly-front-end
+          docker compose up -d cashly-front-end
       
       - name: Clean old images
         run: |
@@ -50,8 +55,20 @@ jobs:
       
       - name: Deploy backend
         run: |
-          docker compose up --build --no-cache -d cashly-back-end
+          docker compose build --no-cache cashly-back-end
+          docker compose up -d cashly-back-end
       
       - name: Clean old images
         run: |
           docker image prune -f
+
+  deploy-nginx:
+    needs: check-changes
+    if: needs.check-changes.outputs.nginx == 'true'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Restart nginx
+        run: |
+          docker compose restart nginx
