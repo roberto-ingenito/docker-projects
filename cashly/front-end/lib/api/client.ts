@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosError } from 'axios';
 import { ApiError } from '@/lib/types/api';
 import { getJwtToken } from '@/app/actions';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://roberto-ingenito.ddns.net:5001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 class ApiClient {
     private client: AxiosInstance;

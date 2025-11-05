@@ -6,3 +6,6 @@ nginx/certbot/conf/
 # Environment files
 .env
 *.env
+
+# GitHub self-hosted runner files
+actions-runner/

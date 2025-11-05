@@ -4,14 +4,19 @@ import { getJwtToken } from './app/actions';
 const AUTH_ROUTES = ['/login', '/signup'];
 const PROTECTED_ROUTES = ['/dashboard', '/accounts', '/transactions', '/categories'];
 
+// Ottieni il basePath dalla configurazione
+const BASE_PATH = '/cashly';
+
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
+    // Redirect da root a dashboard
     if (pathname === "/") {
-        return NextResponse.redirect(new URL('/dashboard', request.url));
+        const url = new URL(`${BASE_PATH}/dashboard`, request.url);
+        return NextResponse.redirect(url);
     }
 
-    // Check route type con un singolo controllo
+    // Check route type
     const isAuthPage = AUTH_ROUTES.some(route => pathname.startsWith(route));
     const isProtectedPage = PROTECTED_ROUTES.some(route => pathname.startsWith(route));
 
@@ -24,12 +29,14 @@ export async function middleware(request: NextRequest) {
 
     // Redirect non autenticati dalle pagine protette
     if (!token && isProtectedPage) {
-        return NextResponse.redirect(new URL('/login', request.url));
+        const url = new URL(`${BASE_PATH}/login`, request.url);
+        return NextResponse.redirect(url);
     }
 
     // Redirect autenticati dalle pagine di auth
     if (token && isAuthPage) {
-        return NextResponse.redirect(new URL('/dashboard', request.url));
+        const url = new URL(`${BASE_PATH}/dashboard`, request.url);
+        return NextResponse.redirect(url);
     }
 
     return NextResponse.next();
