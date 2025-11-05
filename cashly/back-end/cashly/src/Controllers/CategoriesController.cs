@@ -8,7 +8,7 @@ namespace cashly.src.Controllers;
 
 [ApiController]
 [Authorize]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class CategoriesController(ICategoryService categoryService) : ControllerBase
 {
     [HttpDelete("{categoryId}")]

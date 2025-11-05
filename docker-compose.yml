@@ -1,83 +1,77 @@
 services:
-  # Nginx Reverse Proxy con SSL
   nginx:
-    container_name: cashly-nginx
     image: nginx:alpine
+    container_name: cashly-nginx
     ports:
-      - "80:80"       # Necessaria per Let's Encrypt
-      - "5000:5000"   # Porta per il frontend
-      - "5001:5001"   # Porta per il backend
-      - "5002:5002"   # Porta per fortil-excel-timesheet
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/certbot/conf:/etc/letsencrypt
-      - ./nginx/certbot/www:/var/www/certbot
-    depends_on:
-      - back-end
-      - front-end
-      - fortil-excel-timesheet
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/certbot/conf:/etc/letsencrypt:ro
+      - ./nginx/certbot/www:/var/www/certbot:ro
     networks:
       - common-network
     restart: always
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    depends_on:
+      - cashly-back-end
+      - cashly-front-end
+      - fortil-excel-timesheet
 
-  # Certbot per Let's Encrypt
   certbot:
-    container_name: cashly-certbot
     image: certbot/certbot
+    container_name: certbot
     volumes:
       - ./nginx/certbot/conf:/etc/letsencrypt
       - ./nginx/certbot/www:/var/www/certbot
-    networks:
-      - common-network
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    restart: always
 
-  back-end:
-    image: cashly-back-end
-    container_name: cashly-back-end
+  cashly-back-end:
     build:
       context: ./cashly/back-end
       dockerfile: dockerfile
+    image: cashly-back-end
+    container_name: cashly-back-end
     expose:
       - "80"
     depends_on:
-      - db
+      - cashly-database
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings:DefaultConnection=Server=db;Port=5432;Database=cashly_prod;User Id=user;Password=Your_Password_123;
+      - ConnectionStrings__DefaultConnection=Host=cashly-database;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
     networks:
       - common-network
     restart: always
 
-  db:
-    container_name: cashly-db
-    image: postgres:18rc1
+  cashly-database:
+    container_name: cashly-database
+    image: postgres:18-alpine3.22
     expose:
       - "5432"
     environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=Your_Password_123
-      - POSTGRES_DB=cashly_prod
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - common-network
     restart: always
 
-  front-end:
+  cashly-front-end:
     build:
       context: ./cashly/front-end
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=https://roberto-ingenito.ddns.net:5001
+        - NEXT_PUBLIC_API_URL=https://roberto-ingenito.ddns.net/api
     image: cashly-front-end
     container_name: cashly-front-end
     expose:
       - "3000"
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=https://roberto-ingenito.ddns.net:5001
+      - NEXT_PUBLIC_API_URL=https://roberto-ingenito.ddns.net/api
     networks:
       - common-network
     restart: always

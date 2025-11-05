@@ -1,0 +1,86 @@
+name: Self-Hosted Workflow
+
+on:
+  push:
+    branches: [main, front-end]
+    paths:
+      - 'cashly/front-end/**'
+      - 'cashly/back-end/**'
+      - 'nginx/**'
+      - 'docker-compose.yml'
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Service to deploy'
+        required: true
+        type: choice
+        options:
+          - all
+          - frontend
+          - backend
+          - nginx
+
+jobs:
+  check-changes:
+    runs-on: self-hosted
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend || github.event.inputs.service == 'frontend' || github.event.inputs.service == 'all' }}
+      backend: ${{ steps.filter.outputs.backend || github.event.inputs.service == 'backend' || github.event.inputs.service == 'all' }}
+      nginx: ${{ steps.filter.outputs.nginx || github.event.inputs.service == 'nginx' || github.event.inputs.service == 'all' }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: dorny/paths-filter@v3
+        id: filter
+        if: github.event_name == 'push'
+        with:
+          filters: |
+            frontend:
+              - 'cashly/front-end/**'
+            backend:
+              - 'cashly/back-end/**'
+            nginx:
+              - 'nginx/**'
+
+  deploy-frontend:
+    needs: check-changes
+    if: needs.check-changes.outputs.frontend == 'true'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy frontend
+        run: |
+          docker compose build --no-cache cashly-front-end
+          docker compose up -d cashly-front-end
+      
+      - name: Clean old images
+        run: |
+          docker image prune -f
+
+  deploy-backend:
+    needs: check-changes
+    if: needs.check-changes.outputs.backend == 'true'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy backend
+        run: |
+          docker compose build --no-cache cashly-back-end
+          docker compose up -d cashly-back-end
+      
+      - name: Clean old images
+        run: |
+          docker image prune -f
+
+  deploy-nginx:
+    needs: check-changes
+    if: needs.check-changes.outputs.nginx == 'true'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Restart nginx
+        run: |
+          docker compose restart nginx

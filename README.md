@@ -1,0 +1,1 @@
+[How to configure github-actions self-hosted](https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners/add-runners#adding-a-self-hosted-runner-to-a-repository)
