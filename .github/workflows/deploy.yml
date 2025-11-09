@@ -4,14 +4,15 @@ on:
   push:
     branches: [main, front-end]
     paths:
-      - 'cashly/front-end/**'
-      - 'cashly/back-end/**'
-      - 'nginx/**'
-      - 'docker-compose.yml'
+      - "cashly/front-end/**"
+      - "cashly/back-end/**"
+      - "nginx/**"
+      - "fortil-excel-timesheet/**"
+      - "prompt-builder/**"
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to deploy'
+        description: "Service to deploy"
         required: true
         type: choice
         options:
@@ -19,6 +20,8 @@ on:
           - frontend
           - backend
           - nginx
+          - fortil-excel-timesheet
+          - prompt-builder
 
 jobs:
   check-changes:
@@ -27,9 +30,11 @@ jobs:
       frontend: ${{ steps.filter.outputs.frontend || github.event.inputs.service == 'frontend' || github.event.inputs.service == 'all' }}
       backend: ${{ steps.filter.outputs.backend || github.event.inputs.service == 'backend' || github.event.inputs.service == 'all' }}
       nginx: ${{ steps.filter.outputs.nginx || github.event.inputs.service == 'nginx' || github.event.inputs.service == 'all' }}
+      fortil_timesheet: ${{ steps.filter.outputs.fortil_timesheet || github.event.inputs.service == 'fortil-excel-timesheet' || github.event.inputs.service == 'all' }}
+      prompt_builder: ${{ steps.filter.outputs.prompt_builder || github.event.inputs.service == 'prompt-builder' || github.event.inputs.service == 'all' }}
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: dorny/paths-filter@v3
         id: filter
         if: github.event_name == 'push'
@@ -41,6 +46,10 @@ jobs:
               - 'cashly/back-end/**'
             nginx:
               - 'nginx/**'
+            fortil_timesheet:
+              - 'fortil-excel-timesheet/**'
+            prompt_builder:
+              - 'prompt-builder/**'
 
   deploy-frontend:
     needs: check-changes
@@ -48,12 +57,12 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Deploy frontend
         run: |
           docker compose build --no-cache cashly-front-end
           docker compose up -d cashly-front-end
-      
+
       - name: Clean old images
         run: |
           docker image prune -f
@@ -64,12 +73,12 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Deploy backend
         run: |
           docker compose build --no-cache cashly-back-end
           docker compose up -d cashly-back-end
-      
+
       - name: Clean old images
         run: |
           docker image prune -f
@@ -80,7 +89,39 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Restart nginx
         run: |
           docker compose restart nginx
+
+  deploy-fortil-timesheet:
+    needs: check-changes
+    if: needs.check-changes.outputs.fortil_timesheet == 'true'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy fortil-excel-timesheet
+        run: |
+          docker compose build --no-cache fortil-excel-timesheet
+          docker compose up -d fortil-excel-timesheet
+
+      - name: Clean old images
+        run: |
+          docker image prune -f
+
+  deploy-prompt-builder:
+    needs: check-changes
+    if: needs.check-changes.outputs.prompt_builder == 'true'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy prompt-builder
+        run: |
+          docker compose build --no-cache prompt-builder
+          docker compose up -d prompt-builder
+
+      - name: Clean old images
+        run: |
+          docker image prune -f
