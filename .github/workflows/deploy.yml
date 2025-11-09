@@ -2,7 +2,7 @@ name: Self-Hosted Workflow
 
 on:
   push:
-    branches: [main, front-end]
+    branches: [main]
     paths:
       - "cashly/front-end/**"
       - "cashly/back-end/**"
