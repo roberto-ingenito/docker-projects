@@ -76,6 +76,9 @@ jobs:
 
       - name: Deploy backend
         run: |
+          set -a
+          source /home/ingenitor/docker-projects/.env
+          set +a
           docker compose build --no-cache cashly-back-end
           docker compose up -d cashly-back-end
 
