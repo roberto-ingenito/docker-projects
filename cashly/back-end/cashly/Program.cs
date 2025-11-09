@@ -66,7 +66,6 @@ builder.Services.AddDbContext<AppDbContext>(
 
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 
 // Aggiungi i controller
@@ -117,8 +116,8 @@ app.UsePathBase("/api");
 // ===================================
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | 
-                       ForwardedHeaders.XForwardedProto | 
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+                       ForwardedHeaders.XForwardedProto |
                        ForwardedHeaders.XForwardedHost,
     // Accetta headers da qualsiasi proxy (dato che siamo in Docker network)
     KnownProxies = { },
@@ -133,10 +132,10 @@ app.UseSwagger(c =>
     // Personalizza il path e il server URL per Swagger
     c.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
     {
-        swaggerDoc.Servers = new List<OpenApiServer> 
-        { 
-            new OpenApiServer 
-            { 
+        swaggerDoc.Servers = new List<OpenApiServer>
+        {
+            new OpenApiServer
+            {
                 Url = $"{httpReq.Scheme}://{httpReq.Host.Value}/api",
                 Description = "API Server"
             }

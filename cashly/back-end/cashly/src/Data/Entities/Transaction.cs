@@ -20,11 +20,11 @@ public class Transaction
     [MaxLength(500)]
     public string? Description { get; set; } // Nullable, quindi opzionale
 
-    // Foreign Key per il conto
-    public int AccountId { get; set; }
-    public virtual Account Account { get; set; } = null!;
-
     // Foreign Key per la categoria
     public int? CategoryId { get; set; }
     public virtual Category? Category { get; set; }
+
+    // Foreign Key per l'utente
+    public int UserId { get; set; }
+    public virtual User User { get; set; } = null!;
 }

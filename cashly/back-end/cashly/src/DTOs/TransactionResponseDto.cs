@@ -9,6 +9,5 @@ public class TransactionResponseDto
     public TransactionType Type { get; set; }
     public DateTime TransactionDate { get; set; }
     public string? Description { get; set; }
-    public int AccountId { get; set; }
     public CategoryResponseDto? Category { get; set; }
 }
