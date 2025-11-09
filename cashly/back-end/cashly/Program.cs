@@ -16,14 +16,17 @@ var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
 
 // ===================================
-// CORS - Aggiornato per il nuovo dominio
+// CORS
 // ===================================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
         policy =>
         {
-            policy.WithOrigins("https://roberto-ingenito.ddns.net")
+            policy.WithOrigins(
+                    "https://roberto-ingenito.ddns.net",
+                    "http://192.168.1.21" // IP fisso del mio PC desktop
+                )
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials(); // Importante per JWT cookies/auth
