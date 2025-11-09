@@ -18,7 +18,7 @@ RUN npm install -g serve
 
 COPY --from=builder /app/dist ./dist
 
-EXPOSE 5002
+EXPOSE 3000
 
 # Aggiungi --no-port-switching e specifica l'host 0.0.0.0
-CMD ["serve", "-s", "dist", "-p", "5002", "--no-port-switching"]
+CMD ["serve", "-s", "dist", "-p", "3000", "--no-port-switching"]

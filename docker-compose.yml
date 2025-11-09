@@ -89,7 +89,19 @@ services:
     image: fortil-excel-timesheet
     container_name: fortil-excel-timesheet-app
     expose:
-      - "5002"
+      - "3000"
+    networks:
+      - common-network
+    restart: unless-stopped
+
+  prompt-builder:
+    build:
+      context: ./prompt-builder
+      dockerfile: Dockerfile
+    image: prompt-builder
+    container_name: prompt-builder-app
+    expose:
+      - "3000"
     networks:
       - common-network
     restart: unless-stopped

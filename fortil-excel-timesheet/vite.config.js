@@ -6,13 +6,13 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   preview: {
-    port: 5002,
+    port: 3000,
     strictPort: true,
   },
   server: {
-    port: 5002,
+    port: 3000,
     strictPort: true,
     host: true,
-    origin: "http://0.0.0.0:5002",
+    origin: "http://0.0.0.0:3000",
   },
 })
