@@ -5,10 +5,12 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  base: '/timesheet/',
   preview: {
     port: 3000,
     strictPort: true,
   },
+  // Server dev (opzionale, per sviluppo locale)
   server: {
     port: 3000,
     strictPort: true,

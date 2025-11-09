@@ -8,7 +8,7 @@ namespace cashly.src.Controllers;
 
 [ApiController]
 [AllowAnonymous]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class UsersController(IUserService userService) : ControllerBase
 {
     [HttpPost("signup")]

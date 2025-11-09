@@ -9,7 +9,7 @@ namespace cashly.src.Controllers;
 
 [ApiController]
 [Authorize]
-[Route("api/Accounts/{accountId}/[controller]")] // <-- Rotta annidata
+[Route("Accounts/{accountId}/[controller]")] // <-- Rotta annidata
 public class TransactionsController(ITransactionService transactionService) : ControllerBase
 {
     [HttpPost]
