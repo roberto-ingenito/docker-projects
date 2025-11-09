@@ -25,7 +25,7 @@ builder.Services.AddCors(options =>
         {
             policy.WithOrigins(
                     "https://roberto-ingenito.ddns.net",
-                    "http://192.168.1.21" // IP fisso del mio PC desktop
+                    "http://192.168.1.21:3000" // IP fisso del mio PC desktop
                 )
                 .AllowAnyHeader()
                 .AllowAnyMethod()
