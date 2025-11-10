@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace cashly.src.Data.Entities;
 
@@ -14,9 +15,16 @@ public class User
     [Required]
     public required string HashedPassword { get; set; }
 
+    // Questo è il saldo che verrà aggiornato dalla tua logica di business
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal CurrentBalance { get; set; } = 0;
+
+    [MaxLength(10)]
+    public string Currency { get; set; } = "EUR";
+
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    // Navigation properties: un utente ha una collezione di conti e categorie
-    public virtual ICollection<Account> Accounts { get; set; } = [];
+    public virtual ICollection<Transaction> Transactions { get; set; } = [];
     public virtual ICollection<Category> Categories { get; set; } = [];
 }

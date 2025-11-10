@@ -8,7 +8,7 @@ namespace cashly.src.Services.Implementations;
 
 public class TransactionService(AppDbContext context) : ITransactionService
 {
-    public async Task<Transaction> CreateTransactionAsync(int accountId, TransactionCreateDto transactionDto, int userId)
+    public async Task<Transaction> CreateTransactionAsync(TransactionCreateDto transactionDto, int userId)
     {
         // 1. Ottieni la strategia di esecuzione dal DbContext
         var strategy = context.Database.CreateExecutionStrategy();
@@ -22,15 +22,7 @@ public class TransactionService(AppDbContext context) : ITransactionService
             try
             {
                 // 1. Controlla che il conto esista e appartenga all'utente
-                Account? account = await context.Accounts.Where(a => a.AccountId == accountId).SingleOrDefaultAsync();
-                if (account == null)
-                {
-                    throw new InvalidOperationException("account-not-found");
-                }
-                else if (account.UserId != userId)
-                {
-                    throw new InvalidOperationException("not-account-owner");
-                }
+                User? user = await context.Users.Where(u => u.UserId == userId).SingleOrDefaultAsync() ?? throw new InvalidOperationException("user-not-found");
 
                 // 2. Crea la nuova entità Transaction
                 Transaction newTransaction = new()
@@ -39,18 +31,17 @@ public class TransactionService(AppDbContext context) : ITransactionService
                     Type = transactionDto.Type,
                     TransactionDate = transactionDto.TransactionDate.ToUniversalTime(),
                     Description = transactionDto.Description,
-                    AccountId = accountId,
                     CategoryId = transactionDto.CategoryId
                 };
 
-                // 3. Aggiorna il saldo del conto in base al tipo di transazione
+                // 3. Aggiorna il saldo
                 switch (newTransaction.Type)
                 {
                     case TransactionType.income:
-                        account.CurrentBalance += newTransaction.Amount;
+                        user.CurrentBalance += newTransaction.Amount;
                         break;
                     case TransactionType.expense:
-                        account.CurrentBalance -= newTransaction.Amount;
+                        user.CurrentBalance -= newTransaction.Amount;
                         break;
                 }
 
@@ -72,22 +63,11 @@ public class TransactionService(AppDbContext context) : ITransactionService
         });
     }
 
-    public async Task<IEnumerable<Transaction>> GetTransactionsByAccountIdAsync(int accountId, int userId)
+    public async Task<IEnumerable<Transaction>> GetTransactionsByUserIdAsync(int userId)
     {
-        // Verifica che l'utente abbia accesso al conto prima di restituire le transazioni
-        Account? account = await context.Accounts.Where(a => a.AccountId == accountId).SingleOrDefaultAsync();
-        if (account == null)
-        {
-            throw new InvalidOperationException("account-not-found");
-        }
-        else if (account.UserId != userId)
-        {
-            throw new InvalidOperationException("not-account-owner");
-        }
-
         return await context.Transactions
             .Include(t => t.Category) // Includi i dati della categoria
-            .Where(t => t.AccountId == accountId)
+            .Where(t => t.UserId == userId)
             .OrderByDescending(t => t.TransactionDate)
             .ToListAsync();
     }

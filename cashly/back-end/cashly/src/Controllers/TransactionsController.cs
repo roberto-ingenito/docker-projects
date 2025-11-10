@@ -9,18 +9,18 @@ namespace cashly.src.Controllers;
 
 [ApiController]
 [Authorize]
-[Route("Accounts/{accountId}/[controller]")] // <-- Rotta annidata
+[Route("[controller]")]
 public class TransactionsController(ITransactionService transactionService) : ControllerBase
 {
     [HttpPost]
-    public async Task<ActionResult<Transaction>> CreateTransaction(int accountId, [FromBody] TransactionCreateDto createTransactionDto)
+    public async Task<ActionResult<Transaction>> CreateTransaction([FromBody] TransactionCreateDto createTransactionDto)
     {
         var userId = User.GetUserId();
         Transaction newTransaction;
 
         try
         {
-            newTransaction = await transactionService.CreateTransactionAsync(accountId, createTransactionDto, userId);
+            newTransaction = await transactionService.CreateTransactionAsync(createTransactionDto, userId);
         }
         catch (Exception e)
         {
@@ -31,7 +31,7 @@ public class TransactionsController(ITransactionService transactionService) : Co
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TransactionResponseDto>>> GetTransactions(int accountId)
+    public async Task<ActionResult<IEnumerable<TransactionResponseDto>>> GetTransactions()
     {
         var userId = User.GetUserId();
 
@@ -39,7 +39,7 @@ public class TransactionsController(ITransactionService transactionService) : Co
 
         try
         {
-            transactions = await transactionService.GetTransactionsByAccountIdAsync(accountId, userId);
+            transactions = await transactionService.GetTransactionsByUserIdAsync(userId);
         }
         catch (Exception e)
         {

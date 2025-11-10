@@ -26,21 +26,7 @@ public static class MappingExtensions
             Type = value.Type,
             TransactionDate = value.TransactionDate,
             Description = value.Description,
-            AccountId = value.AccountId,
             Category = value.Category?.ToDto(),
-        };
-    }
-
-
-    public static AccountResponseDto ToDto(this Account value)
-    {
-        return new AccountResponseDto
-        {
-            AccountId = value.AccountId,
-            AccountName = value.AccountName,
-            CurrentBalance = value.CurrentBalance,
-            Currency = value.Currency,
-            CreatedAt = value.CreatedAt
         };
     }
 
