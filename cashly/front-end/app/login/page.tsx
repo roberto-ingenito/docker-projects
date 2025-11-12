@@ -12,7 +12,6 @@ import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
-import { ThemeSwitch } from "@/components/theme-switch";
 
 export default function LoginPage() {
   const router = useRouter();

@@ -2,7 +2,7 @@
 
 import { Navbar as HeroUINavbar, NavbarContent, NavbarMenu, NavbarMenuToggle, NavbarBrand, NavbarItem, NavbarMenuItem } from "@heroui/navbar";
 import { Link } from "@heroui/link";
-import React, { useState } from "react";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { ThemeSwitch } from "./theme-switch";
 import { ArrowRightStartOnRectangleIcon } from "@heroicons/react/24/outline";
@@ -22,7 +22,7 @@ export const Navbar = () => {
 
   async function logout() {
     await dispatch(authSlice.logout());
-    dispatch(categoriesSlice.clear())
+    dispatch(categoriesSlice.clear());
 
     router.replace("/login");
   }
@@ -46,9 +46,10 @@ export const Navbar = () => {
                 href={item.href}
                 className={`
                   transition-all duration-150
-                  ${isActive
-                    ? "font-semibold border-b-2 border-primary pb-1"
-                    : "hover:text-primary hover:border-b-2 hover:border-primary/30 hover:pb-1"
+                  ${
+                    isActive
+                      ? "font-semibold border-b-2 border-primary pb-1"
+                      : "hover:text-primary hover:border-b-2 hover:border-primary/30 hover:pb-1"
                   }
                 `}>
                 {item.label}

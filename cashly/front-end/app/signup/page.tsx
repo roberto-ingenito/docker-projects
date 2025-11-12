@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
 import { useAppDispatch } from "@/lib/redux/hooks";
-import { login, signup } from "@/lib/redux/slices/authSlice"; // Nota: probabilmente dovrebbe essere 'signup' o 'register'
+import { signup } from "@/lib/redux/slices/authSlice"; // Nota: probabilmente dovrebbe essere 'signup' o 'register'
 import { addToast } from "@heroui/toast";
 import { Form } from "@heroui/form";
 import { Card, CardHeader, CardBody, CardFooter } from "@heroui/card";
@@ -53,21 +53,21 @@ export default function SignupPage() {
     if (!value) {
       return "La password è obbligatoria";
     }
-    if (value.length < 8) {
-      return "La password deve contenere almeno 8 caratteri";
-    }
-    if (!/(?=.*[a-z])/.test(value)) {
-      return "La password deve contenere almeno una lettera minuscola";
-    }
-    if (!/(?=.*[A-Z])/.test(value)) {
-      return "La password deve contenere almeno una lettera maiuscola";
-    }
-    if (!/(?=.*\d)/.test(value)) {
-      return "La password deve contenere almeno un numero";
-    }
-    if (!/(?=.*[@$!%*?&])/.test(value)) {
-      return "La password deve contenere almeno un carattere speciale (@$!%*?&)";
-    }
+    // if (value.length < 6) {
+    //   return "La password deve contenere almeno 6 caratteri";
+    // }
+    // if (!/(?=.*[a-z])/.test(value)) {
+    //   return "La password deve contenere almeno una lettera minuscola";
+    // }
+    // if (!/(?=.*[A-Z])/.test(value)) {
+    //   return "La password deve contenere almeno una lettera maiuscola";
+    // }
+    // if (!/(?=.*\d)/.test(value)) {
+    //   return "La password deve contenere almeno un numero";
+    // }
+    // if (!/(?=.*[@$!%*?&])/.test(value)) {
+    //   return "La password deve contenere almeno un carattere speciale (@$!%*?&)";
+    // }
     return "";
   };
 
@@ -223,7 +223,7 @@ export default function SignupPage() {
               variant="faded"
               isInvalid={touched.password && !!errors.password}
               errorMessage={touched.password && errors.password}
-              description="Minimo 8 caratteri, con maiuscole, minuscole, numeri e simboli"
+              // description="Minimo 8 caratteri, con maiuscole, minuscole, numeri e simboli"
               required
               endContent={
                 <button
