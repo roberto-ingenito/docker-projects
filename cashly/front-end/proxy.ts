@@ -2,12 +2,12 @@ import { NextResponse, NextRequest } from 'next/server'
 import { getJwtToken } from './app/actions';
 
 const AUTH_ROUTES = ['/login', '/signup'];
-const PROTECTED_ROUTES = ['/dashboard', '/accounts', '/transactions', '/categories'];
+const PROTECTED_ROUTES = ['/dashboard', '/transactions', '/categories'];
 
 // Ottieni il basePath dalla configurazione
 const BASE_PATH = '/cashly';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     // Redirect da root a dashboard
@@ -46,7 +46,6 @@ export const config = {
     matcher: [
         '/',
         '/dashboard/:path*',
-        '/accounts/:path*',
         '/transactions/:path*',
         '/categories/:path*',
         '/login',

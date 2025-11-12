@@ -9,7 +9,6 @@ interface TransactionsState {
     error: string | null;
     firstLoadDone: boolean;
     filters: {
-        accountId?: number;
         type?: TransactionType;
         categoryId?: number;
         dateFrom?: string;
@@ -28,16 +27,16 @@ const initialState: TransactionsState = {
 // Thunks
 export const fetchTransactions = createAsyncThunk(
     'transactions/fetchTransactions',
-    async (accountId: number) => {
-        const response = await transactionsApi.getTransactions(accountId);
+    async () => {
+        const response = await transactionsApi.getTransactions();
         return response;
     }
 );
 
 export const createTransaction = createAsyncThunk(
     'transactions/createTransaction',
-    async ({ accountId, data }: { accountId: number; data: TransactionCreateDto }) => {
-        const response = await transactionsApi.createTransaction(accountId, data);
+    async (data: TransactionCreateDto) => {
+        const response = await transactionsApi.createTransaction(data);
         return response;
     }
 );

@@ -3,6 +3,7 @@ export interface User {
     userId: number;
     email: string;
     createdAt: string;
+    currency: string;
 }
 
 export interface UserCreateDto {

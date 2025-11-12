@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Transaction, TransactionType } from "@/lib/types/transaction";
 import { Card, CardBody } from "@heroui/card";
 import { Chip } from "@heroui/chip";

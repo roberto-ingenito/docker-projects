@@ -3,7 +3,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { fetchTransactions, createTransaction, setFilters, clearFilters } from "@/lib/redux/slices/transactionsSlice";
-import { fetchAccounts } from "@/lib/redux/slices/accountsSlice";
 import { getCategories } from "@/lib/redux/slices/categoriesSlice";
 import { TransactionCreateDto, TransactionType } from "@/lib/types/transaction";
 import { Card, CardBody } from "@heroui/card";
@@ -27,18 +26,13 @@ export default function TransactionsPage() {
   const firstLoadDone = useAppSelector((state) => state.transactions.firstLoadDone);
   const filters = useAppSelector((state) => state.transactions.filters);
 
-  const accounts = useAppSelector((state) => state.accounts.accounts);
-  const accountsLoaded = useAppSelector((state) => state.accounts.firstLoadDone);
-
+  const userCurrency = useAppSelector((state) => state.auth.user?.currency) ?? "EUR";
   const categories = useAppSelector((state) => state.categories.categories);
   const categoriesLoaded = useAppSelector((state) => state.categories.firstLoadDone);
 
   // Modal states
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { isOpen: isFilterOpen, onOpen: onFilterOpen, onOpenChange: onFilterOpenChange } = useDisclosure();
-
-  // Selected account for viewing transactions
-  const [selectedAccountId, setSelectedAccountId] = useState<number | null>(null);
 
   // Form data for creating transaction
   const [formData, setFormData] = useState<TransactionCreateDto>({
@@ -59,46 +53,15 @@ export default function TransactionsPage() {
 
   // Load initial data
   useEffect(() => {
-    if (!accountsLoaded) dispatch(fetchAccounts());
     if (!categoriesLoaded) dispatch(getCategories());
+    if (!firstLoadDone) dispatch(fetchTransactions());
   }, []);
-
-  // Load transactions when account is selected
-  useEffect(() => {
-    if (selectedAccountId && !firstLoadDone) {
-      dispatch(fetchTransactions(selectedAccountId));
-    }
-  }, [selectedAccountId]);
-
-  // Auto-select first account if available
-  useEffect(() => {
-    if (accounts.length > 0 && !selectedAccountId) {
-      setSelectedAccountId(accounts[0].accountId);
-      dispatch(fetchTransactions(accounts[0].accountId));
-    }
-  }, [accounts]);
-
-  // Handle account change
-  const handleAccountChange = (accountId: string) => {
-    const id = parseInt(accountId);
-    setSelectedAccountId(id);
-    dispatch(fetchTransactions(id));
-  };
 
   // Handle create transaction
   const handleCreateTransactionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedAccountId) return;
 
-    const result = await dispatch(
-      createTransaction({
-        accountId: selectedAccountId,
-        data: {
-          ...formData,
-          categoryId: formData.categoryId || undefined,
-        },
-      })
-    );
+    const result = await dispatch(createTransaction(formData));
 
     if (result.meta.requestStatus === "fulfilled") {
       setFormData({
@@ -109,8 +72,6 @@ export default function TransactionsPage() {
         categoryId: undefined,
       });
       onOpenChange();
-      // Refresh account balance
-      dispatch(fetchAccounts());
     }
   };
 
@@ -166,9 +127,6 @@ export default function TransactionsPage() {
   // Count active filters
   const activeFiltersCount = Object.values(filters).filter((v) => v !== undefined).length;
 
-  // Get selected account
-  const selectedAccount = accounts.find((acc) => acc.accountId === selectedAccountId);
-
   return (
     <>
       {/* Header */}
@@ -197,8 +155,7 @@ export default function TransactionsPage() {
             size="lg"
             startContent={<PlusIcon className="w-5 h-5" />}
             onPress={onOpen}
-            className="flex-1 sm:flex-initial font-semibold"
-            isDisabled={!selectedAccountId}>
+            className="flex-1 sm:flex-initial font-semibold">
             Nuova Transazione
           </Button>
         </div>
@@ -209,31 +166,6 @@ export default function TransactionsPage() {
         <Card className="mb-6 border-l-4 border-danger">
           <CardBody className="bg-danger-50">
             <p className="text-danger font-medium">{error}</p>
-          </CardBody>
-        </Card>
-      )}
-
-      {/* Account Selector */}
-      {accounts.length > 0 && (
-        <Card className="mb-6">
-          <CardBody className="p-4">
-            <Select
-              label="Seleziona Conto"
-              placeholder="Scegli un conto"
-              selectedKeys={selectedAccountId ? [selectedAccountId.toString()] : []}
-              onChange={(e) => handleAccountChange(e.target.value)}
-              variant="bordered"
-              size="lg"
-              classNames={{
-                trigger: "h-14",
-              }}>
-              {accounts.map((account) => (
-                <SelectItem key={account.accountId.toString()}>
-                  {account.accountName} -{" "}
-                  {account.currentBalance.toLocaleString("it-IT", account.currency ? { style: "currency", currency: account.currency } : {})}
-                </SelectItem>
-              ))}
-            </Select>
           </CardBody>
         </Card>
       )}
@@ -283,7 +215,7 @@ export default function TransactionsPage() {
                   <p className="text-2xl font-bold text-success-700">
                     {statistics.income.toLocaleString("it-IT", {
                       style: "currency",
-                      currency: selectedAccount?.currency || "EUR",
+                      currency: userCurrency,
                     })}
                   </p>
                 </div>
@@ -303,7 +235,7 @@ export default function TransactionsPage() {
                   <p className="text-2xl font-bold text-danger-700">
                     {statistics.expense.toLocaleString("it-IT", {
                       style: "currency",
-                      currency: selectedAccount?.currency || "EUR",
+                      currency: userCurrency,
                     })}
                   </p>
                 </div>
@@ -323,7 +255,7 @@ export default function TransactionsPage() {
                   <p className="text-2xl font-bold text-primary-700">
                     {statistics.balance.toLocaleString("it-IT", {
                       style: "currency",
-                      currency: selectedAccount?.currency || "EUR",
+                      currency: userCurrency,
                     })}
                   </p>
                 </div>
@@ -343,16 +275,6 @@ export default function TransactionsPage() {
             <Spinner size="lg" color="primary" />
             <p className="text-default-500 mt-4">Caricamento transazioni...</p>
           </div>
-        ) : !selectedAccountId ? (
-          <Card className="border-2 border-dashed border-default-300">
-            <CardBody className="py-20">
-              <div className="text-center">
-                <ChartBarIcon className="w-16 h-16 mx-auto text-default-300 mb-4" />
-                <h3 className="text-xl font-semibold text-default-600 mb-2">Seleziona un conto</h3>
-                <p className="text-default-500">Scegli un conto per visualizzare le transazioni</p>
-              </div>
-            </CardBody>
-          </Card>
         ) : filteredTransactions.length === 0 ? (
           <Card className="border-2 border-dashed border-default-300">
             <CardBody className="py-20">
@@ -509,7 +431,7 @@ export default function TransactionsPage() {
                         {formData.type === TransactionType.Income ? "+" : "-"}
                         {formData.amount.toLocaleString("it-IT", {
                           style: "currency",
-                          currency: selectedAccount?.currency || "EUR",
+                          currency: userCurrency,
                         })}
                       </p>
                     </div>

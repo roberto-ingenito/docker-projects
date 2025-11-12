@@ -11,7 +11,6 @@ export interface Transaction {
     type: TransactionType;
     transactionDate: string;
     description?: string;
-    accountId: number;
     category?: Category;
 }
 

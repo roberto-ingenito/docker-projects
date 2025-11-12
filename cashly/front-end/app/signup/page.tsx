@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
 import { useAppDispatch } from "@/lib/redux/hooks";
-import { login, signup } from "@/lib/redux/slices/authSlice"; // Nota: probabilmente dovrebbe essere 'signup' o 'register'
+import { signup } from "@/lib/redux/slices/authSlice"; // Nota: probabilmente dovrebbe essere 'signup' o 'register'
 import { addToast } from "@heroui/toast";
 import { Form } from "@heroui/form";
 import { Card, CardHeader, CardBody, CardFooter } from "@heroui/card";
