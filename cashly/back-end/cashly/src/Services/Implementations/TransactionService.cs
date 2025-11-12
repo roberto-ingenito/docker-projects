@@ -21,8 +21,11 @@ public class TransactionService(AppDbContext context) : ITransactionService
 
             try
             {
-                // 1. Controlla che il conto esista e appartenga all'utente
+                // 1. Controlla l'utente esista all'utente
                 User? user = await context.Users.Where(u => u.UserId == userId).SingleOrDefaultAsync() ?? throw new InvalidOperationException("user-not-found");
+
+                if (transactionDto.CategoryId is not null && !await context.Categories.AnyAsync(c => c.CategoryId == transactionDto.CategoryId && c.UserId == userId))
+                    throw new InvalidOperationException("category-not-found");
 
                 // 2. Crea la nuova entità Transaction
                 Transaction newTransaction = new()
@@ -31,7 +34,8 @@ public class TransactionService(AppDbContext context) : ITransactionService
                     Type = transactionDto.Type,
                     TransactionDate = transactionDto.TransactionDate.ToUniversalTime(),
                     Description = transactionDto.Description,
-                    CategoryId = transactionDto.CategoryId
+                    CategoryId = transactionDto.CategoryId,
+                    UserId = userId,
                 };
 
                 // 3. Aggiorna il saldo
