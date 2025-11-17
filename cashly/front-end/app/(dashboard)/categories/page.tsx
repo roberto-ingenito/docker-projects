@@ -65,8 +65,8 @@ export default function CategoriesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-bold bg-primary bg-clip-text text-transparent">Le Tue Categorie</h1>
-          <p className="text-default-500 mt-2">Organizza le tue transazioni con categorie personalizzate</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground">Le Tue Categorie</h1>
+          <p className="text-foreground/80 mt-2">Organizza le tue transazioni con categorie personalizzate</p>
         </div>
         <Button color="primary" size="lg" startContent={<PlusIcon className="w-5 h-5" />} onPress={onOpen} className="w-full sm:w-auto font-semibold">
           Nuova Categoria

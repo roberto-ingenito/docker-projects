@@ -1,5 +1,6 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { useTheme } from "next-themes";
+import { themeConfig } from "@/tailwind.config";
 
 interface CumulativeBalance {
   date: string;
@@ -30,6 +31,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export default function CumulativeBalanceChart({ data, height = 300 }: CumulativeBalanceChartProps) {
   const { theme } = useTheme();
 
+  const primary =
+    theme === "light" //
+      ? themeConfig.themes!.light.colors!.primary![500]!
+      : themeConfig.themes!.dark.colors!.primary![500]!;
+
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center" style={{ height }}>
@@ -46,7 +52,7 @@ export default function CumulativeBalanceChart({ data, height = 300 }: Cumulativ
         <YAxis stroke={theme === "light" ? "#000000aa" : "#ffffffaa"} fontSize={12} />
         <Tooltip content={<CustomTooltip />} cursor={{ fill: theme === "light" ? "#000" : "#fff", opacity: 0.1 }} />
         <ReferenceLine y={0} stroke={theme === "light" ? "#000" : "#fff"} strokeDasharray="6 6" />
-        <Line type="monotone" dataKey="saldo" name="Saldo" stroke={theme === "light" ? "#000" : "#fff"} strokeWidth={3} dot={false} />
+        <Line type="monotone" dataKey="saldo" name="Saldo" stroke={primary} strokeWidth={3} dot={false} />
       </LineChart>
     </ResponsiveContainer>
   );

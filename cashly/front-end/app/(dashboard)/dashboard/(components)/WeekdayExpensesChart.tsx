@@ -1,5 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useTheme } from "next-themes";
+import config, { themeConfig } from "@/tailwind.config";
 
 interface WeekdayExpense {
   day: string;
@@ -30,6 +31,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export default function WeekdayExpensesChart({ data, height = 300 }: WeekdayExpensesChartProps) {
   const { theme } = useTheme();
 
+  const primary =
+    theme === "light" //
+      ? themeConfig.themes!.light.colors!.primary![500]!
+      : themeConfig.themes!.dark.colors!.primary![500]!;
+
   if (!data.some((d) => d.spese > 0)) {
     return (
       <div className="flex items-center justify-center" style={{ height }}>
@@ -44,8 +50,14 @@ export default function WeekdayExpensesChart({ data, height = 300 }: WeekdayExpe
         <CartesianGrid strokeDasharray="3 3" stroke={theme === "light" ? "#00000033" : "#ffffff33"} />
         <XAxis dataKey="day" stroke={theme === "light" ? "#000000aa" : "#ffffffaa"} fontSize={11} />
         <YAxis stroke={theme === "light" ? "#000000aa" : "#ffffffaa"} fontSize={12} />
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: theme === "light" ? "#000" : "#fff", opacity: 0.1 }} />
-        <Bar dataKey="spese" name="Spese" fill={theme === "light" ? "#b0b0b0" : "#e0e0e0"} radius={[4, 4, 0, 0]} />
+        <Tooltip
+          content={<CustomTooltip />}
+          cursor={{
+            fill: primary,
+            opacity: 0.1,
+          }}
+        />
+        <Bar dataKey="spese" name="Spese" fill={primary} radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );

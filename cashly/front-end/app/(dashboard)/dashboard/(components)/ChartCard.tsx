@@ -30,7 +30,7 @@ export default function ChartCard({
         <div className="flex items-center gap-2 flex-1">
           <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">{icon}</div>
           <div>
-            <h3 className="text-lg font-bold text-foreground">{title}</h3>
+            <h3 className="text-lg font-bold text-primary">{title}</h3>
             <p className="text-sm text-default-500">{subtitle}</p>
           </div>
         </div>

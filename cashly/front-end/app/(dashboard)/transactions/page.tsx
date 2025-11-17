@@ -106,8 +106,8 @@ export default function TransactionsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-bold bg-primary bg-clip-text text-transparent">Transazioni</h1>
-          <p className="text-default-500 mt-2">Gestisci le tue entrate e uscite</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground">Transazioni</h1>
+          <p className="text-foreground/80 mt-2">Gestisci le tue entrate e uscite</p>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
           <Button
