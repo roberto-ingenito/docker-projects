@@ -63,7 +63,7 @@ export const Navbar = () => {
         <ThemeSwitch />
         <ArrowRightStartOnRectangleIcon
           strokeWidth={2}
-          className="size-6 transition-opacity hover:opacity-80 cursor-pointer !text-default-500"
+          className="size-6 transition-opacity hover:opacity-80 cursor-pointer text-default-500!"
           onClick={logout}
         />
       </NavbarContent>

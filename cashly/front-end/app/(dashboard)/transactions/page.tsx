@@ -34,14 +34,22 @@ export default function TransactionsPage() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { isOpen: isFilterOpen, onOpen: onFilterOpen, onOpenChange: onFilterOpenChange } = useDisclosure();
 
+  // Helper function to get current date and time
+  const getCurrentDate = () => new Date().toISOString().split("T")[0];
+  const getDefaultTime = () => "00:00";
+
   // Form data for creating transaction
   const [formData, setFormData] = useState<TransactionCreateDto>({
     amount: 0,
     type: TransactionType.Expense,
-    transactionDate: new Date().toISOString().split("T")[0],
+    transactionDate: new Date().toISOString(),
     description: "",
     categoryId: undefined,
   });
+
+  // Separate state for date and time to make UI easier
+  const [transactionDate, setTransactionDate] = useState(getCurrentDate());
+  const [transactionTime, setTransactionTime] = useState(getDefaultTime());
 
   // Filter form data
   const [filterFormData, setFilterFormData] = useState({
@@ -57,6 +65,12 @@ export default function TransactionsPage() {
     if (!firstLoadDone) dispatch(fetchTransactions());
   }, []);
 
+  // Update formData.transactionDate when date or time changes
+  useEffect(() => {
+    const dateTimeString = `${transactionDate}T${transactionTime}:00`;
+    setFormData((prev) => ({ ...prev, transactionDate: dateTimeString }));
+  }, [transactionDate, transactionTime]);
+
   // Handle create transaction
   const handleCreateTransactionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,13 +78,16 @@ export default function TransactionsPage() {
     const result = await dispatch(createTransaction(formData));
 
     if (result.meta.requestStatus === "fulfilled") {
+      // Reset form
       setFormData({
         amount: 0,
         type: TransactionType.Expense,
-        transactionDate: new Date().toISOString().split("T")[0],
+        transactionDate: new Date().toISOString(),
         description: "",
         categoryId: undefined,
       });
+      setTransactionDate(getCurrentDate());
+      setTransactionTime(getDefaultTime());
       onOpenChange();
     }
   };
@@ -126,6 +143,18 @@ export default function TransactionsPage() {
 
   // Count active filters
   const activeFiltersCount = Object.values(filters).filter((v) => v !== undefined).length;
+
+  // Format date and time for preview
+  const formatDateTime = (dateStr: string, timeStr: string) => {
+    const date = new Date(`${dateStr}T${timeStr}`);
+    return date.toLocaleString("it-IT", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   return (
     <>
@@ -384,15 +413,27 @@ export default function TransactionsPage() {
                   ))}
                 </Select>
 
-                {/* Date */}
-                <Input
-                  label="Data"
-                  type="date"
-                  value={formData.transactionDate}
-                  onChange={(e) => setFormData({ ...formData, transactionDate: e.target.value })}
-                  variant="bordered"
-                  size="lg"
-                />
+                {/* Date and Time */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Input
+                    label="Data"
+                    type="date"
+                    value={transactionDate}
+                    onChange={(e) => setTransactionDate(e.target.value)}
+                    variant="bordered"
+                    size="lg"
+                    isRequired
+                  />
+                  <Input
+                    label="Ora"
+                    type="time"
+                    value={transactionTime}
+                    onChange={(e) => setTransactionTime(e.target.value)}
+                    variant="bordered"
+                    size="lg"
+                    isRequired
+                  />
+                </div>
 
                 {/* Description */}
                 <Textarea
@@ -423,9 +464,7 @@ export default function TransactionsPage() {
                             {categories.find((c) => c.categoryId === formData.categoryId)?.categoryName}
                           </p>
                         )}
-                        {formData.transactionDate && (
-                          <p className="text-xs text-default-500 mt-1">{new Date(formData.transactionDate!).toLocaleDateString("it-IT")}</p>
-                        )}
+                        <p className="text-xs text-default-500 mt-1">{formatDateTime(transactionDate, transactionTime)}</p>
                       </div>
                       <p className={`text-2xl font-bold ${formData.type === TransactionType.Income ? "text-success-700" : "text-danger-700"}`}>
                         {formData.type === TransactionType.Income ? "+" : "-"}
