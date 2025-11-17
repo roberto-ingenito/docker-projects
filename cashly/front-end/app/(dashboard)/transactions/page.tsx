@@ -7,7 +7,7 @@ import { getCategories } from "@/lib/redux/slices/categoriesSlice";
 import { TransactionCreateDto, TransactionType } from "@/lib/types/transaction";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
-import { Input, Textarea } from "@heroui/input";
+import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { useDisclosure } from "@heroui/use-disclosure";
@@ -15,6 +15,7 @@ import { Spinner } from "@heroui/spinner";
 import { Chip } from "@heroui/chip";
 import { PlusIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, ChartBarIcon, FunnelIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import TransactionCard from "./(components)/transactionCard";
+import CreateTransactionModal from "@/components/create-transaction-modal";
 
 export default function TransactionsPage() {
   const dispatch = useAppDispatch();
@@ -31,25 +32,8 @@ export default function TransactionsPage() {
   const categoriesLoaded = useAppSelector((state) => state.categories.firstLoadDone);
 
   // Modal states
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen: isCreateTransasctionOpen, onOpen: onCreateTransasctionOpen, onOpenChange: onCreateTransasctionOpenChange } = useDisclosure();
   const { isOpen: isFilterOpen, onOpen: onFilterOpen, onOpenChange: onFilterOpenChange } = useDisclosure();
-
-  // Helper function to get current date and time
-  const getCurrentDate = () => new Date().toISOString().split("T")[0];
-  const getDefaultTime = () => "00:00";
-
-  // Form data for creating transaction
-  const [formData, setFormData] = useState<TransactionCreateDto>({
-    amount: 0,
-    type: TransactionType.Expense,
-    transactionDate: new Date().toISOString(),
-    description: "",
-    categoryId: undefined,
-  });
-
-  // Separate state for date and time to make UI easier
-  const [transactionDate, setTransactionDate] = useState(getCurrentDate());
-  const [transactionTime, setTransactionTime] = useState(getDefaultTime());
 
   // Filter form data
   const [filterFormData, setFilterFormData] = useState({
@@ -64,33 +48,6 @@ export default function TransactionsPage() {
     if (!categoriesLoaded) dispatch(getCategories());
     if (!firstLoadDone) dispatch(fetchTransactions());
   }, []);
-
-  // Update formData.transactionDate when date or time changes
-  useEffect(() => {
-    const dateTimeString = `${transactionDate}T${transactionTime}:00`;
-    setFormData((prev) => ({ ...prev, transactionDate: dateTimeString }));
-  }, [transactionDate, transactionTime]);
-
-  // Handle create transaction
-  const handleCreateTransactionSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const result = await dispatch(createTransaction(formData));
-
-    if (result.meta.requestStatus === "fulfilled") {
-      // Reset form
-      setFormData({
-        amount: 0,
-        type: TransactionType.Expense,
-        transactionDate: new Date().toISOString(),
-        description: "",
-        categoryId: undefined,
-      });
-      setTransactionDate(getCurrentDate());
-      setTransactionTime(getDefaultTime());
-      onOpenChange();
-    }
-  };
 
   // Handle filter submit
   const handleFilterSubmit = (e: React.FormEvent) => {
@@ -144,18 +101,6 @@ export default function TransactionsPage() {
   // Count active filters
   const activeFiltersCount = Object.values(filters).filter((v) => v !== undefined).length;
 
-  // Format date and time for preview
-  const formatDateTime = (dateStr: string, timeStr: string) => {
-    const date = new Date(`${dateStr}T${timeStr}`);
-    return date.toLocaleString("it-IT", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   return (
     <>
       {/* Header */}
@@ -183,7 +128,7 @@ export default function TransactionsPage() {
             color="primary"
             size="lg"
             startContent={<PlusIcon className="w-5 h-5" />}
-            onPress={onOpen}
+            onPress={onCreateTransasctionOpen}
             className="flex-1 sm:flex-initial font-semibold">
             Nuova Transazione
           </Button>
@@ -316,7 +261,7 @@ export default function TransactionsPage() {
                   {activeFiltersCount > 0 ? "Prova a modificare i filtri di ricerca" : "Crea la tua prima transazione per iniziare"}
                 </p>
                 {activeFiltersCount === 0 && (
-                  <Button color="primary" variant="flat" startContent={<PlusIcon className="w-5 h-5" />} onPress={onOpen}>
+                  <Button color="primary" variant="flat" startContent={<PlusIcon className="w-5 h-5" />} onPress={onCreateTransasctionOpen}>
                     Nuova Transazione
                   </Button>
                 )}
@@ -339,160 +284,7 @@ export default function TransactionsPage() {
         )}
       </div>
 
-      {/* Modal Create Transaction */}
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl" scrollBehavior="inside" placement="center" backdrop="blur">
-        <ModalContent as="form" onSubmit={handleCreateTransactionSubmit}>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                <h2 className="text-2xl font-bold">Nuova Transazione</h2>
-                <p className="text-sm text-default-500 font-normal">Registra una nuova entrata o uscita</p>
-              </ModalHeader>
-              <ModalBody className="gap-6">
-                {/* Transaction Type */}
-                <div>
-                  <label className="block text-sm font-medium mb-3">Tipo di Transazione</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <Button
-                      type="button"
-                      size="lg"
-                      variant={formData.type === TransactionType.Income ? "solid" : "bordered"}
-                      color={formData.type === TransactionType.Income ? "success" : "default"}
-                      startContent={<ArrowTrendingUpIcon className="w-5 h-5" />}
-                      onPress={() => setFormData({ ...formData, type: TransactionType.Income })}
-                      className="h-16">
-                      Entrata
-                    </Button>
-                    <Button
-                      type="button"
-                      size="lg"
-                      variant={formData.type === TransactionType.Expense ? "solid" : "bordered"}
-                      color={formData.type === TransactionType.Expense ? "danger" : "default"}
-                      startContent={<ArrowTrendingDownIcon className="w-5 h-5" />}
-                      onPress={() => setFormData({ ...formData, type: TransactionType.Expense })}
-                      className="h-16">
-                      Uscita
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Amount */}
-                <Input
-                  label="Importo"
-                  placeholder="0.00"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  value={formData.amount.toString()}
-                  onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
-                  isRequired
-                  variant="bordered"
-                  size="lg"
-                  startContent={
-                    <div className="pointer-events-none flex items-center">
-                      <span className="text-default-400 text-small">€</span>
-                    </div>
-                  }
-                />
-
-                {/* Category */}
-                <Select
-                  label="Categoria"
-                  placeholder="Seleziona una categoria (opzionale)"
-                  selectedKeys={formData.categoryId ? [formData.categoryId.toString()] : []}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      categoryId: e.target.value ? parseInt(e.target.value) : undefined,
-                    })
-                  }
-                  variant="bordered"
-                  size="lg">
-                  {categories.map((category) => (
-                    <SelectItem key={category.categoryId.toString()}>{category.categoryName}</SelectItem>
-                  ))}
-                </Select>
-
-                {/* Date and Time */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Input
-                    label="Data"
-                    type="date"
-                    value={transactionDate}
-                    onChange={(e) => setTransactionDate(e.target.value)}
-                    variant="bordered"
-                    size="lg"
-                    isRequired
-                  />
-                  <Input
-                    label="Ora"
-                    type="time"
-                    value={transactionTime}
-                    onChange={(e) => setTransactionTime(e.target.value)}
-                    variant="bordered"
-                    size="lg"
-                    isRequired
-                  />
-                </div>
-
-                {/* Description */}
-                <Textarea
-                  label="Descrizione"
-                  placeholder="Aggiungi una nota (opzionale)"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  variant="bordered"
-                  size="lg"
-                  maxLength={500}
-                  minRows={3}
-                />
-
-                {/* Preview */}
-                <div>
-                  <label className="block text-sm font-medium mb-3">Anteprima</label>
-                  <div
-                    className={`p-4 border-2 rounded-lg ${
-                      formData.type === TransactionType.Income ? "border-success-300 bg-success-100" : "border-danger-300 bg-danger-100"
-                    }`}>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-semibold text-lg">
-                          {formData.description || (formData.type === TransactionType.Income ? "Entrata" : "Uscita")}
-                        </p>
-                        {formData.categoryId && (
-                          <p className="text-sm text-default-600 mt-1">
-                            {categories.find((c) => c.categoryId === formData.categoryId)?.categoryName}
-                          </p>
-                        )}
-                        <p className="text-xs text-default-500 mt-1">{formatDateTime(transactionDate, transactionTime)}</p>
-                      </div>
-                      <p className={`text-2xl font-bold ${formData.type === TransactionType.Income ? "text-success-700" : "text-danger-700"}`}>
-                        {formData.type === TransactionType.Income ? "+" : "-"}
-                        {formData.amount.toLocaleString("it-IT", {
-                          style: "currency",
-                          currency: userCurrency,
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </ModalBody>
-              <ModalFooter>
-                <Button onPress={onClose} variant="flat">
-                  Annulla
-                </Button>
-                <Button
-                  type="submit"
-                  color={formData.type === TransactionType.Income ? "success" : "danger"}
-                  isLoading={isLoading}
-                  startContent={!isLoading && <PlusIcon className="w-5 h-5" />}>
-                  Crea Transazione
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+      <CreateTransactionModal isOpen={isCreateTransasctionOpen} onOpenChange={onCreateTransasctionOpenChange} />
 
       {/* Modal Filters */}
       <Modal isOpen={isFilterOpen} onOpenChange={onFilterOpenChange} size="xl" placement="center" backdrop="blur">

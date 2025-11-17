@@ -8,7 +8,6 @@ import { TransactionType, Transaction } from "@/lib/types/transaction";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Spinner } from "@heroui/spinner";
-import { Progress } from "@heroui/progress";
 import { Chip } from "@heroui/chip";
 import {
   BanknotesIcon,
@@ -21,7 +20,7 @@ import {
   CalendarDaysIcon,
   ArrowTrendingUpIcon,
   FireIcon,
-  SparklesIcon,
+  PlusIcon,
 } from "@heroicons/react/24/solid";
 import {
   AreaChart,
@@ -42,6 +41,8 @@ import {
   ReferenceLine,
 } from "recharts";
 import { useTheme } from "next-themes";
+import { useDisclosure } from "@heroui/modal";
+import CreateTransactionModal from "@/components/create-transaction-modal";
 
 // ============================================
 // INTERFACCE
@@ -91,10 +92,12 @@ export default function DashboardPage() {
 
   const { theme } = useTheme();
 
+  // Modal states
+  const { isOpen: isCreateTransasctionOpen, onOpen: onCreateTransasctionOpen, onOpenChange: onCreateTransasctionOpenChange } = useDisclosure();
+
   // Stati per la navigazione
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [heatmapMonth, setHeatmapMonth] = useState(new Date());
 
   useEffect(() => {
     if (!firstLoadDone) dispatch(fetchTransactions());
@@ -422,9 +425,21 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl sm:text-4xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-default-500 mt-2">Panoramica completa delle tue finanze</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-bold bg-primary bg-clip-text text-transparent">Dashboard</h1>
+          <p className="text-default-500 mt-2">Panoramica completa delle tue finanze</p>
+        </div>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Button
+            color="primary"
+            size="lg"
+            startContent={<PlusIcon className="w-5 h-5" />}
+            className="flex-1 sm:flex-initial font-semibold"
+            onPress={onCreateTransasctionOpen}>
+            Nuova Transazione
+          </Button>
+        </div>
       </div>
 
       {/* Messaggio errore */}
@@ -501,34 +516,6 @@ export default function DashboardPage() {
           </CardBody>
         </Card>
       </div>
-
-      {/* Tasso di Risparmio */}
-      <Card className="border-2 border-primary/20">
-        <CardBody className="p-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-              <SparklesIcon className="w-6 h-6 text-primary" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-bold text-foreground">Tasso di Risparmio</h3>
-              <p className="text-sm text-default-500">Percentuale delle entrate risparmiata questo mese</p>
-            </div>
-            <div className="text-right">
-              <p className={`text-3xl font-bold ${stats.savingsRate >= 0 ? "text-success" : "text-danger"}`}>{stats.savingsRate.toFixed(1)}%</p>
-            </div>
-          </div>
-          <Progress
-            value={Math.max(0, Math.min(100, stats.savingsRate))}
-            color={stats.savingsRate >= 20 ? "success" : stats.savingsRate >= 10 ? "warning" : "danger"}
-            size="lg"
-            className="max-w-full"
-          />
-          <div className="flex justify-between mt-2 text-xs text-default-500">
-            <span>Critico (&lt;10%)</span>
-            <span>Buono (20%+)</span>
-          </div>
-        </CardBody>
-      </Card>
 
       {/* Grafico 1: Andamento Giornaliero */}
       <Card>
@@ -864,6 +851,8 @@ export default function DashboardPage() {
           </CardBody>
         </Card>
       )}
+
+      <CreateTransactionModal isOpen={isCreateTransasctionOpen} onOpenChange={onCreateTransasctionOpenChange} />
     </div>
   );
 }
