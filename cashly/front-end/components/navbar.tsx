@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import * as authSlice from "@/lib/redux/slices/authSlice";
 import * as categoriesSlice from "@/lib/redux/slices/categoriesSlice";
+import * as transactionsSlice from "@/lib/redux/slices/transactionsSlice";
 import { siteConfig } from "@/config/site";
 
 export const Navbar = () => {
@@ -23,6 +24,7 @@ export const Navbar = () => {
   async function logout() {
     await dispatch(authSlice.logout());
     dispatch(categoriesSlice.clear());
+    dispatch(transactionsSlice.clear());
 
     router.replace("/login");
   }

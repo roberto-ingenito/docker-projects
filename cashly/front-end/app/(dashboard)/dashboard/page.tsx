@@ -490,19 +490,6 @@ export default function DashboardPage() {
         <TopTransactionsList transactions={topTransactions} />
       </ChartCard>
 
-      {/* Empty State */}
-      {transactions.length === 0 && (
-        <Card className="border-2 border-dashed border-default-300">
-          <CardBody className="py-20">
-            <div className="text-center">
-              <ChartBarIcon className="w-16 h-16 mx-auto text-default-300 mb-4" />
-              <h3 className="text-xl font-semibold text-default-600 mb-2">Nessun dato disponibile</h3>
-              <p className="text-default-500 mb-6">Inizia ad aggiungere le tue transazioni per visualizzare le statistiche</p>
-            </div>
-          </CardBody>
-        </Card>
-      )}
-
       <CreateTransactionModal isOpen={isCreateTransasctionOpen} onOpenChange={onCreateTransasctionOpenChange} />
     </div>
   );
