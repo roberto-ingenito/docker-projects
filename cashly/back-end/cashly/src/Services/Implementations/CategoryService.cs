@@ -25,6 +25,22 @@ public class CategoryService(AppDbContext dbContext) : ICategoryService
         return newCategory;
     }
 
+    public async Task<Category> Update(int categoryId, CategoryUpdateDto dto, int userId)
+    {
+        // Trova la categoria esistente
+        var category = await dbContext.Categories.FirstOrDefaultAsync(c => c.CategoryId == categoryId && c.UserId == userId) ?? throw new InvalidOperationException("category-not-found");
+
+        // Aggiorna i campi
+        category.CategoryName = dto.CategoryName;
+        category.IconName = dto.IconName;
+        category.ColorHex = dto.ColorHex;
+
+        // Salva le modifiche
+        await dbContext.SaveChangesAsync();
+
+        return category;
+    }
+
     public async Task Delete(int categoryId, int userId)
     {
         await dbContext.Categories
