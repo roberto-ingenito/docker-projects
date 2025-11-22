@@ -13,7 +13,7 @@ namespace cashly.src.Controllers;
 public class TransactionsController(ITransactionService transactionService) : ControllerBase
 {
     [HttpPost]
-    public async Task<ActionResult<Transaction>> CreateTransaction([FromBody] TransactionCreateDto createTransactionDto)
+    public async Task<ActionResult<TransactionResponseDto>> CreateTransaction([FromBody] TransactionCreateDto createTransactionDto)
     {
         var userId = User.GetUserId();
         Transaction newTransaction;
@@ -49,5 +49,58 @@ public class TransactionsController(ITransactionService transactionService) : Co
         var transactionResponse = transactions.Select(t => t.ToDto());
 
         return Ok(transactionResponse);
+    }
+
+    [HttpPut("{transactionId}")]
+    public async Task<ActionResult<TransactionResponseDto>> UpdateTransaction(int transactionId, [FromBody] TransactionUpdateDto updateTransactionDto)
+    {
+        var userId = User.GetUserId();
+
+        try
+        {
+            var updatedTransaction = await transactionService.UpdateTransactionAsync(transactionId, updateTransactionDto, userId);
+            return Ok(updatedTransaction.ToDto()); // 200
+        }
+        catch (InvalidOperationException ex)
+        {
+            if (ex.Message == "transaction-not-found")
+            {
+                return NotFound(new { message = "Transazione non trovata" }); // 404
+            }
+            if (ex.Message == "category-not-found")
+            {
+                return BadRequest(new { message = "Categoria non valida" }); // 400
+            }
+            return BadRequest(new { message = ex.Message }); // 400
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { message = "Si è verificato un errore interno" });
+        }
+    }
+
+    [HttpDelete("{transactionId}")]
+    public async Task<IActionResult> DeleteTransactions(int transactionId)
+    {
+        var userId = User.GetUserId();
+
+        try
+        {
+            await transactionService.DeleteTransaction(transactionId, userId);
+
+            return NoContent(); // 204 - Eliminazione avvenuta con successo
+        }
+        catch (InvalidOperationException ex)
+        {
+            if (ex.Message == "transaction-not-found")
+            {
+                return NotFound(new { message = "Transazione non trovata" }); // 404
+            }
+            return BadRequest(new { message = ex.Message }); // 400
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { message = "Si è verificato un errore interno" });
+        }
     }
 }
