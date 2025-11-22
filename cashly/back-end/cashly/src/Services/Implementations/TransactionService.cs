@@ -67,6 +67,86 @@ public class TransactionService(AppDbContext context) : ITransactionService
         });
     }
 
+    public async Task<Transaction> UpdateTransactionAsync(int transactionId, TransactionUpdateDto transactionDto, int userId)
+    {
+        var strategy = context.Database.CreateExecutionStrategy();
+
+        return await strategy.ExecuteAsync(async () =>
+        {
+            await using var dbTransaction = await context.Database.BeginTransactionAsync();
+
+            try
+            {
+                // 1. Trova la transazione esistente
+                var transaction = await context.Transactions
+                    .Include(t => t.User)
+                    .FirstOrDefaultAsync(t => t.TransactionId == transactionId && t.UserId == userId);
+
+                if (transaction == null)
+                {
+                    throw new InvalidOperationException("transaction-not-found");
+                }
+
+                // 2. Verifica che la categoria appartenga all'utente (se specificata)
+                if (transactionDto.CategoryId is not null &&
+                    !await context.Categories.AnyAsync(c => c.CategoryId == transactionDto.CategoryId && c.UserId == userId))
+                {
+                    throw new InvalidOperationException("category-not-found");
+                }
+
+                // 3. Calcola la differenza di saldo
+                var user = transaction.User;
+
+                // Rimuovi l'effetto della vecchia transazione dal saldo
+                switch (transaction.Type)
+                {
+                    case TransactionType.income:
+                        user.CurrentBalance -= transaction.Amount;
+                        break;
+                    case TransactionType.expense:
+                        user.CurrentBalance += transaction.Amount;
+                        break;
+                }
+
+                // 4. Aggiorna i campi della transazione
+                transaction.Amount = transactionDto.Amount;
+                transaction.Type = transactionDto.Type;
+                transaction.TransactionDate = transactionDto.TransactionDate.ToUniversalTime();
+                transaction.Description = transactionDto.Description;
+                transaction.CategoryId = transactionDto.CategoryId;
+
+                // 5. Applica l'effetto della nuova transazione al saldo
+                switch (transaction.Type)
+                {
+                    case TransactionType.income:
+                        user.CurrentBalance += transaction.Amount;
+                        break;
+                    case TransactionType.expense:
+                        user.CurrentBalance -= transaction.Amount;
+                        break;
+                }
+
+                // 6. Salva le modifiche
+                await context.SaveChangesAsync();
+
+                // 7. Conferma la transazione
+                await dbTransaction.CommitAsync();
+
+                // 8. Ricarica la transazione con la categoria per restituirla completa
+                await context.Entry(transaction)
+                    .Reference(t => t.Category)
+                    .LoadAsync();
+
+                return transaction;
+            }
+            catch (Exception)
+            {
+                await dbTransaction.RollbackAsync();
+                throw;
+            }
+        });
+    }
+
     public async Task<IEnumerable<Transaction>> GetTransactionsByUserIdAsync(int userId)
     {
         return await context.Transactions
@@ -75,5 +155,53 @@ public class TransactionService(AppDbContext context) : ITransactionService
             .OrderByDescending(t => t.TransactionDate)
             .ToListAsync();
     }
-}
 
+    public async Task DeleteTransaction(int id, int userId)
+    {
+        var strategy = context.Database.CreateExecutionStrategy();
+
+        await strategy.ExecuteAsync(async () =>
+        {
+            await using var dbTransaction = await context.Database.BeginTransactionAsync();
+
+            try
+            {
+                // 1. Trova la transazione con l'utente
+                var transaction = await context.Transactions
+                    .Include(t => t.User)
+                    .FirstOrDefaultAsync(t => t.TransactionId == id && t.UserId == userId);
+
+                if (transaction == null)
+                {
+                    throw new InvalidOperationException("transaction-not-found");
+                }
+
+                // 2. Aggiorna il saldo dell'utente
+                var user = transaction.User;
+                switch (transaction.Type)
+                {
+                    case TransactionType.income:
+                        user.CurrentBalance -= transaction.Amount;
+                        break;
+                    case TransactionType.expense:
+                        user.CurrentBalance += transaction.Amount;
+                        break;
+                }
+
+                // 3. Elimina la transazione
+                context.Transactions.Remove(transaction);
+
+                // 4. Salva le modifiche
+                await context.SaveChangesAsync();
+
+                // 5. Conferma la transazione
+                await dbTransaction.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await dbTransaction.RollbackAsync();
+                throw;
+            }
+        });
+    }
+}
