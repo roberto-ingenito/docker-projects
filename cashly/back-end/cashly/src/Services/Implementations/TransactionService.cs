@@ -150,7 +150,6 @@ public class TransactionService(AppDbContext context) : ITransactionService
     public async Task<IEnumerable<Transaction>> GetTransactionsByUserIdAsync(int userId)
     {
         return await context.Transactions
-            .Include(t => t.Category) // Includi i dati della categoria
             .Where(t => t.UserId == userId)
             .OrderByDescending(t => t.TransactionDate)
             .ToListAsync();
