@@ -2,33 +2,48 @@
 
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { createTransaction } from "@/lib/redux/slices/transactionsSlice";
-import { TransactionCreateDto, TransactionType } from "@/lib/types/transaction";
+import { createTransaction, updateTransaction } from "@/lib/redux/slices/transactionsSlice";
+import { Transaction, TransactionCreateDto, TransactionUpdateDto, TransactionType } from "@/lib/types/transaction";
 import { Button } from "@heroui/button";
 import { Input, Textarea } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
-import { ArrowTrendingUpIcon, ArrowTrendingDownIcon, PlusIcon } from "@heroicons/react/24/solid";
+import { ArrowTrendingUpIcon, ArrowTrendingDownIcon, PlusIcon, PencilIcon } from "@heroicons/react/24/solid";
 
-interface CreateTransactionModalProps {
+interface TransactionFormModalProps {
   isOpen: boolean;
   onOpenChange: () => void;
   onSuccess?: () => void;
+  mode?: "create" | "edit";
+  transaction?: Transaction; // Per modalità edit
 }
 
-export default function CreateTransactionModal({ isOpen, onOpenChange, onSuccess }: CreateTransactionModalProps) {
+export default function TransactionFormModal({ isOpen, onOpenChange, onSuccess, mode = "create", transaction }: TransactionFormModalProps) {
   const dispatch = useAppDispatch();
 
   const isLoading = useAppSelector((state) => state.transactions.isLoading);
+  const isUpdating = useAppSelector((state) => (transaction ? state.transactions.isLoading : false));
   const userCurrency = useAppSelector((state) => state.auth.user?.currency) ?? "EUR";
   const categories = useAppSelector((state) => state.categories.categories);
+
+  const isEditMode = mode === "edit" && transaction;
+  const isProcessing = isEditMode ? isUpdating : isLoading;
 
   // Helper functions
   const getCurrentDate = () => new Date().toISOString().split("T")[0];
   const getDefaultTime = () => new Date().toTimeString().slice(0, 5);
 
+  // Parse existing date/time for edit mode
+  const parseDateTime = (isoString: string) => {
+    const date = new Date(isoString);
+    return {
+      date: date.toISOString().split("T")[0],
+      time: date.toTimeString().slice(0, 5),
+    };
+  };
+
   // Form state
-  const [formData, setFormData] = useState<TransactionCreateDto>({
+  const [formData, setFormData] = useState<TransactionCreateDto | TransactionUpdateDto>({
     amount: 0,
     type: TransactionType.Expense,
     transactionDate: new Date().toISOString(),
@@ -39,37 +54,65 @@ export default function CreateTransactionModal({ isOpen, onOpenChange, onSuccess
   const [transactionDate, setTransactionDate] = useState(getCurrentDate());
   const [transactionTime, setTransactionTime] = useState(getDefaultTime());
 
+  // Initialize form with transaction data in edit mode
+  useEffect(() => {
+    if (isOpen) {
+      if (isEditMode && transaction) {
+        // Edit mode: carica i dati della transazione esistente
+        const { date, time } = parseDateTime(transaction.transactionDate);
+        setFormData({
+          amount: transaction.amount,
+          type: transaction.type,
+          transactionDate: transaction.transactionDate,
+          description: transaction.description || "",
+          categoryId: transaction.category?.categoryId || undefined,
+        });
+        setTransactionDate(date);
+        setTransactionTime(time);
+      } else {
+        // Create mode: reset form
+        setFormData({
+          amount: 0,
+          type: TransactionType.Expense,
+          transactionDate: new Date().toISOString(),
+          description: "",
+          categoryId: undefined,
+        });
+        setTransactionDate(getCurrentDate());
+        setTransactionTime(getDefaultTime());
+      }
+    }
+  }, [isOpen, isEditMode, transaction]);
+
   // Update transactionDate when date or time changes
   useEffect(() => {
     const dateTimeString = `${transactionDate}T${transactionTime}:00`;
-    setFormData((prev) => ({ ...prev, transactionDate: dateTimeString }));
+    setFormData((prev) => ({ ...prev, transactionDate: new Date(dateTimeString).toISOString() }));
   }, [transactionDate, transactionTime]);
-
-  // Reset form when modal closes
-  useEffect(() => {
-    if (!isOpen) {
-      setFormData({
-        amount: 0,
-        type: TransactionType.Expense,
-        transactionDate: new Date().toISOString(),
-        description: "",
-        categoryId: undefined,
-      });
-      setTransactionDate(getCurrentDate());
-      setTransactionTime(getDefaultTime());
-    }
-  }, [isOpen]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const result = await dispatch(createTransaction(formData));
+    try {
+      let result;
 
-    if (result.meta.requestStatus === "fulfilled") {
+      if (isEditMode && transaction) {
+        // Update existing transaction
+        result = await dispatch(
+          updateTransaction({
+            transactionId: transaction.transactionId,
+            data: formData as TransactionUpdateDto,
+          })
+        ).unwrap();
+      } else {
+        // Create new transaction
+        result = await dispatch(createTransaction(formData as TransactionCreateDto)).unwrap();
+      }
+
       onOpenChange();
       onSuccess?.();
-    }
+    } catch (error) {}
   };
 
   // Format date and time for preview
@@ -84,14 +127,20 @@ export default function CreateTransactionModal({ isOpen, onOpenChange, onSuccess
     });
   };
 
+  // Modal title and button text based on mode
+  const modalTitle = isEditMode ? "Modifica Transazione" : "Nuova Transazione";
+  const modalSubtitle = isEditMode ? "Modifica i dettagli della transazione" : "Registra una nuova entrata o uscita";
+  const submitButtonText = isEditMode ? "Salva Modifiche" : "Crea Transazione";
+  const submitButtonIcon = isEditMode ? <PencilIcon className="w-5 h-5" /> : <PlusIcon className="w-5 h-5" />;
+
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl" scrollBehavior="inside" placement="center" backdrop="blur">
       <ModalContent as="form" onSubmit={handleSubmit}>
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              <h2 className="text-2xl font-bold">Nuova Transazione</h2>
-              <p className="text-sm text-default-500 font-normal">Registra una nuova entrata o uscita</p>
+              <h2 className="text-2xl font-bold">{modalTitle}</h2>
+              <p className="text-sm text-default-500 font-normal">{modalSubtitle}</p>
             </ModalHeader>
 
             <ModalBody className="gap-6">
@@ -185,7 +234,7 @@ export default function CreateTransactionModal({ isOpen, onOpenChange, onSuccess
               <Textarea
                 label="Descrizione"
                 placeholder="Aggiungi una nota (opzionale)"
-                value={formData.description}
+                value={formData.description ?? ""}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 variant="bordered"
                 size="lg"
@@ -223,15 +272,15 @@ export default function CreateTransactionModal({ isOpen, onOpenChange, onSuccess
             </ModalBody>
 
             <ModalFooter>
-              <Button onPress={onClose} variant="flat">
+              <Button onPress={onClose} variant="flat" isDisabled={isProcessing}>
                 Annulla
               </Button>
               <Button
                 type="submit"
                 color={formData.type === TransactionType.Income ? "success" : "danger"}
-                isLoading={isLoading}
-                startContent={!isLoading && <PlusIcon className="w-5 h-5" />}>
-                Crea Transazione
+                isLoading={isProcessing}
+                startContent={!isProcessing && submitButtonIcon}>
+                {submitButtonText}
               </Button>
             </ModalFooter>
           </>

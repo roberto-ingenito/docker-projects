@@ -20,7 +20,6 @@ import {
   PlusIcon,
 } from "@heroicons/react/24/solid";
 import { useDisclosure } from "@heroui/modal";
-import CreateTransactionModal from "@/components/create-transaction-modal";
 
 // Componenti grafici astratti
 import ChartCard from "./(components)/ChartCard";
@@ -31,6 +30,7 @@ import PeriodComparisonChart from "./(components)/PeriodComparisonChart";
 import CumulativeBalanceChart from "./(components)/CumulativeBalanceChart";
 import WeekdayExpensesChart from "./(components)/WeekdayExpensesChart";
 import TopTransactionsList from "./(components)/TopTransactionsList";
+import TransactionFormModal from "@/components/transactionFormModal";
 
 // ============================================
 // INTERFACCE
@@ -490,7 +490,7 @@ export default function DashboardPage() {
         <TopTransactionsList transactions={topTransactions} />
       </ChartCard>
 
-      <CreateTransactionModal isOpen={isCreateTransasctionOpen} onOpenChange={onCreateTransasctionOpenChange} />
+      <TransactionFormModal isOpen={isCreateTransasctionOpen} onOpenChange={onCreateTransasctionOpenChange} mode="create" />
     </div>
   );
 }

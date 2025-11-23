@@ -1,6 +1,6 @@
 // lib/redux/slices/transactionsSlice.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { Transaction, TransactionCreateDto, TransactionType } from "@/lib/types/transaction";
+import { Transaction, TransactionCreateDto, TransactionType, TransactionUpdateDto } from "@/lib/types/transaction";
 import * as transactionsApi from "@/lib/api/transactions";
 
 interface TransactionsState {
@@ -40,6 +40,22 @@ export const createTransaction = createAsyncThunk(
         return response;
     }
 );
+
+export const deleteTransaction = createAsyncThunk(
+    'categories/deleteTransaction',
+    async (transactionId: number) => {
+        await transactionsApi.deleteTransaction(transactionId);
+        return transactionId;
+    }
+);
+
+export const updateTransaction = createAsyncThunk(
+    "transactions/updateTransaction",
+    async ({ transactionId, data }: { transactionId: number; data: TransactionUpdateDto }) => {
+        return await transactionsApi.updateTransaction({ transactionId, data });
+    }
+);
+
 
 // Slice
 const transactionsSlice = createSlice({
@@ -92,6 +108,43 @@ const transactionsSlice = createSlice({
             .addCase(createTransaction.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.error.message || 'Errore nella creazione della transazione';
+            });
+
+        // Update transaction
+        builder
+            .addCase(updateTransaction.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(updateTransaction.fulfilled, (state, action) => {
+                const updatedTransaction = action.payload;
+                const index = state.transactions.findIndex(t => t.transactionId === updatedTransaction.transactionId);
+                if (index !== -1) {
+                    state.transactions[index].amount = updatedTransaction.amount;
+                    state.transactions[index].category = updatedTransaction.category;
+                    state.transactions[index].description = updatedTransaction.description;
+                    state.transactions[index].transactionDate = updatedTransaction.transactionDate;
+                    state.transactions[index].type = updatedTransaction.type;
+                }
+                state.isLoading = false;
+            })
+            .addCase(updateTransaction.rejected, (state) => {
+                state.isLoading = false;
+            });
+
+        // Delete transaction
+        builder
+            .addCase(deleteTransaction.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(deleteTransaction.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.transactions = state.transactions.filter((transaction) => transaction.transactionId !== action.payload);
+            })
+            .addCase(deleteTransaction.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.error.message || 'Failed to delete transaction';
             });
     },
 });
