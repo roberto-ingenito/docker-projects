@@ -31,6 +31,7 @@ import CumulativeBalanceChart from "./(components)/CumulativeBalanceChart";
 import WeekdayExpensesChart from "./(components)/WeekdayExpensesChart";
 import TopTransactionsList from "./(components)/TopTransactionsList";
 import TransactionFormModal from "@/components/transactionFormModal";
+import { Category } from "@/lib/types/category";
 
 // ============================================
 // INTERFACCE
@@ -77,6 +78,7 @@ export default function DashboardPage() {
   const error = useAppSelector((state) => state.transactions.error);
   const firstLoadDone = useAppSelector((state) => state.transactions.firstLoadDone);
   const categoriesFirstLoadDone = useAppSelector((state) => state.categories.firstLoadDone);
+  const categories = useAppSelector((state) => state.categories.categories);
 
   // Modal states
   const { isOpen: isCreateTransasctionOpen, onOpen: onCreateTransasctionOpen, onOpenChange: onCreateTransasctionOpenChange } = useDisclosure();
@@ -89,6 +91,10 @@ export default function DashboardPage() {
     if (!firstLoadDone) dispatch(fetchTransactions());
     if (!categoriesFirstLoadDone) dispatch(getCategories());
   }, [dispatch, firstLoadDone, categoriesFirstLoadDone]);
+
+  function getTransactionCategory(categoryId: number | null) {
+    return categories.find((x) => x.categoryId === categoryId);
+  }
 
   // ============================================
   // CALCOLO STATISTICHE PRINCIPALI
@@ -191,16 +197,16 @@ export default function DashboardPage() {
     const totalExpenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
 
     expenseTransactions.forEach((t) => {
-      const categoryId = t.category?.categoryId ?? -1;
+      const categoryId = t.categoryId ?? -1;
       const existing = categoryMap.get(categoryId);
 
       if (existing) {
         existing.value += t.amount;
       } else {
         categoryMap.set(categoryId, {
-          name: t.category?.categoryName ?? "Senza categoria",
+          name: getTransactionCategory(t.categoryId)?.categoryName ?? "Senza categoria",
           value: t.amount,
-          color: t.category?.colorHex || "#9ca3af",
+          color: getTransactionCategory(t.categoryId)?.colorHex || "#9ca3af",
         });
       }
     });

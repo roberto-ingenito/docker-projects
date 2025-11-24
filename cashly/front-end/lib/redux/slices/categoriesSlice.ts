@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { CategoriesState, CategoryCreateDto } from '@/lib/types/category';
+import { CategoriesState, CategoryCreateDto, CategoryUpdateDto } from '@/lib/types/category';
 import * as categoriesApi from '@/lib/api/categories';
 
 const initialState: CategoriesState = {
@@ -21,6 +21,14 @@ export const createCategory = createAsyncThunk(
     'categories/createCategory',
     async (data: CategoryCreateDto) => {
         const response = await categoriesApi.createCategory(data);
+        return response;
+    }
+);
+
+export const updateCategory = createAsyncThunk(
+    'categories/updateCategory',
+    async ({ categoryId, data }: { categoryId: number, data: CategoryUpdateDto }) => {
+        const response = await categoriesApi.updateCategory({ categoryId, data });
         return response;
     }
 );
@@ -55,8 +63,10 @@ const categoriesSlice = createSlice({
             .addCase(getCategories.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.error.message || 'Failed to fetch categories';
-            })
-            // Create Category
+            });
+
+        // Create Category
+        builder
             .addCase(createCategory.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
@@ -68,18 +78,35 @@ const categoriesSlice = createSlice({
             .addCase(createCategory.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.error.message || 'Failed to create category';
+            });
+
+        // Update Category
+        builder
+            .addCase(updateCategory.pending, (state) => {
+                state.error = null;
             })
-            // Delete Category
+            .addCase(updateCategory.fulfilled, (state, action) => {
+                const updatedCategory = action.payload;
+                const index = state.categories.findIndex(c => c.categoryId === updatedCategory.categoryId);
+
+                if (index !== -1) {
+                    state.categories.splice(index, 1);
+                    state.categories.splice(index, 0, updatedCategory);
+                }
+            })
+            .addCase(updateCategory.rejected, (state, action) => {
+                state.error = action.error.message || 'Failed to update category';
+            });
+
+        // Delete Category
+        builder
             .addCase(deleteCategory.pending, (state) => {
-                state.isLoading = true;
                 state.error = null;
             })
             .addCase(deleteCategory.fulfilled, (state, action) => {
-                state.isLoading = false;
                 state.categories = state.categories.filter((category) => category.categoryId !== action.payload);
             })
             .addCase(deleteCategory.rejected, (state, action) => {
-                state.isLoading = false;
                 state.error = action.error.message || 'Failed to delete category';
             });
     },

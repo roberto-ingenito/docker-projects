@@ -1,24 +1,16 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { getCategories, createCategory, deleteCategory } from "@/lib/redux/slices/categoriesSlice";
-import { CategoryCreateDto } from "@/lib/types/category";
+import { getCategories } from "@/lib/redux/slices/categoriesSlice";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
-import { Input } from "@heroui/input";
-import { Modal } from "@heroui/modal";
-import { ModalContent } from "@heroui/modal";
-import { ModalHeader } from "@heroui/modal";
-import { ModalBody } from "@heroui/modal";
-import { ModalFooter } from "@heroui/modal";
 import { useDisclosure } from "@heroui/use-disclosure";
 import { Spinner } from "@heroui/spinner";
 
-import { PlusIcon, TagIcon, SparklesIcon } from "@heroicons/react/24/solid";
+import { PlusIcon, TagIcon } from "@heroicons/react/24/solid";
 import CategoryCard from "./(components)/categoryCard";
-import ColorSelector from "./(components)/colorSelector";
-import IconSelector, { getCategoryIcon } from "./(components)/iconSelector";
+import CategoryFormModal from "@/components/category_form_modal/categoryFormModal";
 
 export default function CategoriesPage() {
   const dispatch = useAppDispatch();
@@ -29,36 +21,10 @@ export default function CategoriesPage() {
   const firstLoadDone = useAppSelector((state) => state.categories.firstLoadDone);
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [deletingId, setDeletingId] = useState<number | null>(null);
-
-  const [formData, setFormData] = useState<CategoryCreateDto>({
-    categoryName: "",
-    iconName: "tag",
-    colorHex: "#3B82F6",
-  });
 
   useEffect(() => {
     if (!firstLoadDone) dispatch(getCategories());
   }, []);
-
-  const handleCreateCategorySubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const result = await dispatch(createCategory(formData));
-    if (result.meta.requestStatus === "fulfilled") {
-      setFormData({
-        categoryName: "",
-        iconName: "tag",
-        colorHex: "#3B82F6",
-      });
-      onOpenChange();
-    }
-  };
-
-  const handleDelete = async (categoryId: number) => {
-    setDeletingId(categoryId);
-    await dispatch(deleteCategory(categoryId));
-    setDeletingId(null);
-  };
 
   return (
     <>
@@ -111,12 +77,7 @@ export default function CategoriesPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {categories.map((category) => (
-                <CategoryCard
-                  key={category.categoryId}
-                  category={category}
-                  onDelete={() => handleDelete(category.categoryId)}
-                  isDeleting={deletingId === category.categoryId}
-                />
+                <CategoryCard key={category.categoryId} category={category} />
               ))}
             </div>
           </>
@@ -124,64 +85,7 @@ export default function CategoriesPage() {
       </div>
 
       {/* Modal Crea Categoria */}
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl" scrollBehavior="inside" placement="center" backdrop="blur">
-        <ModalContent as="form" onSubmit={handleCreateCategorySubmit}>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                <h2 className="text-2xl font-bold">Crea Nuova Categoria</h2>
-                <p className="text-sm text-default-500 font-normal">Personalizza la tua categoria con nome, icona e colore</p>
-              </ModalHeader>
-              <ModalBody className="gap-6">
-                {/* Nome Categoria */}
-                <Input
-                  label="Nome Categoria"
-                  placeholder="Es: Stipendio, Spese Casa, Shopping..."
-                  value={formData.categoryName}
-                  onChange={(e) => setFormData({ ...formData, categoryName: e.target.value })}
-                  required
-                  variant="bordered"
-                  size="lg"
-                  maxLength={100}
-                />
-
-                {/* Selettore Icona */}
-                <IconSelector value={formData.iconName || ""} onChange={(icon) => setFormData({ ...formData, iconName: icon })} />
-
-                {/* Selettore Colore */}
-                <ColorSelector value={formData.colorHex || "#3B82F6"} onChange={(color) => setFormData({ ...formData, colorHex: color })} />
-
-                {/* Preview */}
-                <div>
-                  <label className="block text-sm font-medium mb-3">Anteprima</label>
-                  <div className="flex items-center gap-4 p-4 border-2 border-default-200 rounded-lg bg-default-50">
-                    <div className="w-16 h-16 rounded-xl flex items-center justify-center shadow-lg" style={{ backgroundColor: formData.colorHex }}>
-                      {(() => {
-                        const Icon = getCategoryIcon(formData.iconName);
-                        return <Icon className="w-8 h-8 text-white" />;
-                      })()}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-lg">{formData.categoryName || "Nome categoria"}</p>
-                      <p className="text-sm text-default-500">
-                        {formData.iconName} • {formData.colorHex}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </ModalBody>
-              <ModalFooter>
-                <Button onPress={onClose} variant="flat">
-                  Annulla
-                </Button>
-                <Button type="submit" color="primary" isLoading={isLoading} startContent={!isLoading && <SparklesIcon className="w-5 h-5" />}>
-                  Crea Categoria
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+      <CategoryFormModal mode="create" isOpen={isOpen} onOpenChange={onOpenChange} />
     </>
   );
 }

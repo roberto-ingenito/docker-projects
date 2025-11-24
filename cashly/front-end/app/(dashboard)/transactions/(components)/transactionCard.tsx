@@ -14,31 +14,31 @@ import {
 } from "@heroicons/react/24/solid";
 import { Button } from "@heroui/button";
 import { Modal, ModalBody, ModalContent, ModalHeader, useDisclosure, ModalFooter } from "@heroui/modal";
-import { Input, Textarea } from "@heroui/input";
-import { Select, SelectItem } from "@heroui/select";
 import { useState, useEffect } from "react";
-import { useAppSelector } from "@/lib/redux/hooks";
 import TransactionFormModal from "@/components/transactionFormModal";
+import { useAppSelector } from "@/lib/redux/hooks";
 
 interface TransactionCardProps {
   transaction: Transaction;
   isDeleting: boolean;
-  isUpdating?: boolean;
+  isUpdating: boolean;
   onDelete: () => void;
   onUpdate: (transactionId: number, data: TransactionUpdateDto) => void;
 }
 
 export default function TransactionCard({ transaction, isDeleting, isUpdating = false, onDelete, onUpdate }: TransactionCardProps) {
-  const categories = useAppSelector((state) => state.categories.categories);
-
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange } = useDisclosure();
   const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
+
+  const categories = useAppSelector((state) => state.categories.categories);
+
+  const transactionCategory = categories.find((x) => x.categoryId === transaction.categoryId);
 
   // Stati per il form di modifica
   const [editData, setEditData] = useState<TransactionUpdateDto>({
     amount: transaction.amount,
     type: transaction.type,
-    categoryId: transaction.category?.categoryId || null,
+    categoryId: transaction.categoryId,
     transactionDate: transaction.transactionDate,
     description: transaction.description || null,
   });
@@ -51,7 +51,7 @@ export default function TransactionCard({ transaction, isDeleting, isUpdating = 
       setEditData({
         amount: transaction.amount,
         type: transaction.type,
-        categoryId: transaction.category?.categoryId || null,
+        categoryId: transaction.categoryId,
         transactionDate: transaction.transactionDate.split("T")[0], // Formato YYYY-MM-DD per input date
         description: transaction.description || null,
       });
@@ -90,21 +90,6 @@ export default function TransactionCard({ transaction, isDeleting, isUpdating = 
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSaveEdit = () => {
-    if (validateForm()) {
-      // Formatta la data correttamente con timezone
-      const formattedData = {
-        ...editData,
-        transactionDate: new Date(editData.transactionDate + "T00:00:00").toISOString(),
-        categoryId: editData.categoryId || null,
-        description: editData.description || null,
-      };
-
-      onUpdate(transaction.transactionId, formattedData);
-      onEditOpenChange();
-    }
-  };
-
   return (
     <>
       <Card className="hover:shadow-lg transition-shadow border border-default-200">
@@ -125,10 +110,10 @@ export default function TransactionCard({ transaction, isDeleting, isUpdating = 
                 <p className="font-semibold text-base truncate">{transaction.description || (isIncome ? "Entrata" : "Uscita")}</p>
 
                 {/* Category */}
-                {transaction.category && (
+                {transactionCategory && (
                   <div className="flex items-center gap-1 mt-1">
                     <TagIcon className="w-3.5 h-3.5 text-default-400" />
-                    <span className="text-sm text-default-600">{transaction.category.categoryName}</span>
+                    <span className="text-sm text-default-600">{transactionCategory.categoryName}</span>
                   </div>
                 )}
 

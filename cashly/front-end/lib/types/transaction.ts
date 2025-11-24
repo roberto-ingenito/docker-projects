@@ -1,5 +1,3 @@
-import { Category } from "./category";
-
 export enum TransactionType {
     Income = "income",
     Expense = "expense",
@@ -10,22 +8,22 @@ export interface Transaction {
     amount: number;
     type: TransactionType;
     transactionDate: string;
-    description?: string | null;
-    category?: Category | null;
+    description: string | null;
+    categoryId: number | null;
 }
 
 export interface TransactionCreateDto {
     amount: number;
     type: TransactionType;
-    categoryId?: number | null;
+    categoryId: number | null;
     transactionDate: string;
-    description?: string | null;
+    description: string | null;
 }
 
 export interface TransactionUpdateDto {
     amount: number;
     type: TransactionType;
-    categoryId?: number | null;
+    categoryId: number | null;
     transactionDate: string;
-    description?: string | null;
+    description: string | null;
 }

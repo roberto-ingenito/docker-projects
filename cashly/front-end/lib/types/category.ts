@@ -12,6 +12,12 @@ export interface CategoryCreateDto {
     colorHex?: string;
 }
 
+export interface CategoryUpdateDto {
+    categoryName: string;
+    iconName?: string;
+    colorHex?: string;
+}
+
 export interface CategoryResponseDto {
     categoryId: number;
     categoryName: string;

@@ -119,13 +119,12 @@ const transactionsSlice = createSlice({
             .addCase(updateTransaction.fulfilled, (state, action) => {
                 const updatedTransaction = action.payload;
                 const index = state.transactions.findIndex(t => t.transactionId === updatedTransaction.transactionId);
+
                 if (index !== -1) {
-                    state.transactions[index].amount = updatedTransaction.amount;
-                    state.transactions[index].category = updatedTransaction.category;
-                    state.transactions[index].description = updatedTransaction.description;
-                    state.transactions[index].transactionDate = updatedTransaction.transactionDate;
-                    state.transactions[index].type = updatedTransaction.type;
+                    state.transactions.splice(index, 1);
+                    state.transactions.splice(index, 0, updatedTransaction);
                 }
+
                 state.isLoading = false;
             })
             .addCase(updateTransaction.rejected, (state) => {

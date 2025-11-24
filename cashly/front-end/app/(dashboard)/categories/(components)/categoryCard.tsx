@@ -2,29 +2,32 @@ import { CategoryResponseDto } from "@/lib/types/category";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
-import { Tooltip } from "@heroui/tooltip";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal";
 
-import { TrashIcon, ExclamationTriangleIcon } from "@heroicons/react/24/solid";
-import { getCategoryIcon } from "./iconSelector";
+import { TrashIcon, ExclamationTriangleIcon, PencilIcon } from "@heroicons/react/24/solid";
+import { getCategoryIcon } from "../../../../components/category_form_modal/iconSelector";
+import CategoryFormModal from "@/components/category_form_modal/categoryFormModal";
+import { useState } from "react";
+import { deleteCategory } from "@/lib/redux/slices/categoriesSlice";
+import { useAppDispatch } from "@/lib/redux/hooks";
 
 // Componente Card Categoria
-export default function CategoryCard({
-  category,
-  onDelete,
-  isDeleting,
-}: {
-  category: CategoryResponseDto;
-  onDelete: () => void;
-  isDeleting: boolean;
-}) {
+export default function CategoryCard({ category }: { category: CategoryResponseDto }) {
   const IconComponent = getCategoryIcon(category.iconName);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const handleConfirmDelete = () => {
-    onDelete();
-    onOpenChange(); // Chiudi il modal
-  };
+  const { isOpen: isUpdateOpen, onOpen: onUpdateOpen, onOpenChange: onUpdateOpenChange } = useDisclosure();
+  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange } = useDisclosure();
+
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const dispatch = useAppDispatch();
+
+  async function handleConfirmDelete() {
+    setIsProcessing(true);
+    await dispatch(deleteCategory(category.categoryId));
+    setIsProcessing(false);
+    onDeleteOpenChange(); // Chiudi il modal
+  }
 
   return (
     <>
@@ -56,17 +59,20 @@ export default function CategoryCard({
             </div>
 
             {/* Bottone elimina */}
-            <Tooltip content="Elimina categoria" color="danger">
-              <Button isIconOnly color="danger" variant="flat" size="sm" onPress={onOpen} isDisabled={isDeleting} className="ml-2">
+            <div className="flex gap-2 flex-col">
+              <Button isIconOnly color="primary" variant="flat" size="sm" onPress={onUpdateOpen} isDisabled={isProcessing} className="ml-2">
+                <PencilIcon className="w-4 h-4" />
+              </Button>
+              <Button isIconOnly color="danger" variant="flat" size="sm" onPress={onDeleteOpen} isDisabled={isProcessing} className="ml-2">
                 <TrashIcon className="w-4 h-4" />
               </Button>
-            </Tooltip>
+            </div>
           </div>
         </CardBody>
       </Card>
 
       {/* Modal di conferma eliminazione */}
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center" backdrop="blur">
+      <Modal isOpen={isDeleteOpen} onOpenChange={onDeleteOpenChange} placement="center" backdrop="blur">
         <ModalContent>
           {(onClose) => (
             <>
@@ -101,14 +107,14 @@ export default function CategoryCard({
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="light" onPress={onClose} isDisabled={isDeleting}>
+                <Button variant="light" onPress={onClose} isDisabled={isProcessing}>
                   Annulla
                 </Button>
                 <Button
                   color="danger"
                   onPress={handleConfirmDelete}
-                  isLoading={isDeleting}
-                  startContent={!isDeleting && <TrashIcon className="w-4 h-4" />}>
+                  isLoading={isProcessing}
+                  startContent={!isProcessing && <TrashIcon className="w-4 h-4" />}>
                   Elimina
                 </Button>
               </ModalFooter>
@@ -116,6 +122,9 @@ export default function CategoryCard({
           )}
         </ModalContent>
       </Modal>
+
+      {/* Modal di aggiornamento */}
+      <CategoryFormModal isOpen={isUpdateOpen} onOpenChange={onUpdateOpenChange} mode="edit" category={category} />
     </>
   );
 }
