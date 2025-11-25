@@ -63,14 +63,11 @@ public class TransactionsController(ITransactionService transactionService) : Co
         }
         catch (InvalidOperationException ex)
         {
-            if (ex.Message == "transaction-not-found")
+            if (ex.Message == "transaction-not-found" || ex.Message == "category-not-found")
             {
-                return NotFound(new { message = "Transazione non trovata" }); // 404
+                return NotFound(new { message = ex.Message }); // 404
             }
-            if (ex.Message == "category-not-found")
-            {
-                return BadRequest(new { message = "Categoria non valida" }); // 400
-            }
+
             return BadRequest(new { message = ex.Message }); // 400
         }
         catch (Exception)

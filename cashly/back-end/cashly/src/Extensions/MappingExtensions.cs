@@ -26,7 +26,7 @@ public static class MappingExtensions
             Type = value.Type,
             TransactionDate = value.TransactionDate,
             Description = value.Description,
-            Category = value.Category?.ToDto(),
+            CategoryId = value.CategoryId,
         };
     }
 
