@@ -1,16 +1,26 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { CategoriesState, CategoryCreateDto, CategoryUpdateDto } from '@/lib/types/category';
+import { CategoryCreateDto, CategoryResponseDto, CategoryUpdateDto } from '@/lib/types/category';
 import * as categoriesApi from '@/lib/api/categories';
+
+
+interface CategoriesState {
+    categories: CategoryResponseDto[];
+    isLoading: boolean;
+    isPerformingAction: boolean;
+    firstLoadDone: boolean;
+    error: string | null;
+}
 
 const initialState: CategoriesState = {
     categories: [],
     isLoading: false,
+    isPerformingAction: false,
     error: null,
     firstLoadDone: false,
 };
 
-export const getCategories = createAsyncThunk(
-    'categories/getCategories',
+export const fetchCategories = createAsyncThunk(
+    'categories/fetchCategories',
     async () => {
         const response = await categoriesApi.getCategories();
         return response;
@@ -50,17 +60,17 @@ const categoriesSlice = createSlice({
     extraReducers: (builder) => {
         builder
             // Get Categories
-            .addCase(getCategories.pending, (state) => {
+            .addCase(fetchCategories.pending, (state) => {
                 state.isLoading = true;
                 state.firstLoadDone = false;
                 state.error = null;
             })
-            .addCase(getCategories.fulfilled, (state, action) => {
+            .addCase(fetchCategories.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.firstLoadDone = true;
                 state.categories = action.payload;
             })
-            .addCase(getCategories.rejected, (state, action) => {
+            .addCase(fetchCategories.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.error.message || 'Failed to fetch categories';
             });
@@ -68,21 +78,22 @@ const categoriesSlice = createSlice({
         // Create Category
         builder
             .addCase(createCategory.pending, (state) => {
-                state.isLoading = true;
+                state.isPerformingAction = true;
                 state.error = null;
             })
             .addCase(createCategory.fulfilled, (state, action) => {
-                state.isLoading = false;
                 state.categories.push(action.payload);
+                state.isPerformingAction = false;
             })
             .addCase(createCategory.rejected, (state, action) => {
-                state.isLoading = false;
+                state.isPerformingAction = false;
                 state.error = action.error.message || 'Failed to create category';
             });
 
         // Update Category
         builder
             .addCase(updateCategory.pending, (state) => {
+                state.isPerformingAction = true;
                 state.error = null;
             })
             .addCase(updateCategory.fulfilled, (state, action) => {
@@ -93,21 +104,26 @@ const categoriesSlice = createSlice({
                     state.categories.splice(index, 1);
                     state.categories.splice(index, 0, updatedCategory);
                 }
+                state.isPerformingAction = false;
             })
             .addCase(updateCategory.rejected, (state, action) => {
                 state.error = action.error.message || 'Failed to update category';
+                state.isPerformingAction = false;
             });
 
         // Delete Category
         builder
             .addCase(deleteCategory.pending, (state) => {
+                state.isPerformingAction = true;
                 state.error = null;
             })
             .addCase(deleteCategory.fulfilled, (state, action) => {
                 state.categories = state.categories.filter((category) => category.categoryId !== action.payload);
+                state.isPerformingAction = false;
             })
             .addCase(deleteCategory.rejected, (state, action) => {
                 state.error = action.error.message || 'Failed to delete category';
+                state.isPerformingAction = false;
             });
     },
 });

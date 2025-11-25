@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { getCategories } from "@/lib/redux/slices/categoriesSlice";
+import { fetchCategories } from "@/lib/redux/slices/categoriesSlice";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { useDisclosure } from "@heroui/use-disclosure";
@@ -23,7 +23,7 @@ export default function CategoriesPage() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   useEffect(() => {
-    if (!firstLoadDone) dispatch(getCategories());
+    if (!firstLoadDone) dispatch(fetchCategories());
   }, []);
 
   return (

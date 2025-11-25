@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { fetchTransactions } from "@/lib/redux/slices/transactionsSlice";
-import { getCategories } from "@/lib/redux/slices/categoriesSlice";
+import { fetchCategories } from "@/lib/redux/slices/categoriesSlice";
 import { TransactionType, Transaction } from "@/lib/types/transaction";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
@@ -89,7 +89,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!firstLoadDone) dispatch(fetchTransactions());
-    if (!categoriesFirstLoadDone) dispatch(getCategories());
+    if (!categoriesFirstLoadDone) dispatch(fetchCategories());
   }, [dispatch, firstLoadDone, categoriesFirstLoadDone]);
 
   function getTransactionCategory(categoryId: number | null) {

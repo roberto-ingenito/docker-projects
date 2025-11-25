@@ -25,9 +25,3 @@ export interface CategoryResponseDto {
     colorHex?: string;
 }
 
-export interface CategoriesState {
-    categories: CategoryResponseDto[];
-    isLoading: boolean;
-    firstLoadDone: boolean;
-    error: string | null;
-}

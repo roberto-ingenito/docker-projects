@@ -21,13 +21,11 @@ interface TransactionFormModalProps {
 export default function TransactionFormModal({ isOpen, onOpenChange, onSuccess, mode = "create", transaction }: TransactionFormModalProps) {
   const dispatch = useAppDispatch();
 
-  const isLoading = useAppSelector((state) => state.transactions.isLoading);
-  const isUpdating = useAppSelector((state) => (transaction ? state.transactions.isLoading : false));
+  const isPerformingAction = useAppSelector((state) => state.transactions.isPerformingAction);
   const userCurrency = useAppSelector((state) => state.auth.user?.currency) ?? "EUR";
   const categories = useAppSelector((state) => state.categories.categories);
 
   const isEditMode = mode === "edit" && transaction;
-  const isProcessing = isEditMode ? isUpdating : isLoading;
 
   // Helper functions
   const getCurrentDate = () => new Date().toISOString().split("T")[0];
@@ -48,7 +46,7 @@ export default function TransactionFormModal({ isOpen, onOpenChange, onSuccess, 
     type: TransactionType.Expense,
     transactionDate: new Date().toISOString(),
     description: "",
-    categoryId: undefined,
+    categoryId: null,
   });
 
   const [transactionDate, setTransactionDate] = useState(getCurrentDate());
@@ -65,7 +63,7 @@ export default function TransactionFormModal({ isOpen, onOpenChange, onSuccess, 
           type: transaction.type,
           transactionDate: transaction.transactionDate,
           description: transaction.description || "",
-          categoryId: transaction.category?.categoryId || undefined,
+          categoryId: transaction.categoryId,
         });
         setTransactionDate(date);
         setTransactionTime(time);
@@ -76,7 +74,7 @@ export default function TransactionFormModal({ isOpen, onOpenChange, onSuccess, 
           type: TransactionType.Expense,
           transactionDate: new Date().toISOString(),
           description: "",
-          categoryId: undefined,
+          categoryId: null,
         });
         setTransactionDate(getCurrentDate());
         setTransactionTime(getDefaultTime());
@@ -198,7 +196,7 @@ export default function TransactionFormModal({ isOpen, onOpenChange, onSuccess, 
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    categoryId: e.target.value ? parseInt(e.target.value) : undefined,
+                    categoryId: e.target.value ? parseInt(e.target.value) : null,
                   })
                 }
                 variant="bordered"
@@ -272,14 +270,14 @@ export default function TransactionFormModal({ isOpen, onOpenChange, onSuccess, 
             </ModalBody>
 
             <ModalFooter>
-              <Button onPress={onClose} variant="flat" isDisabled={isProcessing}>
+              <Button onPress={onClose} variant="flat" isDisabled={isPerformingAction}>
                 Annulla
               </Button>
               <Button
                 type="submit"
                 color={formData.type === TransactionType.Income ? "success" : "danger"}
-                isLoading={isProcessing}
-                startContent={!isProcessing && submitButtonIcon}>
+                isLoading={isPerformingAction}
+                startContent={!isPerformingAction && submitButtonIcon}>
                 {submitButtonText}
               </Button>
             </ModalFooter>

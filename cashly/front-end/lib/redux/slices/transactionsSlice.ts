@@ -6,6 +6,7 @@ import * as transactionsApi from "@/lib/api/transactions";
 interface TransactionsState {
     transactions: Transaction[];
     isLoading: boolean;
+    isPerformingAction: boolean;
     error: string | null;
     firstLoadDone: boolean;
     filters: {
@@ -19,6 +20,7 @@ interface TransactionsState {
 const initialState: TransactionsState = {
     transactions: [],
     isLoading: false,
+    isPerformingAction: false,
     error: null,
     firstLoadDone: false,
     filters: {},
@@ -98,22 +100,22 @@ const transactionsSlice = createSlice({
         // Create Transaction
         builder
             .addCase(createTransaction.pending, (state) => {
-                state.isLoading = true;
+                state.isPerformingAction = true;
                 state.error = null;
             })
             .addCase(createTransaction.fulfilled, (state, action) => {
-                state.isLoading = false;
+                state.isPerformingAction = false;
                 state.transactions.unshift(action.payload); // Aggiungi in cima
             })
             .addCase(createTransaction.rejected, (state, action) => {
-                state.isLoading = false;
+                state.isPerformingAction = false;
                 state.error = action.error.message || 'Errore nella creazione della transazione';
             });
 
         // Update transaction
         builder
             .addCase(updateTransaction.pending, (state) => {
-                state.isLoading = true;
+                state.isPerformingAction = true;
                 state.error = null;
             })
             .addCase(updateTransaction.fulfilled, (state, action) => {
@@ -125,24 +127,24 @@ const transactionsSlice = createSlice({
                     state.transactions.splice(index, 0, updatedTransaction);
                 }
 
-                state.isLoading = false;
+                state.isPerformingAction = false;
             })
             .addCase(updateTransaction.rejected, (state) => {
-                state.isLoading = false;
+                state.isPerformingAction = false;
             });
 
         // Delete transaction
         builder
             .addCase(deleteTransaction.pending, (state) => {
-                state.isLoading = true;
+                state.isPerformingAction = true;
                 state.error = null;
             })
             .addCase(deleteTransaction.fulfilled, (state, action) => {
-                state.isLoading = false;
+                state.isPerformingAction = false;
                 state.transactions = state.transactions.filter((transaction) => transaction.transactionId !== action.payload);
             })
             .addCase(deleteTransaction.rejected, (state, action) => {
-                state.isLoading = false;
+                state.isPerformingAction = false;
                 state.error = action.error.message || 'Failed to delete transaction';
             });
     },

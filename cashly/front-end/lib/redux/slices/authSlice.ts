@@ -61,8 +61,10 @@ const authSlice = createSlice({
             .addCase(login.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.error.message || 'Login failed';
-            })
-            // Signup
+            });
+
+        // Signup
+        builder
             .addCase(signup.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
@@ -76,8 +78,10 @@ const authSlice = createSlice({
             .addCase(signup.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.error.message || 'Signup failed';
-            })
-            // Logout
+            });
+
+        // Logout
+        builder
             .addCase(logout.fulfilled, (state) => {
                 state = initialState;
             });

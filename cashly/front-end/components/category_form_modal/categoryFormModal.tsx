@@ -23,7 +23,7 @@ export default function CategoryFormModal({ isOpen, onOpenChange, onSuccess, mod
   const dispatch = useAppDispatch();
 
   const isEditMode = mode === "edit" && category;
-  const isProcessing = useAppSelector((state) => state.categories.isLoading);
+  const isProcessing = useAppSelector((state) => state.categories.isPerformingAction);
 
   // Form state
   const [formData, setFormData] = useState<CategoryCreateDto | CategoryUpdateDto>({
