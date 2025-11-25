@@ -34,7 +34,6 @@ export default function TopTransactionsList({ transactions, emptyMessage = "Ness
     <div className="space-y-4">
       {transactions.map((transaction, index) => {
         const category = transaction.categoryId ? categoriesMap[transaction.categoryId] : null;
-        console.log(transaction.categoryId);
 
         return (
           <div key={transaction.transactionId} className="flex items-center gap-4 p-4 rounded-lg bg-primary/15">

@@ -31,7 +31,6 @@ import CumulativeBalanceChart from "./(components)/CumulativeBalanceChart";
 import WeekdayExpensesChart from "./(components)/WeekdayExpensesChart";
 import TopTransactionsList from "./(components)/TopTransactionsList";
 import TransactionFormModal from "@/components/transactionFormModal";
-import { Category } from "@/lib/types/category";
 
 // ============================================
 // INTERFACCE
@@ -74,7 +73,7 @@ interface WeekdayExpense {
 export default function DashboardPage() {
   const dispatch = useAppDispatch();
   const transactions = useAppSelector((state) => state.transactions.transactions);
-  const isLoading = useAppSelector((state) => state.transactions.isLoading);
+  const isLoading = useAppSelector((state) => state.transactions.isLoading || state.categories.isLoading);
   const error = useAppSelector((state) => state.transactions.error);
   const firstLoadDone = useAppSelector((state) => state.transactions.firstLoadDone);
   const categoriesFirstLoadDone = useAppSelector((state) => state.categories.firstLoadDone);
@@ -217,7 +216,7 @@ export default function DashboardPage() {
         percentage: totalExpenses > 0 ? (item.value / totalExpenses) * 100 : 0,
       }))
       .sort((a, b) => b.value - a.value);
-  }, [transactions]);
+  }, [transactions, categories]);
 
   const comparisonData = useMemo((): ComparisonData[] => {
     const now = new Date();
