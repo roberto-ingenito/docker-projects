@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { fetchTransactions } from "@/lib/redux/slices/transactionsSlice";
-import { getCategories } from "@/lib/redux/slices/categoriesSlice";
+import { fetchCategories } from "@/lib/redux/slices/categoriesSlice";
 import { TransactionType, Transaction } from "@/lib/types/transaction";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
@@ -20,7 +20,6 @@ import {
   PlusIcon,
 } from "@heroicons/react/24/solid";
 import { useDisclosure } from "@heroui/modal";
-import CreateTransactionModal from "@/components/create-transaction-modal";
 
 // Componenti grafici astratti
 import ChartCard from "./(components)/ChartCard";
@@ -31,6 +30,8 @@ import PeriodComparisonChart from "./(components)/PeriodComparisonChart";
 import CumulativeBalanceChart from "./(components)/CumulativeBalanceChart";
 import WeekdayExpensesChart from "./(components)/WeekdayExpensesChart";
 import TopTransactionsList from "./(components)/TopTransactionsList";
+import TransactionFormModal from "@/components/transactionFormModal";
+import { Category } from "@/lib/types/category";
 
 // ============================================
 // INTERFACCE
@@ -77,6 +78,7 @@ export default function DashboardPage() {
   const error = useAppSelector((state) => state.transactions.error);
   const firstLoadDone = useAppSelector((state) => state.transactions.firstLoadDone);
   const categoriesFirstLoadDone = useAppSelector((state) => state.categories.firstLoadDone);
+  const categories = useAppSelector((state) => state.categories.categories);
 
   // Modal states
   const { isOpen: isCreateTransasctionOpen, onOpen: onCreateTransasctionOpen, onOpenChange: onCreateTransasctionOpenChange } = useDisclosure();
@@ -87,8 +89,12 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!firstLoadDone) dispatch(fetchTransactions());
-    if (!categoriesFirstLoadDone) dispatch(getCategories());
+    if (!categoriesFirstLoadDone) dispatch(fetchCategories());
   }, [dispatch, firstLoadDone, categoriesFirstLoadDone]);
+
+  function getTransactionCategory(categoryId: number | null) {
+    return categories.find((x) => x.categoryId === categoryId);
+  }
 
   // ============================================
   // CALCOLO STATISTICHE PRINCIPALI
@@ -191,16 +197,16 @@ export default function DashboardPage() {
     const totalExpenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
 
     expenseTransactions.forEach((t) => {
-      const categoryId = t.category?.categoryId ?? -1;
+      const categoryId = t.categoryId ?? -1;
       const existing = categoryMap.get(categoryId);
 
       if (existing) {
         existing.value += t.amount;
       } else {
         categoryMap.set(categoryId, {
-          name: t.category?.categoryName ?? "Senza categoria",
+          name: getTransactionCategory(t.categoryId)?.categoryName ?? "Senza categoria",
           value: t.amount,
-          color: t.category?.colorHex || "#9ca3af",
+          color: getTransactionCategory(t.categoryId)?.colorHex || "#9ca3af",
         });
       }
     });
@@ -490,7 +496,7 @@ export default function DashboardPage() {
         <TopTransactionsList transactions={topTransactions} />
       </ChartCard>
 
-      <CreateTransactionModal isOpen={isCreateTransasctionOpen} onOpenChange={onCreateTransasctionOpenChange} />
+      <TransactionFormModal isOpen={isCreateTransasctionOpen} onOpenChange={onCreateTransasctionOpenChange} mode="create" />
     </div>
   );
 }

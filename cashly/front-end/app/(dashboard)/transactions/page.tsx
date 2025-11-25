@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { fetchTransactions, createTransaction, setFilters, clearFilters } from "@/lib/redux/slices/transactionsSlice";
-import { getCategories } from "@/lib/redux/slices/categoriesSlice";
-import { TransactionCreateDto, TransactionType } from "@/lib/types/transaction";
+import { fetchTransactions, setFilters, clearFilters, deleteTransaction, updateTransaction } from "@/lib/redux/slices/transactionsSlice";
+import { fetchCategories } from "@/lib/redux/slices/categoriesSlice";
+import { TransactionType, TransactionUpdateDto } from "@/lib/types/transaction";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
@@ -15,7 +15,7 @@ import { Spinner } from "@heroui/spinner";
 import { Chip } from "@heroui/chip";
 import { PlusIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, ChartBarIcon, FunnelIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import TransactionCard from "./(components)/transactionCard";
-import CreateTransactionModal from "@/components/create-transaction-modal";
+import TransactionFormModal from "@/components/transactionFormModal";
 
 export default function TransactionsPage() {
   const dispatch = useAppDispatch();
@@ -43,11 +43,26 @@ export default function TransactionsPage() {
     dateTo: "",
   });
 
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [updatingId, setUpdatingId] = useState<number | null>(null);
+
   // Load initial data
   useEffect(() => {
-    if (!categoriesLoaded) dispatch(getCategories());
+    if (!categoriesLoaded) dispatch(fetchCategories());
     if (!firstLoadDone) dispatch(fetchTransactions());
   }, []);
+
+  const handleDelete = async (transactionId: number) => {
+    setDeletingId(transactionId);
+    await dispatch(deleteTransaction(transactionId));
+    setDeletingId(null);
+  };
+
+  const handleUpdate = async (transactionId: number, data: TransactionUpdateDto) => {
+    setUpdatingId(transactionId);
+    await dispatch(updateTransaction({ transactionId, data }));
+    setUpdatingId(null);
+  };
 
   // Handle filter submit
   const handleFilterSubmit = (e: React.FormEvent) => {
@@ -78,7 +93,7 @@ export default function TransactionsPage() {
   const filteredTransactions = useMemo(() => {
     return transactions.filter((transaction) => {
       if (filters.type && transaction.type !== filters.type) return false;
-      if (filters.categoryId && transaction.category?.categoryId !== filters.categoryId) return false;
+      if (filters.categoryId && transaction.categoryId !== filters.categoryId) return false;
       if (filters.dateFrom && new Date(transaction.transactionDate) < new Date(filters.dateFrom)) return false;
       if (filters.dateTo && new Date(transaction.transactionDate) > new Date(filters.dateTo)) return false;
       return true;
@@ -277,14 +292,21 @@ export default function TransactionsPage() {
             </div>
             <div className="grid grid-cols-1 gap-3">
               {filteredTransactions.map((transaction) => (
-                <TransactionCard key={transaction.transactionId} transaction={transaction} />
+                <TransactionCard
+                  key={transaction.transactionId}
+                  transaction={transaction}
+                  onDelete={() => handleDelete(transaction.transactionId)}
+                  isDeleting={deletingId === transaction.transactionId}
+                  isUpdating={updatingId === transaction.transactionId}
+                  onUpdate={handleUpdate}
+                />
               ))}
             </div>
           </>
         )}
       </div>
 
-      <CreateTransactionModal isOpen={isCreateTransasctionOpen} onOpenChange={onCreateTransasctionOpenChange} />
+      <TransactionFormModal isOpen={isCreateTransasctionOpen} onOpenChange={onCreateTransasctionOpenChange} mode="create" />
 
       {/* Modal Filters */}
       <Modal isOpen={isFilterOpen} onOpenChange={onFilterOpenChange} size="xl" placement="center" backdrop="blur">

@@ -1,8 +1,6 @@
-import { Category } from "./category";
-
 export enum TransactionType {
-    Income = 'income',
-    Expense = 'expense'
+    Income = "income",
+    Expense = "expense",
 }
 
 export interface Transaction {
@@ -10,27 +8,22 @@ export interface Transaction {
     amount: number;
     type: TransactionType;
     transactionDate: string;
-    description?: string;
-    category?: Category;
+    description: string | null;
+    categoryId: number | null;
 }
 
 export interface TransactionCreateDto {
     amount: number;
     type: TransactionType;
-    categoryId?: number;
-    transactionDate?: string;
-    description?: string;
+    categoryId: number | null;
+    transactionDate: string;
+    description: string | null;
 }
 
-export interface TransactionsState {
-    transactions: Transaction[];
-    isLoading: boolean;
-    error: string | null;
-    filters: {
-        accountId?: number;
-        type?: TransactionType;
-        categoryId?: number;
-        dateFrom?: string;
-        dateTo?: string;
-    };
+export interface TransactionUpdateDto {
+    amount: number;
+    type: TransactionType;
+    categoryId: number | null;
+    transactionDate: string;
+    description: string | null;
 }
