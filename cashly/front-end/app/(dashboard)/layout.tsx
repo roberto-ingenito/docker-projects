@@ -13,6 +13,15 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    const userData = await actions.getUser();
+
+    if (!initialized.current && initialUserData) {
+      store.dispatch(setUser(initialUserData));
+      initialized.current = true;
+    }
+  }, [initialUserData]);
+
   return (
     <div className={clsx(" text-foreground bg-background font-sans antialiased relative flex flex-col h-dvh", fontSans.variable)}>
       <Navbar />

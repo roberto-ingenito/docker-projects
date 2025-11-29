@@ -15,7 +15,7 @@ import store from "@/lib/redux/store";
 export interface ProvidersProps {
   children: React.ReactNode;
   themeProps?: ThemeProviderProps;
-  initialUserData: User | undefined
+  initialUserData: User | undefined;
 }
 
 declare module "@react-types/shared" {
@@ -27,14 +27,14 @@ declare module "@react-types/shared" {
 export function Providers({ children, themeProps, initialUserData }: ProvidersProps) {
   const router = useRouter();
 
-  const initialized = React.useRef(false)
+  const initialized = React.useRef(false);
 
   React.useEffect(() => {
     if (!initialized.current && initialUserData) {
-      store.dispatch(setUser(initialUserData))
-      initialized.current = true
+      store.dispatch(setUser(initialUserData));
+      initialized.current = true;
     }
-  }, [initialUserData])
+  }, [initialUserData]);
 
   return (
     <HeroUIProvider navigate={router.push}>

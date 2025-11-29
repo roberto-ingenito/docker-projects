@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 export function PwaRegister() {
     useEffect(() => {
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/cashly/sw.js').catch(console.error)
+            navigator.serviceWorker.register('/cashly/sw.js', { scope: '/cashly/' }).catch(console.error)
         }
     }, [])
 
