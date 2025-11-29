@@ -8,14 +8,12 @@ import { useRouter } from "next/navigation";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { ToastProvider } from "@heroui/toast";
 import { Provider as ReduxProvider } from "react-redux";
-import { setUser } from "@/lib/redux/slices/authSlice";
-import { User } from "@/lib/types/auth";
 import store from "@/lib/redux/store";
+import AuthProvider from "./authProvider";
 
 export interface ProvidersProps {
   children: React.ReactNode;
   themeProps?: ThemeProviderProps;
-  initialUserData: User | undefined;
 }
 
 declare module "@react-types/shared" {
@@ -24,17 +22,8 @@ declare module "@react-types/shared" {
   }
 }
 
-export function Providers({ children, themeProps, initialUserData }: ProvidersProps) {
+export function Providers({ children, themeProps }: ProvidersProps) {
   const router = useRouter();
-
-  const initialized = React.useRef(false);
-
-  React.useEffect(() => {
-    if (!initialized.current && initialUserData) {
-      store.dispatch(setUser(initialUserData));
-      initialized.current = true;
-    }
-  }, [initialUserData]);
 
   return (
     <HeroUIProvider navigate={router.push}>
@@ -46,7 +35,9 @@ export function Providers({ children, themeProps, initialUserData }: ProvidersPr
         placement="top-right"
       />
       <NextThemesProvider {...themeProps}>
-        <ReduxProvider store={store}>{children}</ReduxProvider>
+        <ReduxProvider store={store}>
+          <AuthProvider>{children}</AuthProvider>
+        </ReduxProvider>
       </NextThemesProvider>
     </HeroUIProvider>
   );
