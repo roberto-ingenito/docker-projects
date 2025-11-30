@@ -1,29 +1,21 @@
-[How to configure github-actions self-hosted](https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners/add-runners#adding-a-self-hosted-runner-to-a-repository)
+# 🏠 Docker Projects - Hub Self-Hosting
 
-# How to set statical ip on Ubuntu Server
-```
-sudo nano /etc/netplan/50-cloud-init.yaml
-```
+Questo repository è il cuore dell'infrastruttura di self-hosting gestita su **Raspberry Pi**. Raggruppa diversi progetti e servizi containerizzati, orchestrati via **Docker Compose** e gestiti tramite una pipeline CI/CD automatizzata.
 
-Incolla
-```
-network:
-  version: 2
-  ethernets:
-    eth0:
-      dhcp4: no
-      addresses:
-        - 192.168.1.20/24
-      routes:
-        - to: default
-          via: 192.168.1.1
-      nameservers:
-        addresses:
-          - 8.8.8.8
-          - 1.1.1.1
-```
+## 🌟 Panoramica dei Servizi
 
-Poi applica le modifiche con 
-```
-sudo netplan apply
-```
+L'accesso ai servizi è gestito centralmente da Nginx.
+
+| Servizio | URL Path | Descrizione | Stack Tecnologico | Documentazione |
+| :--- | :--- | :--- | :--- | :--- |
+| **Cashly** | `/cashly/` | Gestione finanze personali (App, API, DB). | Next.js, .NET 9, PostgreSQL | [Vedi Dettagli](./cashly/README.md) |
+| **Prompt Builder** | `/prompt-builder/` | Tool per la creazione di prompt AI. | Next.js | [Vedi Dettagli](./prompt-builder/README.md) |
+| **Timesheet** | `/timesheet/` | Utility per fogli orari Excel. | React (Vite) | [Vedi Dettagli](./fortil-excel-timesheet/README.md) |
+| **Backend API** | `/api/` | Gateway API condiviso. | .NET 9 | [Vedi Dettagli](./cashly/README.md) |
+
+## ⚙️ Architettura
+
+* **Host:** Raspberry Pi (Ubuntu Server / Raspberry Pi OS).
+* **Gateway:** Nginx Reverse Proxy con terminazione SSL (Let's Encrypt/Certbot).
+* **Orchestrazione:** Docker Compose (rete `common-network`).
+* **Deployment:** GitHub Actions Self-Hosted Runner (CD automatico su push).
