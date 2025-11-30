@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
   },
+  manifest: "/cashly/manifest.json",
 };
 
 export const viewport: Viewport = {
