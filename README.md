@@ -6,13 +6,12 @@ Questo repository è il cuore dell'infrastruttura di self-hosting gestita su **R
 
 L'accesso ai servizi è gestito centralmente da Nginx.
 
-| Servizio | URL Path | Descrizione | Stack Tecnologico | Documentazione |
-| :--- | :--- | :--- | :--- | :--- |
-| **Cashly** | `/cashly/` | Gestione finanze personali (App, API, DB). | Next.js, .NET 9, PostgreSQL | [Vedi Dettagli](./cashly/README.md) |
-| **Prompt Builder** | `/prompt-builder/` | Tool per la creazione di prompt AI. | Next.js | [Vedi Dettagli](./prompt-builder/README.md) |
-| **Timesheet** | `/timesheet/` | Utility per fogli orari Excel. | React (Vite) | [Vedi Dettagli](./fortil-excel-timesheet/README.md) |
-| **Backend API** | `/api/` | Gateway API condiviso. | .NET 9 | [Vedi Dettagli](./cashly/README.md) |
-
+| Servizio | URL Path | Descrizione |
+| :--- | :--- | :--- |
+| **Cashly** | `/cashly/` | Gestione finanze personali (App, API, DB). | 
+| **Prompt Builder** | `/prompt-builder/` | Tool per la creazione di prompt AI. | 
+| **Timesheet** | `/timesheet/` | Utility per fogli orari Excel. |
+| **Backend API** | `/api/` | Gateway API condiviso. | 
 ## ⚙️ Architettura
 
 * **Host:** Raspberry Pi (Ubuntu Server / Raspberry Pi OS).
