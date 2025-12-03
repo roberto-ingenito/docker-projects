@@ -28,8 +28,8 @@ Per garantire che i servizi Docker siano sempre accessibili allo stesso indirizz
               via: 192.168.1.1   # Gateway del router (ad esempio, indirizzo IP del tuo router Vodafone)
           nameservers:
             addresses:
-              - 8.8.8.8         # DNS di Google
               - 1.1.1.1         # DNS di Cloudflare
+              - 8.8.8.8         # DNS di Google
     ```
 
 3.  **Applicare le Modifiche:**
