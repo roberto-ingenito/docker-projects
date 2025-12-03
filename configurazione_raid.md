@@ -67,23 +67,6 @@ network:
           - 1.1.1.1         # DNS di Cloudflare
           - 8.8.8.8         # DNS di Google
 EOF
-
-cat <<EOF > /mnt/nvme_boot/network-config
-network:
-  version: 2
-  ethernets:
-    eth0:
-      dhcp4: false
-      addresses:
-        - 192.168.1.20/24   # Indirizzo IP statico del tuo Raspberry Pi
-      routes:
-        - to: default
-          via: 192.168.1.1   # Gateway del router (ad esempio, indirizzo IP del tuo router Vodafone)
-      nameservers:
-        addresses:
-          - 1.1.1.1         # DNS di Cloudflare
-          - 8.8.8.8         # DNS di Google
-EOF
 ```
 
 ### Configurazione SSH
