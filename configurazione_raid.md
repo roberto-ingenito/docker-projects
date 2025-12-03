@@ -101,9 +101,9 @@ EOF
      ```sh
      adduser ingenitor
      ```
-   - E modifica la password dell'utente `root`
+   - Imposta l'utente come amministratore
      ```sh
-     passwd root
+     sudo usermod -aG sudo ingenitor
      ```
 1. Esci da _chroot_ con `exit`
 1. Smonta
