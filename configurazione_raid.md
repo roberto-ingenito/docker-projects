@@ -124,5 +124,165 @@ EOF
       ```sh
       sudo rpi-eeprom-config --edit
       ```
-   1. Cerca la riga `BOOT_ORDER=` e modifica il suo valore in `0xf146`
+   1. Cerca la riga `BOOT_ORDER=` e modifica il suo valore in `0xf641`
    1. Salva, esci e aspetta che finisca di eseguire.
+
+### Avvia il sistema
+
+1. Spegni il raspberry
+1. Scollega il vecchio disco
+1. Accendi il raspberry
+1. Accedi con ssh all'utente precedentemente creato
+1. Aggiorna il sistema
+   ```sh
+   sudo apt update && sudo apt upgrade
+   ```
+
+### INFO: ⚙️ Ordine di Avvio (BOOT_ORDER) del Raspberry Pi
+
+Il parametro **`BOOT_ORDER`** è una configurazione cruciale che risiede nell'**EEPROM** del bootloader del Raspberry Pi (tipicamente modelli Pi 4 e successivi).
+
+Definisce la **sequenza esatta** con cui il Raspberry Pi tenta di caricare il sistema operativo da diverse periferiche.
+
+#### 🔢 Decodifica del Valore Esadecimale
+
+Il valore è una stringa esadecimale (es. `0xf146`). Il bootloader legge la sequenza di avvio da **destra a sinistra** (escludendo il prefisso `0x`), dove ogni cifra rappresenta un tentativo di avvio.
+
+| Cifra Esadecimale | Modalità di Avvio | Descrizione                                                                             |
+| :---------------: | :---------------: | :-------------------------------------------------------------------------------------- |
+|       **1**       |    **SD CARD**    | Tenta l'avvio dalla scheda SD (o eMMC).                                                 |
+|       **2**       |      **NET**      | Tenta l'avvio tramite Rete (Ethernet/PXE).                                              |
+|       **4**       |    **USB-MSD**    | Tenta l'avvio da un dispositivo di archiviazione di massa USB (chiavetta, SSD esterno). |
+|       **6**       |     **NVME**      | Tenta l'avvio da un'unità SSD NVMe (se supportata, come su Pi 5).                       |
+|       **f**       |    **RESTART**    | Riavvia l'intera sequenza dall'inizio se tutti i tentativi precedenti falliscono.       |
+
+Esempio: `BOOT_ORDER=0xf146`: Tenta l'avvio da NVME, poi da USB, poi da SD CARD. Altrimenti riavvia (f)
+
+# Fase 3: Configurazione RAID 1
+
+Spegni il raspberry e riaccendilo dalla chiavetta USB. Si devono modificare i due dischi e bisogna eseguire queste operazione dall'esterno.
+
+### Installazione dei tool necessari
+
+#### Entra in modalità superuser
+
+```sh
+sudo -i
+```
+
+#### Installa i tool necessari
+
+```sh
+apt update
+apt install mdadm -y
+```
+
+### Replica la tabella delle partizioni
+
+Copiamo la struttura da nvme0n1 (disco con dati) a nvme1n1 (disco vuoto).
+
+```sh
+sfdisk -d /dev/nvme0n1 | sfdisk /dev/nvme1n1
+```
+
+### Creazione del RAID "Degradato"
+
+1. Crea l'array MD0: Usiamo la parola chiave missing per il primo disco, così l'array parte in modalità degradata con un solo disco.
+   ```sh
+   mdadm --create /dev/md0 --level=1 --raid-devices=2 missing /dev/nvme1n1p2
+   ```
+1. Formatta il nuovo volume RAID:
+   ```sh
+   mkfs.ext4 /dev/md0
+   ```
+
+### Migrazione dei Dati
+
+Ora dobbiamo copiare tutto dal vecchio sistema al nuovo RAID.
+
+1. Monta le partizioni:
+   ```sh
+   mkdir -p /mnt/source /mnt/target
+   mount /dev/nvme0n1p2 /mnt/source  # Vecchio sistema
+   mount /dev/md0 /mnt/target        # Nuovo RAID
+   ```
+1. Clona i dati (Root): Usiamo rsync per preservare permessi, link simbolici e attributi.
+   ```sh
+   rsync -axHAWXS --numeric-ids --info=progress2 /mnt/source/ /mnt/target/
+   ```
+1. Clona la partizione di Boot: Dobbiamo assicurarci che la partizione di boot del secondo disco sia identica alla prima.
+   - Formatta PRIMA di montare (cruciale!)
+     ```sh
+     mkfs.vfat -F 32 /dev/nvme1n1p1
+     ```
+   - Crea le directory
+     ```sh
+     mkdir -p /mnt/boot_source /mnt/boot_target
+     ```
+   - Monta le partizioni
+     ```sh
+     mount /dev/nvme0n1p1 /mnt/boot_source
+     ```
+   - Monta le partizioni
+     ```sh
+     mount /dev/nvme1n1p1 /mnt/boot_target
+     ```
+   - Svuota il target per sicurezza
+     ```sh
+     rm -rf /mnt/boot_target/*
+     ```
+   - Copia i dati
+     ```sh
+     rsync -axHAWXS /mnt/boot_source/ /mnt/boot_target/
+     ```
+
+### Configurazione del Sistema (Chroot)
+
+1. Montiamo la partizione di boot corretta dentro il raid e i filesystem di sistema.
+   ```sh
+   mount /dev/nvme1n1p1 /mnt/target/boot/firmware
+   mount --bind /dev /mnt/target/dev
+   mount --bind /proc /mnt/target/proc
+   mount --bind /sys /mnt/target/sys
+   ```
+1. Entra nel nuovo sistema
+   ```sh
+   chroot /mnt/target
+   ```
+1. Configura mdadm dentro il sistema: Ora sei "dentro" l'installazione su RAID.
+   ```sh
+   # Genera il file di configurazione del raid
+   mdadm --detail --scan >> /etc/mdadm/mdadm.conf
+   ```
+1. Aggiorna fstab: Modifica `/etc/fstab` per montare il device RAID invece del vecchio UUID. Trova l'UUID del raid con il comando `blkid /dev/md0`
+   ```sh
+   nano /etc/fstab
+   ```
+   **Sostituisci** l'intera riga che monta `/` con `UUID=xxxx-xxxx-xxxx    /    ext4    defaults,noatime    0    1`
+   > NOTA BENE: la riga, non usa spazi bensì usa i tab
+   > NOTA BENE: Non toccare la riga `/boot/firmware`
+1. Salva ed esci da nano e dai il comando: Questo passaggio è fondamentale affinché il kernel carichi i moduli RAID all'avvio.
+   ```sh
+   update-initramfs -u
+   ```
+1. Modifica cmdline.txt: Il bootloader del Pi deve sapere dove trovare la root
+   ```sh
+   nano /boot/firmware/cmdline.txt
+   ```
+   - Trova la parte `root=...` e cambiala in: `root=UUID=uuid-del-tuo-md0`.
+   - Assicurati anche che ci sia rootfstype=ext4.
+1. Esci dal Chroot
+   ```sh
+   exit
+   ```
+
+### Avvio del sistema
+
+1. Smonta tutto e spegni
+   ```sh
+   umount -R /mnt/target
+   umount -R /mnt/source
+   shutdown now
+   ```
+1. Rimuovi il disco temporaneo usato per fare la configurazione
+1. Accendi il raspberry
