@@ -1,32 +1,39 @@
 services:
+  # --- REVERSE PROXY ---
+  # Nginx funge da porta d'ingresso per tutto il traffico (HTTP/HTTPS)
   nginx:
     image: nginx:alpine
     container_name: cashly-nginx
     ports:
-      - "80:80"
-      - "443:443"
+      - "80:80" # Espone la porta 80 per HTTP (e rinnovo Certbot)
+      - "443:443" # Espone la porta 443 per traffico HTTPS criptato
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - ./nginx/certbot/conf:/etc/letsencrypt:ro
-      - ./nginx/certbot/www:/var/www/certbot:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro # Configurazione dei virtual host
+      - ./nginx/certbot/conf:/etc/letsencrypt:ro # Certificati SSL generati da Certbot
+      - ./nginx/certbot/www:/var/www/certbot:ro # Necessario per la validazione ACME
     networks:
       - common-network
     restart: always
-    depends_on:
+    depends_on: # Assicura che i servizi destinatari siano avviati prima di Nginx
       - cashly-back-end
       - cashly-front-end
       - fortil-excel-timesheet
       - nextcloud
 
+  # --- SSL MANAGEMENT ---
+  # Certbot gestisce il rilascio e il rinnovo automatico dei certificati Let's Encrypt
   certbot:
     image: certbot/certbot
     container_name: certbot
     volumes:
       - ./nginx/certbot/conf:/etc/letsencrypt
       - ./nginx/certbot/www:/var/www/certbot
+    # Script entrypoint: controlla il rinnovo ogni 12 ore
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     restart: always
 
+  # --- CASHLY APPLICATION ---
+  # Backend .NET Core
   cashly-back-end:
     build:
       context: ./cashly/back-end
@@ -34,7 +41,7 @@ services:
     image: cashly-back-end
     container_name: cashly-back-end
     expose:
-      - "80"
+      - "80" # Porta interna visibile solo agli altri container (Nginx)
     depends_on:
       - cashly-database
     environment:
@@ -45,6 +52,7 @@ services:
       - common-network
     restart: always
 
+  # Database Postgres per Cashly
   cashly-database:
     container_name: cashly-database
     image: postgres:18-alpine3.22
@@ -55,11 +63,12 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data # Persistenza dei dati DB
     networks:
       - common-network
     restart: always
 
+  # Frontend Next.js
   cashly-front-end:
     build:
       context: ./cashly/front-end
@@ -77,6 +86,8 @@ services:
       - common-network
     restart: always
 
+  # --- ADDITIONAL APPS ---
+  # Servizio Timesheet
   fortil-excel-timesheet:
     build:
       context: ./fortil-excel-timesheet
@@ -89,6 +100,7 @@ services:
       - common-network
     restart: unless-stopped
 
+  # Servizio Prompt Builder
   prompt-builder:
     build:
       context: ./prompt-builder
@@ -101,6 +113,7 @@ services:
       - common-network
     restart: unless-stopped
 
+  # Interfaccia grafica per la gestione dei database Postgres
   pgadmin:
     container_name: pgadmin-container
     image: dpage/pgadmin4
@@ -109,14 +122,14 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - "5050:80"
+      - "5050:80" # Accessibile esternamente sulla porta 5050
     networks:
       - common-network
     depends_on:
       - cashly-database
 
-  # ===== NEXTCLOUD SERVICES =====
-
+  # --- NEXTCLOUD SERVICES ---
+  # Applicazione Nextcloud (Cloud storage)
   nextcloud:
     container_name: nextcloud-app
     image: nextcloud:stable-apache
@@ -139,13 +152,13 @@ services:
       - OVERWRITECLIURL=https://roberto-ingenito.ddns.net/cloud
       - APACHE_DISABLE_REWRITE_IP=1
     volumes:
-      - nextcloud_data:/var/www/html
-      # Storage su RAID protetto
-      - /mnt/storage/nextcloud/data:/var/www/html/data
+      - nextcloud_data:/var/www/html # File di sistema dell'app
+      - /mnt/storage/nextcloud/data:/var/www/html/data # File utente su RAID esterno
     networks:
       - common-network
     restart: always
 
+  # Database Postgres specifico per Nextcloud
   nextcloud-db:
     container_name: nextcloud-db
     image: postgres:18-alpine3.22
@@ -161,6 +174,7 @@ services:
       - common-network
     restart: always
 
+  # Redis per il caching e file locking di Nextcloud
   nextcloud-redis:
     container_name: nextcloud-redis
     image: redis:alpine
@@ -170,6 +184,7 @@ services:
       - common-network
     restart: always
 
+  # Servizio Cron per le operazioni in background di Nextcloud
   nextcloud-cron:
     container_name: nextcloud-cron
     image: nextcloud:stable-apache
@@ -185,10 +200,14 @@ services:
       - common-network
     restart: always
 
+# --- NETWORKS ---
+# Rete isolata per la comunicazione interna tra container
 networks:
   common-network:
     driver: bridge
 
+# --- VOLUMES ---
+# Volumi nominati per la persistenza dei dati anche se i container vengono ricreati
 volumes:
   postgres_data:
     name: cashly-db_postgres_data
