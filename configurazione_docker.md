@@ -85,11 +85,9 @@ sudo docker info | grep "Docker Root Dir"
 
 ```bash
 # Struttura organizzata
+# Clona i tuoi progetti qui
 mkdir -p /mnt/storage/projects
 cd /mnt/storage/projects
-
-# Copia/clona i tuoi progetti qui
-# (se sono già da qualche parte, spostali qui)
 ```
 
 ## Avvia i container
@@ -108,4 +106,53 @@ docker compose up -d nginx
 
 ```bash
 docker compose up -d
+```
+
+## Configurazione NextCloud
+
+Entra nel container di NextCloud
+
+```bash
+docker exec -it --user www-data nextcloud-app bash
+```
+
+Esegui questi comandi nella shell del container di NextCloud
+
+```bash
+# Cache e Redis
+php occ config:system:set memcache.local --value='\OC\Memcache\APCu'
+php occ config:system:set memcache.distributed --value='\OC\Memcache\Redis'
+php occ config:system:set memcache.locking --value='\OC\Memcache\Redis'
+php occ config:system:set redis host --value='nextcloud-redis'
+php occ config:system:set redis port --value=6379 --type=integer
+
+# Preview di alta qualità
+php occ config:system:set preview_max_x --value=2048 --type=integer
+php occ config:system:set preview_max_y --value=2048 --type=integer
+php occ config:system:set jpeg_quality --value=90 --type=integer
+
+# Abilita preview per vari formati
+php occ config:system:set enabledPreviewProviders 0 --value='OC\Preview\PNG'
+php occ config:system:set enabledPreviewProviders 1 --value='OC\Preview\JPEG'
+php occ config:system:set enabledPreviewProviders 2 --value='OC\Preview\GIF'
+php occ config:system:set enabledPreviewProviders 3 --value='OC\Preview\BMP'
+php occ config:system:set enabledPreviewProviders 4 --value='OC\Preview\HEIC'
+php occ config:system:set enabledPreviewProviders 5 --value='OC\Preview\MP3'
+php occ config:system:set enabledPreviewProviders 6 --value='OC\Preview\TXT'
+php occ config:system:set enabledPreviewProviders 7 --value='OC\Preview\MarkDown'
+php occ config:system:set enabledPreviewProviders 8 --value='OC\Preview\PDF'
+
+# Finestra manutenzione
+php occ config:system:set maintenance_window_start --value=3 --type=integer
+
+# Italia
+php occ config:system:set default_phone_region --value='IT'
+
+exit
+```
+
+Riavvia il container di NextCloud per apportare le modifiche
+
+```bash
+docker compose restart nextcloud
 ```
