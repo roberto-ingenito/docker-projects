@@ -16,6 +16,7 @@ services:
       - cashly-back-end
       - cashly-front-end
       - fortil-excel-timesheet
+      - nextcloud
 
   certbot:
     image: certbot/certbot
@@ -113,6 +114,77 @@ services:
       - common-network
     depends_on:
       - cashly-database
+
+  # ===== NEXTCLOUD SERVICES =====
+
+  nextcloud:
+    container_name: nextcloud-app
+    image: nextcloud:stable-apache
+    expose:
+      - "80"
+    depends_on:
+      - nextcloud-db
+      - nextcloud-redis
+    environment:
+      - POSTGRES_HOST=nextcloud-db
+      - POSTGRES_DB=nextcloud
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
+      - REDIS_HOST=nextcloud-redis
+      - NEXTCLOUD_TRUSTED_DOMAINS=roberto-ingenito.ddns.net
+      - TRUSTED_PROXIES=172.16.0.0/12
+      - OVERWRITEHOST=roberto-ingenito.ddns.net
+      - OVERWRITEPROTOCOL=https
+      - OVERWRITEWEBROOT=/cloud
+      - OVERWRITECLIURL=https://roberto-ingenito.ddns.net/cloud
+      - APACHE_DISABLE_REWRITE_IP=1
+    volumes:
+      - nextcloud_data:/var/www/html
+      # Storage su RAID protetto
+      - /mnt/storage/nextcloud/data:/var/www/html/data
+    networks:
+      - common-network
+    restart: always
+
+  nextcloud-db:
+    container_name: nextcloud-db
+    image: postgres:18-alpine3.22
+    expose:
+      - "5432"
+    environment:
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
+      - POSTGRES_DB=nextcloud
+    volumes:
+      - nextcloud_db_data:/var/lib/postgresql/data
+    networks:
+      - common-network
+    restart: always
+
+  nextcloud-redis:
+    container_name: nextcloud-redis
+    image: redis:alpine
+    expose:
+      - "6379"
+    networks:
+      - common-network
+    restart: always
+
+  nextcloud-cron:
+    container_name: nextcloud-cron
+    image: nextcloud:stable-apache
+    entrypoint: /cron.sh
+    depends_on:
+      - nextcloud-db
+      - nextcloud-redis
+      - nextcloud
+    volumes:
+      - nextcloud_data:/var/www/html
+      - /mnt/storage/nextcloud/data:/var/www/html/data
+    networks:
+      - common-network
+    restart: always
+
 networks:
   common-network:
     driver: bridge
@@ -120,3 +192,7 @@ networks:
 volumes:
   postgres_data:
     name: cashly-db_postgres_data
+  nextcloud_db_data:
+    name: nextcloud-db_data
+  nextcloud_data:
+    name: nextcloud_app_data
