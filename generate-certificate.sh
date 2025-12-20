@@ -23,8 +23,5 @@ sudo cp -r /etc/letsencrypt/renewal nginx/certbot/conf/
 sudo chown -R $USER:$USER nginx/certbot/conf
 sudo chmod -R 755 nginx/certbot/conf
 
-# Avvia i servizi
-docker compose up -d
-
 echo "✅ Certificati generati e configurati!"
 echo "I certificati si rinnoveranno automaticamente tramite il container certbot"
