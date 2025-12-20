@@ -290,7 +290,85 @@ echo "RAID 1 funziona!" > /mnt/storage/test.txt
 cat /mnt/storage/test.txt
 ```
 
-## Comandi Utili per Gestione RAID
+### 6 Notifiche via Telegram
+
+**Setup:**
+
+1. Crea un bot Telegram:
+
+   - Parla con [@BotFather](https://t.me/botfather) su Telegram
+   - Usa `/newbot` e segui le istruzioni
+   - Ottieni il **TOKEN** del bot
+
+2. Ottieni il tuo **CHAT_ID**:
+
+   - Parla con [@userinfobot](https://t.me/userinfobot)
+   - Ti darà il tuo CHAT_ID
+
+3. Installa lo script di notifica:
+
+```bash
+# Crea script notifiche Telegram
+sudo tee /usr/local/bin/raid-notify-telegram.sh > /dev/null <<'EOF'
+#!/bin/bash
+BOT_TOKEN="IL_TUO_TOKEN_QUI"
+CHAT_ID="IL_TUO_CHAT_ID_QUI"
+MESSAGE="⚠️ RAID Alert on $(hostname): $1"
+
+curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+  -d chat_id="${CHAT_ID}" \
+  -d text="${MESSAGE}" \
+  > /dev/null
+EOF
+
+sudo chmod +x /usr/local/bin/raid-notify-telegram.sh
+
+# Configura mdadm per usare lo script
+sudo nano /etc/mdadm/mdadm.conf
+```
+
+Aggiungi/modifica questa riga:
+
+```
+PROGRAM /usr/local/bin/raid-notify-telegram.sh
+```
+
+Riavvia mdmonitor:
+
+```bash
+sudo systemctl restart mdmonitor.service
+```
+
+**Test:**
+
+```bash
+# Simula un alert
+echo "Test" | /usr/local/bin/raid-notify-telegram.sh "RAID Test Alert"
+```
+
+Dovresti ricevere un messaggio su Telegram! 🎉
+
+## Test del sistema di notifica
+
+Dopo aver configurato una delle opzioni sopra:
+
+```bash
+# Simula un guasto
+# Dovresti ricevere la notifica
+sudo mdadm /dev/md127 --fail /dev/nvme0n1p1
+
+# Aspetta qualche secondo
+sleep 5
+
+# Controlla i log
+sudo journalctl -u mdmonitor.service -n 20
+
+# Ripristina
+sudo mdadm /dev/md127 --remove /dev/nvme0n1p1
+sudo mdadm /dev/md127 --add /dev/nvme0n1p1
+```
+
+# Comandi Utili per Gestione RAID
 
 ### Verificare stato RAID
 
