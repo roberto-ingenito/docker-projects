@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 
-// Funzione helper per ottenere la lettera di colonna (es: 1 -> A, 2 -> B, 27 -> AA)
+// Funzione helper per ottenere la lettera di colonna
 function getColumnLetter(colIndex) {
   let temp, letter = '';
   while (colIndex > 0) {
@@ -11,6 +11,60 @@ function getColumnLetter(colIndex) {
     colIndex = Math.floor((colIndex - 1) / 26);
   }
   return letter;
+}
+
+// --- CALCOLO FESTIVITÀ ITALIANE ---
+
+// Calcolo della Pasqua (Metodo di Gauss/Meeus/Jones)
+function getEaster(year) {
+  const f = Math.floor;
+  const G = year % 19;
+  const C = f(year / 100);
+  const H = (C - f(C / 4) - f((8 * C + 13) / 25) + 19 * G + 15) % 30;
+  const I = H - f(H / 28) * (1 - f(29 / (H + 1)) * f((21 - G) / 11));
+  const J = (year + f(year / 4) + I + 2 - C + f(C / 4)) % 7;
+  const L = I - J;
+  const month = 3 + f((L + 40) / 44);
+  const day = L + 28 - 31 * f(month / 4);
+  return { month, day };
+}
+
+// Verifica se è una festività italiana
+function isItalianHoliday(year, month, day) {
+  // 1. Festività Fisse
+  const fixedHolidays = [
+    "1-1",   // Capodanno
+    "1-6",   // Epifania
+    "4-25",  // Liberazione
+    "5-1",   // Festa del Lavoro
+    "6-2",   // Festa della Repubblica
+    "8-15",  // Ferragosto
+    "11-1",  // Ognissanti
+    "12-8",  // Immacolata
+    "12-25", // Natale
+    "12-26", // Santo Stefano
+  ];
+
+  const dateKey = `${month}-${day}`;
+  if (fixedHolidays.includes(dateKey)) return true;
+
+  // 2. Pasqua e Pasquetta (Mobili)
+  const easter = getEaster(year);
+
+  // Data Pasqua
+  if (month === easter.month && day === easter.day) return true;
+
+  // Calcolo Pasquetta (Giorno dopo Pasqua)
+  const easterDate = new Date(year, easter.month - 1, easter.day);
+  const pasquettaDate = new Date(easterDate);
+  pasquettaDate.setDate(easterDate.getDate() + 1);
+
+  if (month === (pasquettaDate.getMonth() + 1) && day === pasquettaDate.getDate()) {
+    return true;
+  }
+
+  // (Opzionale) Patrono: Qui potresti aggiungere la logica per il santo patrono se serve
+  return false;
 }
 
 function MonthExcelForm() {
@@ -29,7 +83,6 @@ function MonthExcelForm() {
     "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
   ];
 
-  // Nomi dei giorni della settimana in Italiano
   const dayNames = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
 
   function daysInMonth(year, month) {
@@ -40,18 +93,24 @@ function MonthExcelForm() {
     return dayNames[new Date(year, month - 1, day).getDay()];
   }
 
+  // AGGIORNATO: Controlla se è lavorativo (Lun-Ven) E se non è festivo
   function isWorkday(year, month, day) {
     const dayOfWeek = new Date(year, month - 1, day).getDay();
-    return dayOfWeek >= 1 && dayOfWeek <= 5; // Lunedì (1) a Venerdì (5)
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6; // 0=Dom, 6=Sab
+    const isHoliday = isItalianHoliday(year, month, day);
+
+    // È lavorativo se NON è weekend E NON è festa
+    return !isWeekend && !isHoliday;
   }
 
-  // Inizializza le presenze quando il componente si monta o quando cambiano mese/anno
+  // Inizializza le presenze
   useEffect(() => {
     function initializePresenze(year, month) {
       const days = daysInMonth(year, month);
       const newPresenze = {};
 
       for (let d = 1; d <= days; d++) {
+        // Se è lavorativo (quindi NO weekend e NO festa), metti 8 ore
         if (isWorkday(year, month, d)) {
           newPresenze[d] = {
             ordinarie: "8",
@@ -59,6 +118,7 @@ function MonthExcelForm() {
             ferie: "0"
           };
         } else {
+          // Weekend o Festa -> 0 ore
           newPresenze[d] = {
             ordinarie: "0",
             straordinarie: "0",
@@ -170,10 +230,22 @@ function MonthExcelForm() {
       };
     }
 
-    // Riga 8: Ore ordinarie
+    // --- LOGICA EXCEL PER CELLE DATI ---
+    // Definiamo helper per bordi standard
+    const applyBorders = (row) => {
+      row.eachCell({ includeEmpty: true }, (cell, colNum) => {
+        if (colNum > 2 && colNum !== separatorColIndex) {
+          cell.border = {
+            top: { style: "thin" }, bottom: { style: "thin" },
+            left: { style: "thin" }, right: { style: "thin" },
+          };
+        }
+      });
+    }
+
+    // Riga 8: Ordinarie
     let row = ["", "Ore ordinarie"];
     let dayColLetters = [];
-
     for (let d = 1; d <= nDays; d++) {
       const val = presenze[d]?.["ordinarie"] || "0";
       row.push(parseInt(val, 10)); // Valore numerico
@@ -189,16 +261,7 @@ function MonthExcelForm() {
     row.push(null); // Totale Euro (lasciato vuoto)
 
     let excelRow = sheet.addRow(row);
-
-    // Styling e bordi
-    excelRow.eachCell({ includeEmpty: true }, (cell, colNum) => {
-      if (colNum > 2 && colNum !== separatorColIndex) {
-        cell.border = {
-          top: { style: "thin" }, bottom: { style: "thin" },
-          left: { style: "thin" }, right: { style: "thin" },
-        };
-      }
-    });
+    applyBorders(excelRow);
 
     // Riga 9: Ore straordinarie
     row = ["", "Ore straordinarie"];
@@ -219,16 +282,7 @@ function MonthExcelForm() {
     row.push(null); // Totale Euro
 
     excelRow = sheet.addRow(row);
-
-    // Styling e bordi
-    excelRow.eachCell({ includeEmpty: true }, (cell, colNum) => {
-      if (colNum > 2 && colNum !== separatorColIndex) {
-        cell.border = {
-          top: { style: "thin" }, bottom: { style: "thin" },
-          left: { style: "thin" }, right: { style: "thin" },
-        };
-      }
-    });
+    applyBorders(excelRow);
 
     // Riga 10: Ferie
     row = ["", "Ferie"];
@@ -249,17 +303,9 @@ function MonthExcelForm() {
     row.push(null); // Totale Euro
 
     excelRow = sheet.addRow(row);
+    applyBorders(excelRow);
 
-    // Styling e bordi
-    excelRow.eachCell({ includeEmpty: true }, (cell, colNum) => {
-      if (colNum > 2 && colNum !== separatorColIndex) {
-        cell.border = {
-          top: { style: "thin" }, bottom: { style: "thin" },
-          left: { style: "thin" }, right: { style: "thin" },
-        };
-      }
-    });
-
+    // Righe totali e styling finale (invariato)
     // Riga 11 e 12: vuote (per spostare i totali alla Riga 13)
     sheet.addRow([]); // Riga 11: Vuota
     sheet.addRow([]); // Riga 12: Vuota
@@ -379,7 +425,8 @@ function MonthExcelForm() {
         <header className="mb-8 p-6 bg-white shadow-xl rounded-xl">
           <p className="text-2xl">
             Per tutti i giorni lavorativi, sono già indicate 8 ore.<br />
-            Controllare eventuali giorni festivi oltre il <b>sabato</b> e la <b>domenica</b>
+            I weekend sono marcati in <b className="text-red-400">rosso</b>.<br />
+            I giorni festivi sono marcati in <b className="text-orange-400">arancione</b>.
           </p>
         </header>
 
@@ -450,11 +497,13 @@ function MonthExcelForm() {
                 {Array.from({ length: nDays }, (_, i) => {
                   const d = i + 1;
                   const dayName = getDayOfWeek(formData.year, formData.month, d);
-                  const isWeekend = !isWorkday(formData.year, formData.month, d);
+                  // Usiamo !isWorkday perché include sia weekend che festivi
+                  const isRedDay = !isWorkday(formData.year, formData.month, d);
+                  const isOrangeDay = isItalianHoliday(formData.year, formData.month, d);
                   return (
                     <th
                       key={d}
-                      className={`border border-gray-300 p-2 font-bold text-gray-700 ${isWeekend ? "bg-red-100" : "bg-blue-100"}`}
+                      className={`border border-gray-300 p-2 font-bold text-gray-700 ${isOrangeDay ? "bg-orange-300" : isRedDay ? "bg-red-100" : "bg-blue-100"}`}
                       style={{ minWidth: "60px", writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
                     >
                       {dayName}<span className="block">{d}</span>
@@ -471,11 +520,12 @@ function MonthExcelForm() {
                   </td>
                   {Array.from({ length: nDays }, (_, i) => {
                     const d = i + 1;
-                    const isWeekend = !isWorkday(formData.year, formData.month, d);
+                    const isRedDay = !isWorkday(formData.year, formData.month, d);
+                    const isOrangeDay = isItalianHoliday(formData.year, formData.month, d);
                     return (
                       <td
                         key={d}
-                        className={`border border-gray-300 p-1 ${isWeekend ? "bg-red-50" : "bg-white"}`}
+                        className={`border border-gray-300 p-1 ${isOrangeDay ? "bg-orange-100" : isRedDay ? "bg-red-50" : "bg-white"}`}
                       >
                         <input
                           type="number"
