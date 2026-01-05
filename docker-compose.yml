@@ -200,6 +200,40 @@ services:
       - common-network
     restart: always
 
+  mr-white-back-end:
+    build:
+      context: ./mr-white-game/backend/MrWhite.Backend
+      dockerfile: Dockerfile
+    image: mr-white-back-end
+    container_name: mr-white-back-end
+    expose:
+      - "80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+    volumes:
+      - ./mr-white-game/backend/MrWhite.Backend/words.json:/app/words.json
+    networks:
+      - common-network
+    restart: always
+
+  mr-white-front-end:
+    build:
+      context: ./mr-white-game/frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=https://roberto-ingenito.ddns.net/mr-white-api
+    image: mr-white-front-end
+    container_name: mr-white-front-end
+    expose:
+      - "3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=https://roberto-ingenito.ddns.net/mr-white-api
+    networks:
+      - common-network
+    restart: always
+
 # --- NETWORKS ---
 # Rete isolata per la comunicazione interna tra container
 networks:
