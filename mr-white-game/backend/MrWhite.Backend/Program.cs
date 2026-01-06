@@ -56,8 +56,6 @@ app.UseForwardedHeaders(
     new ForwardedHeadersOptions
     {
         ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost,
-        KnownNetworks.Clear(), 
-        KnownProxies.Clear()
     }
 );
 
