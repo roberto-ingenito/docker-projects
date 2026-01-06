@@ -21,10 +21,12 @@ import { Player } from "../types/player";
 class SignalRService {
   private connection: signalR.HubConnection | null = null;
 
+  private apiBasePath: string = process.env.NEXT_PUBLIC_API_URL || "https://roberto-ingenito.ddns.net/mr-white-api";
+
   // Inizializza la connessione e i listener
   init(dispatch: AppDispatch) {
     this.connection = new signalR.HubConnectionBuilder() //
-      .withUrl(process.env.NEXT_PUBLIC_API_URL || "https://roberto-ingenito.ddns.net/mr-white-api")
+      .withUrl(this.apiBasePath + "/gamehub")
       .withAutomaticReconnect()
       .build();
 

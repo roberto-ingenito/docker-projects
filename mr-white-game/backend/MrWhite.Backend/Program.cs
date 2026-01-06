@@ -49,11 +49,6 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // ===================================
-// Questo fa sì che tutte le route siano prefissate con /mr-white-api/
-// ===================================
-app.UsePathBase("/mr-white-api");
-
-// ===================================
 // FORWARDED HEADERS
 // Necessario per gestire correttamente HTTPS dietro Nginx
 // ===================================
@@ -61,11 +56,19 @@ app.UseForwardedHeaders(
     new ForwardedHeadersOptions
     {
         ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost,
+        KnownNetworks.Clear(), 
+        KnownProxies.Clear()
     }
 );
 
+// ===================================
+// Questo fa sì che tutte le route siano prefissate con /mr-white-api/
+// ===================================
+app.UsePathBase("/mr-white-api");
+
+app.UseRouting();
 app.UseCors(myAllowSpecificOrigins);
 
-app.MapHub<GameHub>("");
+app.MapHub<GameHub>("/gamehub");
 
 app.Run();
