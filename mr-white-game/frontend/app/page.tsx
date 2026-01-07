@@ -12,41 +12,25 @@ import { GamePhase } from "@/lib/types/gamePhase.enum";
 
 export default function GameContainer() {
   const { gamePhase, roomCode } = useAppSelector((state) => state.gameRoom.room);
-  const room = useAppSelector((state) => state.gameRoom.room);
 
   if (!roomCode) {
     return <HomeScreen />;
   }
 
-  let ScreenComponent;
-
   switch (gamePhase) {
     case GamePhase.Lobby:
-      ScreenComponent = <LobbyScreen />;
-      break;
+      return <LobbyScreen />;
     case GamePhase.RoleAssignment:
-      ScreenComponent = <RoleAssignmentScreen />;
-      break;
+      return <RoleAssignmentScreen />;
     case GamePhase.Talking:
-      ScreenComponent = <TalkingScreen />;
-      break;
+      return <TalkingScreen />;
     case GamePhase.Voting:
-      ScreenComponent = <VotingScreen />;
-      break;
+      return <VotingScreen />;
     case GamePhase.Revelation:
-      ScreenComponent = <RevelationScreen />;
-      break;
+      return <RevelationScreen />;
     case GamePhase.EndGame:
-      ScreenComponent = <EndGameScreen />;
-      break;
+      return <EndGameScreen />;
     default:
-      ScreenComponent = <LobbyScreen />;
+      return <LobbyScreen />;
   }
-
-  return (
-    <div>
-      {ScreenComponent}
-      <pre>{JSON.stringify(room, null, 2)}</pre>
-    </div>
-  );
 }
