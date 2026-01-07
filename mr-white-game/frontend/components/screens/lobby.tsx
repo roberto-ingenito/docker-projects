@@ -1,13 +1,18 @@
 "use client";
 
-import { useAppSelector } from "@/lib/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import Button from "../ui/button";
 import { signalRBridge } from "@/lib/services/signarHubService";
-import { Copy, Users, Crown, User } from "lucide-react";
+import { Copy, Users, Crown, User, Layers } from "lucide-react"; // Aggiunto icona Layers
+import { setSelectedCategories } from "@/lib/redux/slices/gameRoomSlice";
 
 export default function LobbyScreen() {
+  const dispatch = useAppDispatch();
+
   const { roomCode, players } = useAppSelector((state) => state.gameRoom.room);
   const connectionId = useAppSelector((state) => state.gameRoom.connectionId);
+  const categories = useAppSelector((state) => state.gameRoom.categories);
+  const selectedCategories = useAppSelector((state) => state.gameRoom.selectedCategories);
 
   const playerList = Object.values(players);
   const me = players[connectionId];
@@ -16,12 +21,21 @@ export default function LobbyScreen() {
 
   function handleStartGame() {
     if (canStart) {
-      signalRBridge.invoke("StartGame", roomCode);
+      signalRBridge.invoke("StartGame", roomCode, selectedCategories);
     }
   }
 
   function copyToClipboard() {
     navigator.clipboard.writeText(roomCode);
+  }
+
+  // Gestione selezione/deselezione
+  function toggleCategory(category: string) {
+    if (selectedCategories.includes(category)) {
+      dispatch(setSelectedCategories(selectedCategories.filter((c) => c !== category)));
+    } else {
+      dispatch(setSelectedCategories([...selectedCategories, category]));
+    }
   }
 
   return (
@@ -37,7 +51,7 @@ export default function LobbyScreen() {
         </div>
 
         {/* Lista Giocatori */}
-        <div>
+        <div className="mb-8">
           <div className="flex items-center justify-between mb-4 px-2">
             <h2 className="text-lg font-bold text-slate-200 flex items-center gap-2">
               <Users className="w-5 h-5 text-cyan-500" />
@@ -70,6 +84,39 @@ export default function LobbyScreen() {
             ))}
           </div>
         </div>
+
+        {/* Sezione Categorie (Visibile solo se ci sono categorie) */}
+        {categories && categories.length > 0 && isHost && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4 px-2">
+              <h2 className="text-lg font-bold text-slate-200 flex items-center gap-2">
+                <Layers className="w-5 h-5 text-purple-500" />
+                Categorie
+              </h2>
+              <span className="text-xs text-slate-500 font-medium uppercase tracking-wide">
+                {selectedCategories.length === 0 ? "Tutte (default)" : `${selectedCategories.length} scelte`}
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat) => {
+                const isSelected = selectedCategories.includes(cat);
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => toggleCategory(cat)}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-semibold border transition-all duration-200 cursor-pointer ${
+                      isSelected
+                        ? "bg-purple-500/20 border-purple-500/50 text-purple-300"
+                        : "bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-500 hover:text-slate-300"
+                    }`}>
+                    {cat}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div className="border-t rounded-full border-slate-800 my-8"></div>
 

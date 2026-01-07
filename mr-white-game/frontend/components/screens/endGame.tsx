@@ -1,12 +1,15 @@
 "use client";
 
-import { useAppSelector } from "@/lib/redux/hooks";
-import { signalRBridge } from "@/lib/services/signarHubService"; // Assicurati che il path sia corretto
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import Button from "../ui/button";
 import { Trophy, Skull, Crown, RefreshCw, LogOut, User, Copy } from "lucide-react";
 import { PlayerRole } from "@/lib/types/playerRole.enum";
+import { gamePhaseChanged } from "@/lib/redux/slices/gameRoomSlice";
+import { GamePhase } from "@/lib/types/gamePhase.enum";
 
 export default function ResultScreen() {
+  const dispatch = useAppDispatch();
+
   const { roomCode, players } = useAppSelector((state) => state.gameRoom.room);
   const { winner } = useAppSelector((state) => state.gameRoom);
   const connectionId = useAppSelector((state) => state.gameRoom.connectionId);
@@ -21,8 +24,7 @@ export default function ResultScreen() {
   const mrWhitePlayer = Object.values(players).find((p) => p.role === "MrWhite");
 
   function handleRestart() {
-    // Il backend accetta StartGame anche se la fase è EndGame, resettando ruoli e voti.
-    signalRBridge.invoke("StartGame", roomCode);
+    dispatch(gamePhaseChanged(GamePhase.Lobby));
   }
 
   function handleExit() {

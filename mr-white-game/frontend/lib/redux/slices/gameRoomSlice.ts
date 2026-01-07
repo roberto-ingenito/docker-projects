@@ -2,14 +2,15 @@ import { GamePhase } from "@/lib/types/gamePhase.enum";
 import { GameRoom } from "@/lib/types/gameRoom";
 import { Player } from "@/lib/types/player";
 import { PlayerRole } from "@/lib/types/playerRole.enum";
-
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: {
   room: GameRoom;
   connectionId: string;
   winner: PlayerRole | undefined;
   eliminatedPlayer: string | undefined;
+  categories: string[] | undefined;
+  selectedCategories: string[];
 } = {
   room: {
     gamePhase: GamePhase.Lobby,
@@ -21,6 +22,8 @@ const initialState: {
   connectionId: "",
   winner: undefined,
   eliminatedPlayer: undefined,
+  categories: [],
+  selectedCategories: [],
 };
 
 const slice = createSlice({
@@ -76,7 +79,41 @@ const slice = createSlice({
     playerVoted(state, action: PayloadAction<{ voter: string; voted: string }>) {
       state.room.voting[action.payload.voter] = action.payload.voted;
     },
+
+    setSelectedCategories(state, action: PayloadAction<string[]>) {
+      state.selectedCategories = action.payload;
+    },
   },
+  extraReducers(builder) {
+    builder
+      .addCase(getCategories.pending, (state) => {
+        state.categories = undefined;
+      })
+      .addCase(getCategories.fulfilled, (state, action) => {
+        console.log(state.categories);
+        state.categories = action.payload;
+        console.log(state.categories);
+      })
+      .addCase(getCategories.rejected, (state) => {
+        state.categories = undefined;
+      });
+  },
+});
+
+export const getCategories = createAsyncThunk("gameRoom/getCategories", async (): Promise<string[]> => {
+  const apiBasePath = process.env.NEXT_PUBLIC_API_URL || "https://roberto-ingenito.ddns.net/mr-white-api";
+
+  const response = await fetch(`${apiBasePath}/Words/categories`);
+
+  if (!response.ok) {
+    return [];
+  }
+  try {
+    const data = await response.json();
+    return data as string[];
+  } catch {
+    return [];
+  }
 });
 
 export const {
@@ -91,5 +128,6 @@ export const {
   joinedGameRoom,
   winnerIs,
   playerVoted,
+  setSelectedCategories,
 } = slice.actions;
 export default slice.reducer;

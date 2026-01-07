@@ -123,7 +123,7 @@ public class GameHub(GameService gameService, WordService wordService) : Hub
         await Clients.Caller.SendAsync("RoomCreated", gameRoom);
     }
 
-    public async Task StartGame(string roomCode)
+    public async Task StartGame(string roomCode, List<string> categories)
     {
         var gameRoom = await Check(roomCode);
 
@@ -138,7 +138,7 @@ public class GameHub(GameService gameService, WordService wordService) : Hub
         }
 
         // Parola da indovinare
-        gameRoom.Word = wordService.GetRandomWord();
+        gameRoom.Word = wordService.GetRandomWord(categories);
 
         // Pulisce i voti fatti nella partita precedente
         gameRoom.Voting.Clear();

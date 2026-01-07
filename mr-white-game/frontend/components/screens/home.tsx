@@ -3,6 +3,7 @@
 import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import { useAppDispatch } from "@/lib/redux/hooks";
+import { getCategories } from "@/lib/redux/slices/gameRoomSlice";
 import { signalRBridge } from "@/lib/services/signarHubService";
 import { useEffect, useState } from "react";
 
@@ -20,6 +21,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     signalRBridge.init(dispatch);
+    dispatch(getCategories());
   }, [dispatch]);
 
   const validate = (isJoining = false) => {

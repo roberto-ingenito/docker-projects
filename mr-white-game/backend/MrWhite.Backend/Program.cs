@@ -64,6 +64,14 @@ app.UseForwardedHeaders(
 // ===================================
 app.UsePathBase("/mr-white-api");
 
+if (app.Environment.IsDevelopment())
+{
+    // Questo genererà il JSON all'indirizzo /mr-white-api/openapi/v1.json
+    app.MapOpenApi();
+}
+
+app.MapControllers();
+
 app.UseRouting();
 app.UseCors(myAllowSpecificOrigins);
 
