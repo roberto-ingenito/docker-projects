@@ -1,5 +1,23 @@
 {
-  "frutta": ["asdasd"],
+  "frutta": [
+    "mela",
+    "pera",
+    "banana",
+    "arancia",
+    "limone",
+    "fragola",
+    "ciliegia",
+    "pesca",
+    "albicocca",
+    "anguria",
+    "melone",
+    "kiwi",
+    "ananas",
+    "mandarino",
+    "prugna",
+    "uva",
+    "fico"
+  ],
 
   "animali": [
     "cane",
