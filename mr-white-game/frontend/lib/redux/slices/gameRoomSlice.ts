@@ -90,9 +90,7 @@ const slice = createSlice({
         state.categories = undefined;
       })
       .addCase(getCategories.fulfilled, (state, action) => {
-        console.log(state.categories);
         state.categories = action.payload;
-        console.log(state.categories);
       })
       .addCase(getCategories.rejected, (state) => {
         state.categories = undefined;
