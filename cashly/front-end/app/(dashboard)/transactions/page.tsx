@@ -73,10 +73,37 @@ export default function TransactionsPage() {
         categoryId: filterFormData.categoryId ? parseInt(filterFormData.categoryId) : undefined,
         dateFrom: filterFormData.dateFrom || undefined,
         dateTo: filterFormData.dateTo || undefined,
-      })
+      }),
     );
     onFilterOpenChange();
   };
+
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((transaction) => {
+      if (filters.type && transaction.type !== filters.type) return false;
+      if (filters.categoryId && transaction.categoryId !== filters.categoryId) return false;
+
+      // Trasformiamo la data della transazione in un oggetto Date
+      const tDate = new Date(transaction.transactionDate);
+
+      // Creiamo una versione "solo giorno" per il confronto (mezzanotte locale)
+      const tDateNormalized = new Date(tDate.getFullYear(), tDate.getMonth(), tDate.getDate()).getTime();
+
+      if (filters.dateFrom) {
+        const from = new Date(filters.dateFrom);
+        const fromNormalized = new Date(from.getFullYear(), from.getMonth(), from.getDate()).getTime();
+        if (tDateNormalized < fromNormalized) return false;
+      }
+
+      if (filters.dateTo) {
+        const to = new Date(filters.dateTo);
+        const toNormalized = new Date(to.getFullYear(), to.getMonth(), to.getDate()).getTime();
+        if (tDateNormalized > toNormalized) return false;
+      }
+
+      return true;
+    });
+  }, [transactions, filters]);
 
   // Handle clear filters
   const handleClearFilters = () => {
@@ -88,17 +115,6 @@ export default function TransactionsPage() {
       dateTo: "",
     });
   };
-
-  // Filter transactions based on active filters
-  const filteredTransactions = useMemo(() => {
-    return transactions.filter((transaction) => {
-      if (filters.type && transaction.type !== filters.type) return false;
-      if (filters.categoryId && transaction.categoryId !== filters.categoryId) return false;
-      if (filters.dateFrom && new Date(transaction.transactionDate) < new Date(filters.dateFrom)) return false;
-      if (filters.dateTo && new Date(transaction.transactionDate) > new Date(filters.dateTo)) return false;
-      return true;
-    });
-  }, [transactions, filters]);
 
   // Calculate statistics
   const statistics = useMemo(() => {
@@ -129,12 +145,12 @@ export default function TransactionsPage() {
             color="default"
             variant="flat"
             size="lg"
-            startContent={<FunnelIcon className="w-5 h-5" />}
+            startContent={<FunnelIcon className="w-5 h-5 shrink-0" />}
             onPress={onFilterOpen}
-            className="flex-1 sm:flex-initial">
+            className="flex-1">
             Filtri
             {activeFiltersCount > 0 && (
-              <Chip size="sm" color="primary" variant="flat" className="ml-1">
+              <Chip size="sm" color="primary" variant="flat">
                 {activeFiltersCount}
               </Chip>
             )}
@@ -142,9 +158,9 @@ export default function TransactionsPage() {
           <Button
             color="primary"
             size="lg"
-            startContent={<PlusIcon className="w-5 h-5" />}
+            startContent={<PlusIcon className="w-5 h-5 shrink-0" />}
             onPress={onCreateTransasctionOpen}
-            className="flex-1 sm:flex-initial font-semibold">
+            className="font-semibold sm:flex-initial flex-1 max-[30rem]:flex-none">
             Nuova Transazione
           </Button>
         </div>
