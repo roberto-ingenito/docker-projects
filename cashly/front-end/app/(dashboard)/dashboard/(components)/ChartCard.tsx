@@ -45,7 +45,7 @@ export default function ChartCard({
           </div>
         )}
       </CardHeader>
-      <CardBody className="p-2 items-center justify-center">{children}</CardBody>
+      <CardBody className="p-2">{children}</CardBody>
     </Card>
   );
 }
