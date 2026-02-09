@@ -83,8 +83,7 @@ export default function DashboardPage() {
   const { isOpen: isCreateTransasctionOpen, onOpen: onCreateTransasctionOpen, onOpenChange: onCreateTransasctionOpenChange } = useDisclosure();
 
   // Stati per la navigazione
-  const [selectedDay, setSelectedDay] = useState(new Date());
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedTime, setSelectedTime] = useState(new Date());
 
   useEffect(() => {
     if (!firstLoadDone) dispatch(fetchTransactions());
@@ -143,9 +142,9 @@ export default function DashboardPage() {
   // ============================================
   // PREPARAZIONE DATI PER I GRAFICI
   // ============================================
-  const dailyData = useMemo((): DailyData[] => {
-    const month = selectedDay.getMonth();
-    const year = selectedDay.getFullYear();
+  const monthlyData = useMemo((): DailyData[] => {
+    const month = selectedTime.getMonth();
+    const year = selectedTime.getFullYear();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const result: DailyData[] = [];
 
@@ -166,7 +165,7 @@ export default function DashboardPage() {
     }
 
     return result;
-  }, [transactions, selectedDay]);
+  }, [transactions, selectedTime]);
 
   const yearlyData = useMemo((): MonthlyData[] => {
     const result: MonthlyData[] = [];
@@ -174,25 +173,31 @@ export default function DashboardPage() {
     for (let month = 0; month < 12; month++) {
       const monthTransactions = transactions.filter((t) => {
         const tDate = new Date(t.transactionDate);
-        return tDate.getMonth() === month && tDate.getFullYear() === selectedYear;
+        return tDate.getMonth() === month && tDate.getFullYear() === selectedTime.getFullYear();
       });
 
       const income = monthTransactions.filter((t) => t.type === TransactionType.Income).reduce((sum, t) => sum + t.amount, 0);
       const expenses = monthTransactions.filter((t) => t.type === TransactionType.Expense).reduce((sum, t) => sum + t.amount, 0);
 
       result.push({
-        month: new Date(selectedYear, month).toLocaleDateString("it-IT", { month: "short" }),
+        month: new Date(selectedTime.getFullYear(), month).toLocaleDateString("it-IT", { month: "short" }),
         entrate: Number(income.toFixed(2)),
         uscite: Number(expenses.toFixed(2)),
       });
     }
 
     return result;
-  }, [transactions, selectedYear]);
+  }, [transactions, selectedTime]);
 
   const categoryExpensesData = useMemo((): CategoryExpense[] => {
+    const month = selectedTime.getMonth();
+    const year = selectedTime.getFullYear();
+
     const categoryMap = new Map<number, { name: string; value: number; color: string }>();
-    const expenseTransactions = transactions.filter((t) => t.type === TransactionType.Expense);
+    const expenseTransactions = transactions.filter((t) => {
+      const tDate = new Date(t.transactionDate);
+      return t.type === TransactionType.Expense && tDate.getMonth() === month && tDate.getFullYear() === year;
+    });
     const totalExpenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
 
     expenseTransactions.forEach((t) => {
@@ -216,7 +221,7 @@ export default function DashboardPage() {
         percentage: totalExpenses > 0 ? (item.value / totalExpenses) * 100 : 0,
       }))
       .sort((a, b) => b.value - a.value);
-  }, [transactions, categories]);
+  }, [transactions, categories, selectedTime]);
 
   const comparisonData = useMemo((): ComparisonData[] => {
     const now = new Date();
@@ -302,36 +307,46 @@ export default function DashboardPage() {
   // ============================================
   // FUNZIONI DI NAVIGAZIONE
   // ============================================
-  const handlePreviousDay = () => {
-    const newDate = new Date(selectedDay);
+  const handlePreviousMonth = () => {
+    const newDate = new Date(selectedTime);
     newDate.setMonth(newDate.getMonth() - 1);
-    setSelectedDay(newDate);
+    setSelectedTime(newDate);
   };
 
-  const handleNextDay = () => {
+  const handleNextMonth = () => {
     const now = new Date();
-    const newDate = new Date(selectedDay);
-    newDate.setMonth(newDate.getMonth() + 1);
-    if (newDate <= now) setSelectedDay(newDate);
+    const newDate = new Date(selectedTime);
+
+    if (selectedTime.getFullYear() >= now.getFullYear() && selectedTime.getMonth() >= now.getMonth()) {
+      setSelectedTime(new Date(now.getFullYear(), now.getMonth()));
+    } else {
+      newDate.setMonth(newDate.getMonth() + 1);
+      setSelectedTime(newDate);
+    }
   };
 
   const handlePreviousYear = () => {
-    setSelectedYear((prev) => prev - 1);
+    setSelectedTime((prev) => new Date(prev.getFullYear() - 1, prev.getMonth()));
   };
 
   const handleNextYear = () => {
-    const currentYear = new Date().getFullYear();
-    if (selectedYear < currentYear) setSelectedYear((prev) => prev + 1);
+    const now = new Date();
+    const newDate = new Date(selectedTime);
+
+    if (selectedTime.getFullYear() + 1 >= now.getFullYear()) {
+      setSelectedTime(new Date(now.getFullYear(), now.getMonth()));
+    } else {
+      newDate.setFullYear(newDate.getFullYear() + 1);
+      setSelectedTime(newDate);
+    }
   };
 
   const isCurrentMonth = () => {
     const now = new Date();
-    return selectedDay.getMonth() === now.getMonth() && selectedDay.getFullYear() === now.getFullYear();
+    return selectedTime.getMonth() === now.getMonth() && selectedTime.getFullYear() === now.getFullYear();
   };
 
-  const isCurrentYear = () => {
-    return selectedYear === new Date().getFullYear();
-  };
+  const isCurrentYear = () => selectedTime.getFullYear() === new Date().getFullYear();
 
   // ============================================
   // RENDERING
@@ -443,19 +458,19 @@ export default function DashboardPage() {
       {/* Grafico 1: Andamento Giornaliero */}
       <ChartCard
         title="Andamento Giornaliero"
-        subtitle={selectedDay.toLocaleDateString("it-IT", { month: "long", year: "numeric" })}
+        subtitle={selectedTime.toLocaleDateString("it-IT", { month: "long", year: "numeric" })}
         icon={<ChartBarIcon className="w-5 h-5 text-primary" />}
         navigationEnabled
-        onPrevious={handlePreviousDay}
-        onNext={handleNextDay}
+        onPrevious={handlePreviousMonth}
+        onNext={handleNextMonth}
         isNextDisabled={isCurrentMonth()}>
-        <DailyTrendChart data={dailyData} />
+        <DailyTrendChart data={monthlyData} />
       </ChartCard>
 
       {/* Grafico 2: Panoramica Annuale */}
       <ChartCard
         title="Panoramica Annuale"
-        subtitle={`Anno ${selectedYear}`}
+        subtitle={`Anno ${selectedTime.getFullYear()}`}
         icon={<ChartBarIcon className="w-5 h-5 text-primary" />}
         navigationEnabled
         onPrevious={handlePreviousYear}
@@ -467,7 +482,14 @@ export default function DashboardPage() {
       {/* Layout a 2 colonne per grafici medi */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Grafico 3: Distribuzione Spese */}
-        <ChartCard title="Distribuzione Spese" subtitle="Per categoria" icon={<ChartPieIcon className="w-5 h-5 text-primary" />}>
+        <ChartCard
+          title="Distribuzione Spese"
+          subtitle={selectedTime.toLocaleDateString("it-IT", { month: "long", year: "numeric" })}
+          icon={<ChartPieIcon className="w-5 h-5 text-primary" />}
+          navigationEnabled
+          onPrevious={handlePreviousMonth}
+          onNext={handleNextMonth}
+          isNextDisabled={isCurrentMonth()}>
           <CategoryDistributionChart data={categoryExpensesData} />
         </ChartCard>
 
