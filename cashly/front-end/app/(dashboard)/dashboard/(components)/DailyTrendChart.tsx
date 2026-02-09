@@ -1,5 +1,8 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useTheme } from "next-themes";
+import { TransactionType } from "@/lib/types/transaction";
+import { useMemo } from "react";
+import { useAppSelector } from "@/lib/redux/hooks";
 
 interface DailyData {
   day: string;
@@ -8,7 +11,7 @@ interface DailyData {
 }
 
 interface DailyTrendChartProps {
-  data: DailyData[];
+  selectedTime: Date;
   height?: number;
 }
 
@@ -28,8 +31,35 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-export default function DailyTrendChart({ data, height = 350 }: DailyTrendChartProps) {
+export default function DailyTrendChart({ selectedTime, height = 350 }: DailyTrendChartProps) {
   const { theme } = useTheme();
+
+  const transactions = useAppSelector((state) => state.transactions).transactions;
+
+  const data = useMemo((): DailyData[] => {
+    const month = selectedTime.getMonth();
+    const year = selectedTime.getFullYear();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const result: DailyData[] = [];
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dayTransactions = transactions.filter((t) => {
+        const tDate = new Date(t.transactionDate);
+        return tDate.getDate() === day && tDate.getMonth() === month && tDate.getFullYear() === year;
+      });
+
+      const income = dayTransactions.filter((t) => t.type === TransactionType.Income).reduce((sum, t) => sum + t.amount, 0);
+      const expenses = dayTransactions.filter((t) => t.type === TransactionType.Expense).reduce((sum, t) => sum + t.amount, 0);
+
+      result.push({
+        day: day.toString(),
+        entrate: Number(income.toFixed(2)),
+        uscite: Number(expenses.toFixed(2)),
+      });
+    }
+
+    return result;
+  }, [transactions, selectedTime]);
 
   if (!data.some((d) => d.entrate > 0 || d.uscite > 0)) {
     return (
@@ -41,7 +71,14 @@ export default function DailyTrendChart({ data, height = 350 }: DailyTrendChartP
 
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <AreaChart data={data}>
+      <AreaChart
+        data={data}
+        margin={{
+          top: 0,
+          right: 10,
+          left: 0,
+          bottom: 0,
+        }}>
         <defs>
           <linearGradient id="colorEntrate" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
