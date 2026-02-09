@@ -25,7 +25,7 @@ export default function ChartCard({
   isNextDisabled = false,
 }: ChartCardProps) {
   return (
-    <Card>
+    <Card className="hover:scale-102">
       <CardHeader className="flex-col sm:flex-row gap-3 p-4 pb-2">
         <div className="flex items-center gap-2 flex-1 self-start">
           <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">{icon}</div>
