@@ -26,7 +26,7 @@ const PieTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-export default function CategoryDistributionChart({ data, height = 250, maxCategories = 6 }: CategoryDistributionChartProps) {
+export default function CategoryDistributionChart({ data, height = 300, maxCategories = 6 }: CategoryDistributionChartProps) {
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center" style={{ height: height + 50 }}>
@@ -38,7 +38,7 @@ export default function CategoryDistributionChart({ data, height = 250, maxCateg
   const displayData = data.slice(0, maxCategories);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-0 flex items-center flex-col sm:flex-row sm:gap-2">
       <ResponsiveContainer width="100%" height={height}>
         <PieChart>
           <Pie
@@ -47,7 +47,7 @@ export default function CategoryDistributionChart({ data, height = 250, maxCateg
             cy="50%"
             labelLine={false}
             label={({ percentage }) => `${percentage.toFixed(0)}%`}
-            outerRadius={80}
+            outerRadius={120}
             fill="#8884d8"
             dataKey="value">
             {displayData.map((entry, index) => (
@@ -57,9 +57,9 @@ export default function CategoryDistributionChart({ data, height = 250, maxCateg
           <Tooltip content={<PieTooltip />} />
         </PieChart>
       </ResponsiveContainer>
-      <div className="space-y-2">
+      <div className="space-y-2 p-2 w-full sm:w-min ">
         {displayData.map((category, index) => (
-          <div key={index} className="flex items-center gap-2">
+          <div key={index} className="flex items-center gap-4">
             <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: category.color }} />
             <span className="text-sm text-default-700 flex-1 truncate">{category.name}</span>
             <span className="text-sm font-medium text-default-900">

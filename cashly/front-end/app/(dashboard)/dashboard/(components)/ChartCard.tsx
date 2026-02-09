@@ -26,8 +26,8 @@ export default function ChartCard({
 }: ChartCardProps) {
   return (
     <Card>
-      <CardHeader className="flex-col sm:flex-row gap-3 pb-0 pt-6 px-6">
-        <div className="flex items-center gap-2 flex-1">
+      <CardHeader className="flex-col sm:flex-row gap-3 p-4 pb-2">
+        <div className="flex items-center gap-2 flex-1 self-start">
           <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">{icon}</div>
           <div>
             <h3 className="text-lg font-bold text-primary">{title}</h3>
@@ -45,7 +45,7 @@ export default function ChartCard({
           </div>
         )}
       </CardHeader>
-      <CardBody className="p-6">{children}</CardBody>
+      <CardBody className="p-2 items-center justify-center">{children}</CardBody>
     </Card>
   );
 }

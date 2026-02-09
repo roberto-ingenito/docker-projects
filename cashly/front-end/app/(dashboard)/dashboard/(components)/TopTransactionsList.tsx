@@ -18,7 +18,7 @@ export default function TopTransactionsList({ transactions, emptyMessage = "Ness
         acc[cat.categoryId] = cat;
         return acc;
       },
-      {} as Record<number, (typeof categories)[0]>
+      {} as Record<number, (typeof categories)[0]>,
     );
   }, [categories]);
 
@@ -31,7 +31,7 @@ export default function TopTransactionsList({ transactions, emptyMessage = "Ness
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full">
       {transactions.map((transaction, index) => {
         const category = transaction.categoryId ? categoriesMap[transaction.categoryId] : null;
 
