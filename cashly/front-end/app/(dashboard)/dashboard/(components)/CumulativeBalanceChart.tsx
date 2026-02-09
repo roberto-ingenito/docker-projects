@@ -1,6 +1,9 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { useTheme } from "next-themes";
 import { themeConfig } from "@/tailwind.config";
+import { useAppSelector } from "@/lib/redux/hooks";
+import { TransactionType } from "@/lib/types/transaction";
+import { useMemo } from "react";
 
 interface CumulativeBalance {
   date: string;
@@ -8,7 +11,6 @@ interface CumulativeBalance {
 }
 
 interface CumulativeBalanceChartProps {
-  data: CumulativeBalance[];
   height?: number;
 }
 
@@ -28,13 +30,35 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-export default function CumulativeBalanceChart({ data, height = 300 }: CumulativeBalanceChartProps) {
+export default function CumulativeBalanceChart({ height = 300 }: CumulativeBalanceChartProps) {
   const { theme } = useTheme();
+  const transactions = useAppSelector((state) => state.transactions).transactions;
 
   const primary =
     theme === "light" //
       ? themeConfig.themes!.light.colors!.primary![500]!
       : themeConfig.themes!.dark.colors!.primary![500]!;
+
+  const data = useMemo((): CumulativeBalance[] => {
+    const sortedTransactions = [...transactions].sort((a, b) => new Date(a.transactionDate).getTime() - new Date(b.transactionDate).getTime());
+    let runningBalance = 0;
+    const result: CumulativeBalance[] = [];
+
+    sortedTransactions.forEach((t) => {
+      if (t.type === TransactionType.Income) {
+        runningBalance += t.amount;
+      } else {
+        runningBalance -= t.amount;
+      }
+
+      result.push({
+        date: new Date(t.transactionDate).toLocaleDateString("it-IT", { day: "2-digit", month: "short" }),
+        saldo: Number(runningBalance.toFixed(2)),
+      });
+    });
+
+    return result;
+  }, [transactions]);
 
   if (data.length === 0) {
     return (

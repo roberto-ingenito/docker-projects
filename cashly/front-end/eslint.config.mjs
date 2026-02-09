@@ -94,8 +94,8 @@ export default defineConfig([globalIgnores([
         "jsx-a11y/click-events-have-key-events": "warn",
         "jsx-a11y/interactive-supports-focus": "warn",
         "prettier/prettier": "warn",
-        "no-unused-vars": "off",
-        "unused-imports/no-unused-vars": "off",
+        "no-unused-vars": "warn",
+        "unused-imports/no-unused-vars": "warn",
         "unused-imports/no-unused-imports": "warn",
 
         "@typescript-eslint/no-unused-vars": ["warn", {
@@ -139,13 +139,13 @@ export default defineConfig([globalIgnores([
             prev: "*",
             next: "return",
         }, {
-            blankLine: "always",
-            prev: ["const", "let", "var"],
-            next: "*",
-        }, {
-            blankLine: "any",
-            prev: ["const", "let", "var"],
-            next: ["const", "let", "var"],
-        }],
+                blankLine: "always",
+                prev: ["const", "let", "var"],
+                next: "*",
+            }, {
+                blankLine: "any",
+                prev: ["const", "let", "var"],
+                next: ["const", "let", "var"],
+            }],
     },
 }]);

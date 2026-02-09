@@ -15,7 +15,6 @@ import {
   ChartBarIcon,
   ChartPieIcon,
   ArrowTrendingUpIcon,
-  CalendarDaysIcon,
   FireIcon,
   PlusIcon,
 } from "@heroicons/react/24/solid";
@@ -26,48 +25,15 @@ import ChartCard from "./(components)/ChartCard";
 import DailyTrendChart from "./(components)/DailyTrendChart";
 import YearlyOverviewChart from "./(components)/YearlyOverviewChart";
 import CategoryDistributionChart from "./(components)/CategoryDistributionChart";
-import PeriodComparisonChart from "./(components)/PeriodComparisonChart";
 import CumulativeBalanceChart from "./(components)/CumulativeBalanceChart";
-import WeekdayExpensesChart from "./(components)/WeekdayExpensesChart";
 import TopTransactionsList from "./(components)/TopTransactionsList";
 import TransactionFormModal from "@/components/transactionFormModal";
+import CategoryTrendChart from "./(components)/CategoryTrendChart";
 
-// ============================================
-// INTERFACCE
-// ============================================
-interface DailyData {
-  day: string;
-  entrate: number;
-  uscite: number;
-}
-
-interface MonthlyData {
+export interface MonthlyData {
   month: string;
   entrate: number;
   uscite: number;
-}
-
-interface CategoryExpense {
-  name: string;
-  value: number;
-  color: string;
-  percentage: number;
-}
-
-interface ComparisonData {
-  period: string;
-  corrente: number;
-  precedente: number;
-}
-
-interface CumulativeBalance {
-  date: string;
-  saldo: number;
-}
-
-interface WeekdayExpense {
-  day: string;
-  spese: number;
 }
 
 export default function DashboardPage() {
@@ -77,7 +43,6 @@ export default function DashboardPage() {
   const error = useAppSelector((state) => state.transactions.error);
   const firstLoadDone = useAppSelector((state) => state.transactions.firstLoadDone);
   const categoriesFirstLoadDone = useAppSelector((state) => state.categories.firstLoadDone);
-  const categories = useAppSelector((state) => state.categories.categories);
 
   // Modal states
   const { isOpen: isCreateTransasctionOpen, onOpen: onCreateTransasctionOpen, onOpenChange: onCreateTransasctionOpenChange } = useDisclosure();
@@ -89,10 +54,6 @@ export default function DashboardPage() {
     if (!firstLoadDone) dispatch(fetchTransactions());
     if (!categoriesFirstLoadDone) dispatch(fetchCategories());
   }, [dispatch, firstLoadDone, categoriesFirstLoadDone]);
-
-  function getTransactionCategory(categoryId: number | null) {
-    return categories.find((x) => x.categoryId === categoryId);
-  }
 
   // ============================================
   // CALCOLO STATISTICHE PRINCIPALI
@@ -142,161 +103,6 @@ export default function DashboardPage() {
   // ============================================
   // PREPARAZIONE DATI PER I GRAFICI
   // ============================================
-  const monthlyData = useMemo((): DailyData[] => {
-    const month = selectedTime.getMonth();
-    const year = selectedTime.getFullYear();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const result: DailyData[] = [];
-
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dayTransactions = transactions.filter((t) => {
-        const tDate = new Date(t.transactionDate);
-        return tDate.getDate() === day && tDate.getMonth() === month && tDate.getFullYear() === year;
-      });
-
-      const income = dayTransactions.filter((t) => t.type === TransactionType.Income).reduce((sum, t) => sum + t.amount, 0);
-      const expenses = dayTransactions.filter((t) => t.type === TransactionType.Expense).reduce((sum, t) => sum + t.amount, 0);
-
-      result.push({
-        day: day.toString(),
-        entrate: Number(income.toFixed(2)),
-        uscite: Number(expenses.toFixed(2)),
-      });
-    }
-
-    return result;
-  }, [transactions, selectedTime]);
-
-  const yearlyData = useMemo((): MonthlyData[] => {
-    const result: MonthlyData[] = [];
-
-    for (let month = 0; month < 12; month++) {
-      const monthTransactions = transactions.filter((t) => {
-        const tDate = new Date(t.transactionDate);
-        return tDate.getMonth() === month && tDate.getFullYear() === selectedTime.getFullYear();
-      });
-
-      const income = monthTransactions.filter((t) => t.type === TransactionType.Income).reduce((sum, t) => sum + t.amount, 0);
-      const expenses = monthTransactions.filter((t) => t.type === TransactionType.Expense).reduce((sum, t) => sum + t.amount, 0);
-
-      result.push({
-        month: new Date(selectedTime.getFullYear(), month).toLocaleDateString("it-IT", { month: "short" }),
-        entrate: Number(income.toFixed(2)),
-        uscite: Number(expenses.toFixed(2)),
-      });
-    }
-
-    return result;
-  }, [transactions, selectedTime]);
-
-  const categoryExpensesData = useMemo((): CategoryExpense[] => {
-    const month = selectedTime.getMonth();
-    const year = selectedTime.getFullYear();
-
-    const categoryMap = new Map<number, { name: string; value: number; color: string }>();
-    const expenseTransactions = transactions.filter((t) => {
-      const tDate = new Date(t.transactionDate);
-      return t.type === TransactionType.Expense && tDate.getMonth() === month && tDate.getFullYear() === year;
-    });
-    const totalExpenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
-
-    expenseTransactions.forEach((t) => {
-      const categoryId = t.categoryId ?? -1;
-      const existing = categoryMap.get(categoryId);
-
-      if (existing) {
-        existing.value += t.amount;
-      } else {
-        categoryMap.set(categoryId, {
-          name: getTransactionCategory(t.categoryId)?.categoryName ?? "Senza categoria",
-          value: t.amount,
-          color: getTransactionCategory(t.categoryId)?.colorHex || "#9ca3af",
-        });
-      }
-    });
-
-    return Array.from(categoryMap.values())
-      .map((item) => ({
-        ...item,
-        percentage: totalExpenses > 0 ? (item.value / totalExpenses) * 100 : 0,
-      }))
-      .sort((a, b) => b.value - a.value);
-  }, [transactions, categories, selectedTime]);
-
-  const comparisonData = useMemo((): ComparisonData[] => {
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-    const result: ComparisonData[] = [];
-
-    for (let week = 1; week <= 4; week++) {
-      const currentWeekExpenses = transactions
-        .filter((t) => {
-          const date = new Date(t.transactionDate);
-          const weekOfMonth = Math.ceil(date.getDate() / 7);
-          return date.getMonth() === currentMonth && date.getFullYear() === currentYear && weekOfMonth === week && t.type === TransactionType.Expense;
-        })
-        .reduce((sum, t) => sum + t.amount, 0);
-
-      const lastWeekExpenses = transactions
-        .filter((t) => {
-          const date = new Date(t.transactionDate);
-          const weekOfMonth = Math.ceil(date.getDate() / 7);
-          return date.getMonth() === lastMonth && date.getFullYear() === lastMonthYear && weekOfMonth === week && t.type === TransactionType.Expense;
-        })
-        .reduce((sum, t) => sum + t.amount, 0);
-
-      result.push({
-        period: `Settimana ${week}`,
-        corrente: Number(currentWeekExpenses.toFixed(2)),
-        precedente: Number(lastWeekExpenses.toFixed(2)),
-      });
-    }
-
-    return result;
-  }, [transactions]);
-
-  const cumulativeBalanceData = useMemo((): CumulativeBalance[] => {
-    const sortedTransactions = [...transactions].sort((a, b) => new Date(a.transactionDate).getTime() - new Date(b.transactionDate).getTime());
-    let runningBalance = 0;
-    const result: CumulativeBalance[] = [];
-
-    sortedTransactions.forEach((t) => {
-      if (t.type === TransactionType.Income) {
-        runningBalance += t.amount;
-      } else {
-        runningBalance -= t.amount;
-      }
-
-      result.push({
-        date: new Date(t.transactionDate).toLocaleDateString("it-IT", { day: "2-digit", month: "short" }),
-        saldo: Number(runningBalance.toFixed(2)),
-      });
-    });
-
-    return result;
-  }, [transactions]);
-
-  const weekdayExpenses = useMemo((): WeekdayExpense[] => {
-    const dayNames = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
-    const dayTotals = new Array(7).fill(0);
-
-    transactions
-      .filter((t) => t.type === TransactionType.Expense)
-      .forEach((t) => {
-        const dayOfWeek = new Date(t.transactionDate).getDay();
-        const adjustedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-        dayTotals[adjustedDay] += t.amount;
-      });
-
-    return dayNames.map((name, index) => ({
-      day: name,
-      spese: Number(dayTotals[index].toFixed(2)),
-    }));
-  }, [transactions]);
-
   const topTransactions = useMemo((): Transaction[] => {
     return [...transactions]
       .filter((t) => t.type === TransactionType.Expense)
@@ -466,12 +272,12 @@ export default function DashboardPage() {
           onPrevious={handlePreviousMonth}
           onNext={handleNextMonth}
           isNextDisabled={isCurrentMonth()}>
-          <CategoryDistributionChart data={categoryExpensesData} />
+          <CategoryDistributionChart selectedTime={selectedTime} />
         </ChartCard>
 
-        {/* Confronto Periodi */}
-        <ChartCard title="Confronto Periodi" subtitle="Mese corrente vs precedente" icon={<ArrowTrendingUpIcon className="w-6 h-6 text-primary" />}>
-          <PeriodComparisonChart data={comparisonData} />
+        {/* Saldo Cumulativo */}
+        <ChartCard title="Saldo Cumulativo" subtitle="Andamento nel tempo" icon={<ArrowTrendingUpIcon className="w-5 h-5 text-primary" />}>
+          <CumulativeBalanceChart />
         </ChartCard>
       </div>
 
@@ -484,21 +290,8 @@ export default function DashboardPage() {
         onPrevious={handlePreviousYear}
         onNext={handleNextYear}
         isNextDisabled={isCurrentYear()}>
-        <YearlyOverviewChart data={yearlyData} />
+        <YearlyOverviewChart selectedTime={selectedTime} />
       </ChartCard>
-
-      {/* Layout a 2 colonne */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Saldo Cumulativo */}
-        <ChartCard title="Saldo Cumulativo" subtitle="Andamento nel tempo" icon={<ArrowTrendingUpIcon className="w-5 h-5 text-primary" />}>
-          <CumulativeBalanceChart data={cumulativeBalanceData} />
-        </ChartCard>
-
-        {/* Spese per Giorno della Settimana */}
-        <ChartCard title="Spese per Giorno" subtitle="Analisi settimanale" icon={<CalendarDaysIcon className="w-5 h-5 text-primary" />}>
-          <WeekdayExpensesChart data={weekdayExpenses} />
-        </ChartCard>
-      </div>
 
       {/* Andamento Giornaliero */}
       <ChartCard
@@ -509,7 +302,19 @@ export default function DashboardPage() {
         onPrevious={handlePreviousMonth}
         onNext={handleNextMonth}
         isNextDisabled={isCurrentMonth()}>
-        <DailyTrendChart data={monthlyData} />
+        <DailyTrendChart selectedTime={selectedTime} />
+      </ChartCard>
+
+      {/* Confronto Periodi */}
+      <ChartCard
+        title="Confronto Categorie"
+        subtitle={`Anno ${selectedTime.getFullYear()}`}
+        icon={<ChartBarIcon className="w-6 h-6 text-primary" />}
+        navigationEnabled
+        onPrevious={handlePreviousYear}
+        onNext={handleNextYear}
+        isNextDisabled={isCurrentYear()}>
+        <CategoryTrendChart selectedTime={selectedTime} />
       </ChartCard>
 
       {/* Top 5 Transazioni */}
