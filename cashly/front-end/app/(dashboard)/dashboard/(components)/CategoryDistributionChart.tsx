@@ -29,7 +29,7 @@ const PieTooltip = ({ active, payload }: any) => {
 export default function CategoryDistributionChart({ data, height = 350, maxCategories = 6 }: CategoryDistributionChartProps) {
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center" style={{ height: height + 50 }}>
+      <div className="flex items-center justify-center" style={{ height: height }}>
         <p className="text-default-400">Nessuna spesa categorizzata</p>
       </div>
     );
