@@ -455,33 +455,9 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Grafico 1: Andamento Giornaliero */}
-      <ChartCard
-        title="Andamento Giornaliero"
-        subtitle={selectedTime.toLocaleDateString("it-IT", { month: "long", year: "numeric" })}
-        icon={<ChartBarIcon className="w-5 h-5 text-primary" />}
-        navigationEnabled
-        onPrevious={handlePreviousMonth}
-        onNext={handleNextMonth}
-        isNextDisabled={isCurrentMonth()}>
-        <DailyTrendChart data={monthlyData} />
-      </ChartCard>
-
-      {/* Grafico 2: Panoramica Annuale */}
-      <ChartCard
-        title="Panoramica Annuale"
-        subtitle={`Anno ${selectedTime.getFullYear()}`}
-        icon={<ChartBarIcon className="w-5 h-5 text-primary" />}
-        navigationEnabled
-        onPrevious={handlePreviousYear}
-        onNext={handleNextYear}
-        isNextDisabled={isCurrentYear()}>
-        <YearlyOverviewChart data={yearlyData} />
-      </ChartCard>
-
       {/* Layout a 2 colonne per grafici medi */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Grafico 3: Distribuzione Spese */}
+        {/* Distribuzione Spese */}
         <ChartCard
           title="Distribuzione Spese"
           subtitle={selectedTime.toLocaleDateString("it-IT", { month: "long", year: "numeric" })}
@@ -493,26 +469,50 @@ export default function DashboardPage() {
           <CategoryDistributionChart data={categoryExpensesData} />
         </ChartCard>
 
-        {/* Grafico 4: Confronto Periodi */}
+        {/* Confronto Periodi */}
         <ChartCard title="Confronto Periodi" subtitle="Mese corrente vs precedente" icon={<ArrowTrendingUpIcon className="w-6 h-6 text-primary" />}>
           <PeriodComparisonChart data={comparisonData} />
         </ChartCard>
       </div>
 
+      {/* Panoramica Annuale */}
+      <ChartCard
+        title="Panoramica Annuale"
+        subtitle={`Anno ${selectedTime.getFullYear()}`}
+        icon={<ChartBarIcon className="w-5 h-5 text-primary" />}
+        navigationEnabled
+        onPrevious={handlePreviousYear}
+        onNext={handleNextYear}
+        isNextDisabled={isCurrentYear()}>
+        <YearlyOverviewChart data={yearlyData} />
+      </ChartCard>
+
       {/* Layout a 2 colonne */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Grafico 6: Saldo Cumulativo */}
+        {/* Saldo Cumulativo */}
         <ChartCard title="Saldo Cumulativo" subtitle="Andamento nel tempo" icon={<ArrowTrendingUpIcon className="w-5 h-5 text-primary" />}>
           <CumulativeBalanceChart data={cumulativeBalanceData} />
         </ChartCard>
 
-        {/* Grafico 7: Spese per Giorno della Settimana */}
+        {/* Spese per Giorno della Settimana */}
         <ChartCard title="Spese per Giorno" subtitle="Analisi settimanale" icon={<CalendarDaysIcon className="w-5 h-5 text-primary" />}>
           <WeekdayExpensesChart data={weekdayExpenses} />
         </ChartCard>
       </div>
 
-      {/* Grafico 9: Top 5 Transazioni */}
+      {/* Andamento Giornaliero */}
+      <ChartCard
+        title="Andamento Giornaliero"
+        subtitle={selectedTime.toLocaleDateString("it-IT", { month: "long", year: "numeric" })}
+        icon={<ChartBarIcon className="w-5 h-5 text-primary" />}
+        navigationEnabled
+        onPrevious={handlePreviousMonth}
+        onNext={handleNextMonth}
+        isNextDisabled={isCurrentMonth()}>
+        <DailyTrendChart data={monthlyData} />
+      </ChartCard>
+
+      {/* Top 5 Transazioni */}
       <ChartCard title="Top 5 Spese" subtitle="Le tue transazioni più alte" icon={<FireIcon className="w-5 h-5 text-primary" />}>
         <TopTransactionsList transactions={topTransactions} />
       </ChartCard>

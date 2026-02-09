@@ -26,7 +26,7 @@ const PieTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-export default function CategoryDistributionChart({ data, height = 300, maxCategories = 6 }: CategoryDistributionChartProps) {
+export default function CategoryDistributionChart({ data, height = 350, maxCategories = 6 }: CategoryDistributionChartProps) {
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center" style={{ height: height + 50 }}>
@@ -46,6 +46,7 @@ export default function CategoryDistributionChart({ data, height = 300, maxCateg
             cx="50%"
             cy="50%"
             labelLine={false}
+            isAnimationActive={false}
             label={({ percentage }) => `${percentage.toFixed(0)}%`}
             outerRadius={120}
             fill="#8884d8"
@@ -57,7 +58,7 @@ export default function CategoryDistributionChart({ data, height = 300, maxCateg
           <Tooltip content={<PieTooltip />} />
         </PieChart>
       </ResponsiveContainer>
-      <div className="space-y-2 p-2 w-full sm:w-min ">
+      <div className="space-y-2 p-2 w-full sm:w-min">
         {displayData.map((category, index) => (
           <div key={index} className="flex items-center gap-4">
             <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: category.color }} />
