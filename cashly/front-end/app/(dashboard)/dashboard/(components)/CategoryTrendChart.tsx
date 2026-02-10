@@ -16,7 +16,12 @@ const CHART_COLORS = [
   "#f59e0b", // amber
 ];
 
-export default function CategoryTrendChart({ selectedTime }: { selectedTime: Date }) {
+interface CategoryTrendChartProps {
+  selectedTime: Date;
+  height: number;
+}
+
+export default function CategoryTrendChart({ selectedTime, height }: CategoryTrendChartProps) {
   const { theme } = useTheme();
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
 
@@ -137,7 +142,8 @@ export default function CategoryTrendChart({ selectedTime }: { selectedTime: Dat
                 bottom: 0,
               }}
               barGap={0}
-              barCategoryGap={4}>
+              barCategoryGap={4}
+              height={height}>
               <CartesianGrid strokeDasharray="3 3" stroke={theme === "light" ? "#00000033" : "#ffffff33"} />
               <XAxis stroke={theme === "light" ? "#000000aa" : "#ffffffaa"} dataKey="month" tick={{ fontSize: 12 }} />
               <YAxis stroke={theme === "light" ? "#000000aa" : "#ffffffaa"} />
