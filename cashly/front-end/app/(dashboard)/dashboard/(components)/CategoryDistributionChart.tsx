@@ -29,7 +29,7 @@ const PieTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-export default function CategoryDistributionChart({ selectedTime, height = 350, maxCategories = 6 }: CategoryDistributionChartProps) {
+export default function CategoryDistributionChart({ selectedTime, height, maxCategories = 6 }: CategoryDistributionChartProps) {
   const transactions = useAppSelector((state) => state.transactions).transactions;
   const categories = useAppSelector((state) => state.categories.categories);
 

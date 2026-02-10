@@ -44,6 +44,8 @@ export default function DashboardPage() {
   const firstLoadDone = useAppSelector((state) => state.transactions.firstLoadDone);
   const categoriesFirstLoadDone = useAppSelector((state) => state.categories.firstLoadDone);
 
+  const chartHeight = 350;
+
   // Modal states
   const { isOpen: isCreateTransasctionOpen, onOpen: onCreateTransasctionOpen, onOpenChange: onCreateTransasctionOpenChange } = useDisclosure();
 
@@ -272,26 +274,14 @@ export default function DashboardPage() {
           onPrevious={handlePreviousMonth}
           onNext={handleNextMonth}
           isNextDisabled={isCurrentMonth()}>
-          <CategoryDistributionChart selectedTime={selectedTime} />
+          <CategoryDistributionChart selectedTime={selectedTime} height={chartHeight} />
         </ChartCard>
 
         {/* Saldo Cumulativo */}
         <ChartCard title="Saldo Cumulativo" subtitle="Andamento nel tempo" icon={<ArrowTrendingUpIcon className="w-5 h-5 text-primary" />}>
-          <CumulativeBalanceChart />
+          <CumulativeBalanceChart height={chartHeight} />
         </ChartCard>
       </div>
-
-      {/* Panoramica Annuale */}
-      <ChartCard
-        title="Panoramica Annuale"
-        subtitle={`Anno ${selectedTime.getFullYear()}`}
-        icon={<ChartBarIcon className="w-5 h-5 text-primary" />}
-        navigationEnabled
-        onPrevious={handlePreviousYear}
-        onNext={handleNextYear}
-        isNextDisabled={isCurrentYear()}>
-        <YearlyOverviewChart selectedTime={selectedTime} />
-      </ChartCard>
 
       {/* Andamento Giornaliero */}
       <ChartCard
@@ -302,7 +292,19 @@ export default function DashboardPage() {
         onPrevious={handlePreviousMonth}
         onNext={handleNextMonth}
         isNextDisabled={isCurrentMonth()}>
-        <DailyTrendChart selectedTime={selectedTime} />
+        <DailyTrendChart selectedTime={selectedTime} height={chartHeight} />
+      </ChartCard>
+
+      {/* Panoramica Annuale */}
+      <ChartCard
+        title="Panoramica Annuale"
+        subtitle={`Anno ${selectedTime.getFullYear()}`}
+        icon={<ChartBarIcon className="w-5 h-5 text-primary" />}
+        navigationEnabled
+        onPrevious={handlePreviousYear}
+        onNext={handleNextYear}
+        isNextDisabled={isCurrentYear()}>
+        <YearlyOverviewChart selectedTime={selectedTime} height={chartHeight} />
       </ChartCard>
 
       {/* Confronto Periodi */}
@@ -314,7 +316,7 @@ export default function DashboardPage() {
         onPrevious={handlePreviousYear}
         onNext={handleNextYear}
         isNextDisabled={isCurrentYear()}>
-        <CategoryTrendChart selectedTime={selectedTime} />
+        <CategoryTrendChart selectedTime={selectedTime} height={chartHeight} />
       </ChartCard>
 
       {/* Top 5 Transazioni */}

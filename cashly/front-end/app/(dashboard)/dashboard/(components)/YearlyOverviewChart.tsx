@@ -31,7 +31,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-export default function YearlyOverviewChart({ selectedTime, height = 350 }: YearlyOverviewChartProps) {
+export default function YearlyOverviewChart({ selectedTime, height }: YearlyOverviewChartProps) {
   const { theme } = useTheme();
   const transactions = useAppSelector((state) => state.transactions).transactions;
 
