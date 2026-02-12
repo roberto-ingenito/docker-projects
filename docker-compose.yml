@@ -100,19 +100,6 @@ services:
       - common-network
     restart: unless-stopped
 
-  # Servizio Prompt Builder
-  prompt-builder:
-    build:
-      context: ./prompt-builder
-      dockerfile: Dockerfile
-    image: prompt-builder
-    container_name: prompt-builder-app
-    expose:
-      - "3000"
-    networks:
-      - common-network
-    restart: unless-stopped
-
   # Interfaccia grafica per la gestione dei database Postgres
   pgadmin:
     container_name: pgadmin-container

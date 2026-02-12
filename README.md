@@ -6,15 +6,15 @@ Questo repository è il cuore dell'infrastruttura di self-hosting gestita su **R
 
 L'accesso ai servizi è gestito centralmente da Nginx.
 
-| Servizio | URL Path | Descrizione |
-| :--- | :--- | :--- |
-| **Cashly** | `/cashly/` | Gestione finanze personali (App, API, DB). | 
-| **Prompt Builder** | `/prompt-builder/` | Tool per la creazione di prompt AI. | 
-| **Timesheet** | `/timesheet/` | Utility per fogli orari Excel. |
-| **Backend API** | `/api/` | Gateway API condiviso. | 
+| Servizio        | URL Path      | Descrizione                                |
+| :-------------- | :------------ | :----------------------------------------- |
+| **Cashly**      | `/cashly/`    | Gestione finanze personali (App, API, DB). |
+| **Timesheet**   | `/timesheet/` | Utility per fogli orari Excel.             |
+| **Backend API** | `/api/`       | Gateway API condiviso.                     |
+
 ## ⚙️ Architettura
 
-* **Host:** Raspberry Pi (Ubuntu Server / Raspberry Pi OS).
-* **Gateway:** Nginx Reverse Proxy con terminazione SSL (Let's Encrypt/Certbot).
-* **Orchestrazione:** Docker Compose (rete `common-network`).
-* **Deployment:** GitHub Actions Self-Hosted Runner (CD automatico su push).
+- **Host:** Raspberry Pi (Ubuntu Server / Raspberry Pi OS).
+- **Gateway:** Nginx Reverse Proxy con terminazione SSL (Let's Encrypt/Certbot).
+- **Orchestrazione:** Docker Compose (rete `common-network`).
+- **Deployment:** GitHub Actions Self-Hosted Runner (CD automatico su push).
