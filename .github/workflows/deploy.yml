@@ -127,8 +127,8 @@ jobs:
 
       - name: Deploy mr-white-backend
         run: |
-          docker compose build --no-cache mr-white-backend
-          docker compose up -d mr-white-backend
+          docker compose build --no-cache mr-white-back-end
+          docker compose up -d mr-white-back-end
 
       - name: Clean old images
         run: |
@@ -143,8 +143,8 @@ jobs:
 
       - name: Deploy mr-white-frontend
         run: |
-          docker compose build --no-cache mr-white-frontend
-          docker compose up -d mr-white-frontend
+          docker compose build --no-cache mr-white-front-end
+          docker compose up -d mr-white-front-end
 
       - name: Clean old images
         run: |
