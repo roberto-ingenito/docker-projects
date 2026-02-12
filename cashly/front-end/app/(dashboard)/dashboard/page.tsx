@@ -5,9 +5,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { fetchTransactions } from "@/lib/redux/slices/transactionsSlice";
 import { fetchCategories } from "@/lib/redux/slices/categoriesSlice";
 import { TransactionType, Transaction } from "@/lib/types/transaction";
-import { Card, CardBody } from "@heroui/card";
-import { Button } from "@heroui/button";
-import { Spinner } from "@heroui/spinner";
+import { Button, Card, CardBody, Spinner, useDisclosure } from "@heroui/react";
 import {
   BanknotesIcon,
   ArrowUpIcon,
@@ -18,7 +16,6 @@ import {
   FireIcon,
   PlusIcon,
 } from "@heroicons/react/24/solid";
-import { useDisclosure } from "@heroui/modal";
 
 // Componenti grafici astratti
 import ChartCard from "./(components)/ChartCard";
@@ -231,7 +228,7 @@ export default function DashboardPage() {
               </div>
             </div>
             {stats.incomeChange !== 0 && (
-              <p className={`text-xs font-medium ${stats.incomeChange > 0 ? "text-success" : "text-danger"}`}>
+              <p className={`text-sm font-medium ${stats.incomeChange > 0 ? "text-success" : "text-danger"}`}>
                 {stats.incomeChange > 0 ? "+" : ""}
                 {stats.incomeChange.toFixed(1)}% vs mese scorso
               </p>
@@ -254,7 +251,7 @@ export default function DashboardPage() {
               </div>
             </div>
             {stats.expensesChange !== 0 && (
-              <p className={`text-xs font-medium ${stats.expensesChange > 0 ? "text-danger" : "text-success"}`}>
+              <p className={`text-sm font-medium ${stats.expensesChange > 0 ? "text-danger" : "text-success"}`}>
                 {stats.expensesChange > 0 ? "+" : ""}
                 {stats.expensesChange.toFixed(1)}% vs mese scorso
               </p>

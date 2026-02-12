@@ -5,13 +5,8 @@ import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { login } from "@/lib/redux/slices/authSlice";
-import { addToast } from "@heroui/toast";
-import { Form } from "@heroui/form";
-import { Card, CardHeader, CardBody, CardFooter } from "@heroui/card";
-import { Button } from "@heroui/button";
-import { Link } from "@heroui/link";
-import { Input } from "@heroui/input";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
+import { addToast, Card, CardHeader, CardBody, Form, Input, Button, CardFooter, Link } from "@heroui/react";
 
 export default function LoginPage() {
   const router = useRouter();

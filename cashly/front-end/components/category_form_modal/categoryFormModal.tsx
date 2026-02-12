@@ -4,12 +4,10 @@ import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { createCategory, updateCategory } from "@/lib/redux/slices/categoriesSlice";
 import { CategoryCreateDto, CategoryResponseDto, CategoryUpdateDto } from "@/lib/types/category";
-import { Button } from "@heroui/button";
-import { Input } from "@heroui/input";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { SparklesIcon, PencilIcon } from "@heroicons/react/24/solid";
 import IconSelector, { getCategoryIcon } from "./iconSelector";
 import ColorSelector from "./colorSelector";
+import { Modal, ModalContent, ModalHeader, ModalBody, Input, ModalFooter, Button } from "@heroui/react";
 
 interface CategoryFormModalProps {
   isOpen: boolean;
@@ -69,7 +67,7 @@ export default function CategoryFormModal({ isOpen, onOpenChange, onSuccess, mod
           updateCategory({
             categoryId: category.categoryId,
             data: formData as CategoryUpdateDto,
-          })
+          }),
         );
       } else {
         // Create new category

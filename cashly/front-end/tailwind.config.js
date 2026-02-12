@@ -1,4 +1,4 @@
-import { heroui } from "@heroui/theme"
+import { heroui } from "@heroui/react"
 
 /** @type {import('@heroui/theme').HeroUIPluginConfig} */
 export const themeConfig = {
@@ -237,8 +237,7 @@ const config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)"],
-        mono: ["var(--font-mono)"],
+        sans: ['var(--font-custom)', 'ui-sans-serif', 'system-ui'],
       },
     },
   },

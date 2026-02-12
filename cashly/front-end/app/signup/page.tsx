@@ -5,12 +5,7 @@ import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { signup } from "@/lib/redux/slices/authSlice"; // Nota: probabilmente dovrebbe essere 'signup' o 'register'
-import { addToast } from "@heroui/toast";
-import { Form } from "@heroui/form";
-import { Card, CardHeader, CardBody, CardFooter } from "@heroui/card";
-import { Button } from "@heroui/button";
-import { Link } from "@heroui/link";
-import { Input } from "@heroui/input";
+import { addToast, Button, Card, CardBody, CardFooter, CardHeader, Form, Input, Link } from "@heroui/react";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 
 interface ValidationErrors {

@@ -1,5 +1,4 @@
-import { Input } from "@heroui/input";
-import { Tooltip } from "@heroui/tooltip";
+import { Input, Tooltip } from "@heroui/react";
 
 import { SwatchIcon } from "@heroicons/react/24/solid";
 

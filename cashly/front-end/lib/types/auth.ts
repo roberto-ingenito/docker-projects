@@ -1,30 +1,24 @@
-
 export interface User {
-    userId: number;
-    email: string;
-    createdAt: string;
-    currency: string;
+  userId: number;
+  email: string;
+  password: string;
+  createdAt: string;
+  currency: string;
 }
 
-export interface UserCreateDto {
-    email: string;
-    password: string;
-}
+export type UserCreateDto = Pick<User, "email" | "password">;
 
-export interface UserLoginDto {
-    email: string;
-    password: string;
-}
+export type UserLoginDto = Pick<User, "email" | "password">;
 
 export interface UserLoginResponseDto {
-    token: string;
-    user: User;
+  token: string;
+  user: Omit<User, "password">;
 }
 
 export interface AuthState {
-    user: User | null;
-    token: string | null;
-    isAuthenticated: boolean;
-    isLoading: boolean;
-    error: string | null;
+  user: Omit<User, "password"> | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
 }

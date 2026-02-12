@@ -5,17 +5,25 @@ import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { fetchTransactions, setFilters, clearFilters, deleteTransaction, updateTransaction } from "@/lib/redux/slices/transactionsSlice";
 import { fetchCategories } from "@/lib/redux/slices/categoriesSlice";
 import { TransactionType, TransactionUpdateDto } from "@/lib/types/transaction";
-import { Card, CardBody } from "@heroui/card";
-import { Button } from "@heroui/button";
-import { Input } from "@heroui/input";
-import { Select, SelectItem } from "@heroui/select";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
-import { useDisclosure } from "@heroui/use-disclosure";
-import { Spinner } from "@heroui/spinner";
-import { Chip } from "@heroui/chip";
 import { PlusIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, ChartBarIcon, FunnelIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import TransactionCard from "./(components)/transactionCard";
 import TransactionFormModal from "@/components/transactionFormModal";
+import {
+  useDisclosure,
+  Button,
+  Card,
+  CardBody,
+  Chip,
+  Spinner,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  Select,
+  SelectItem,
+  Input,
+  ModalFooter,
+} from "@heroui/react";
 
 export default function TransactionsPage() {
   const dispatch = useAppDispatch();

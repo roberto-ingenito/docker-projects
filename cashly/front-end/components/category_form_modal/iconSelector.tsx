@@ -1,4 +1,4 @@
-import { Tooltip } from "@heroui/tooltip";
+import { Tooltip } from "@heroui/react";
 import {
   TagIcon,
   SparklesIcon,

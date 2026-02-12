@@ -4,11 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { createTransaction, updateTransaction } from "@/lib/redux/slices/transactionsSlice";
 import { Transaction, TransactionCreateDto, TransactionUpdateDto, TransactionType } from "@/lib/types/transaction";
-import { Button } from "@heroui/button";
-import { Input, Textarea } from "@heroui/input";
-import { Select, SelectItem } from "@heroui/select";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { ArrowTrendingUpIcon, ArrowTrendingDownIcon, PlusIcon, PencilIcon } from "@heroicons/react/24/solid";
+import { Modal, Button, ModalContent, ModalHeader, ModalBody, Input, Select, SelectItem, Textarea, ModalFooter } from "@heroui/react";
 
 interface TransactionFormModalProps {
   isOpen: boolean;
@@ -101,7 +98,7 @@ export default function TransactionFormModal({ isOpen, onOpenChange, onSuccess, 
           updateTransaction({
             transactionId: transaction.transactionId,
             data: formData as TransactionUpdateDto,
-          })
+          }),
         ).unwrap();
       } else {
         // Create new transaction

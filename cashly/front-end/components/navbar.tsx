@@ -1,7 +1,6 @@
 "use client";
 
-import { Navbar as HeroUINavbar, NavbarContent, NavbarMenu, NavbarMenuToggle, NavbarBrand, NavbarItem, NavbarMenuItem } from "@heroui/navbar";
-import { Link } from "@heroui/link";
+import { Navbar as HeroUINavbar, Link, NavbarContent, NavbarMenu, NavbarMenuToggle, NavbarBrand, NavbarItem, NavbarMenuItem } from "@heroui/react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { ThemeSwitch } from "./theme-switch";
@@ -30,8 +29,8 @@ export const Navbar = () => {
   }
 
   return (
-    <HeroUINavbar maxWidth="xl" position="sticky" isBordered>
-      <NavbarContent>
+    <HeroUINavbar maxWidth="xl" position="sticky" isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
+      <NavbarContent justify="start">
         <NavbarMenuToggle aria-label={isMenuOpen ? "Close menu" : "Open menu"} className="sm:hidden" />
         <NavbarBrand>
           <p className="font-bold text-inherit">Cashly</p>
@@ -76,6 +75,9 @@ export const Navbar = () => {
           return (
             <NavbarMenuItem key={`${item.label}-${index}`}>
               <Link
+                onClick={() => {
+                  setIsMenuOpen(false);
+                }}
                 aria-current={isActive ? "page" : undefined}
                 href={item.href}
                 color={isActive ? "primary" : "foreground"}

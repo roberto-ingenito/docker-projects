@@ -1,8 +1,6 @@
 "use client";
 
 import { Transaction, TransactionType, TransactionUpdateDto } from "@/lib/types/transaction";
-import { Card, CardBody } from "@heroui/card";
-import { Chip } from "@heroui/chip";
 import {
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
@@ -12,11 +10,10 @@ import {
   ExclamationTriangleIcon,
   PencilIcon,
 } from "@heroicons/react/24/solid";
-import { Button } from "@heroui/button";
-import { Modal, ModalBody, ModalContent, ModalHeader, useDisclosure, ModalFooter } from "@heroui/modal";
 import { useState, useEffect } from "react";
 import TransactionFormModal from "@/components/transactionFormModal";
 import { useAppSelector } from "@/lib/redux/hooks";
+import { useDisclosure, Card, CardBody, Chip, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/react";
 
 interface TransactionCardProps {
   transaction: Transaction;

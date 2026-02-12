@@ -1,27 +1,13 @@
 export interface Category {
-    categoryId: number;
-    categoryName: string;
-    iconName?: string;
-    colorHex?: string;
-    userId: number;
+  categoryId: number;
+  categoryName: string;
+  iconName?: string;
+  colorHex?: string;
+  userId: number;
 }
 
-export interface CategoryCreateDto {
-    categoryName: string;
-    iconName?: string;
-    colorHex?: string;
-}
+export type CategoryCreateDto = Omit<Category, "categoryId" | "userId">;
 
-export interface CategoryUpdateDto {
-    categoryName: string;
-    iconName?: string;
-    colorHex?: string;
-}
+export type CategoryUpdateDto = Omit<Category, "categoryId" | "userId">;
 
-export interface CategoryResponseDto {
-    categoryId: number;
-    categoryName: string;
-    iconName?: string;
-    colorHex?: string;
-}
-
+export type CategoryResponseDto = Omit<Category, "userId">;
