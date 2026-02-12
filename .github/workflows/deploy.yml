@@ -8,7 +8,8 @@ on:
       - "cashly/back-end/**"
       - "nginx/**"
       - "fortil-excel-timesheet/**"
-      - "prompt-builder/**"
+      - "mr-white/frontend/**"
+      - "mr-white/backend/**"
   workflow_dispatch:
     inputs:
       service:
@@ -17,21 +18,23 @@ on:
         type: choice
         options:
           - all
-          - frontend
-          - backend
+          - cashly-frontend
+          - cashly-backend
           - nginx
           - fortil-excel-timesheet
-          - prompt-builder
+          - mr-white-frontend
+          - mr-white-backend
 
 jobs:
   check-changes:
     runs-on: self-hosted
     outputs:
-      frontend: ${{ steps.filter.outputs.frontend || github.event.inputs.service == 'frontend' || github.event.inputs.service == 'all' }}
-      backend: ${{ steps.filter.outputs.backend || github.event.inputs.service == 'backend' || github.event.inputs.service == 'all' }}
-      nginx: ${{ steps.filter.outputs.nginx || github.event.inputs.service == 'nginx' || github.event.inputs.service == 'all' }}
-      fortil_timesheet: ${{ steps.filter.outputs.fortil_timesheet || github.event.inputs.service == 'fortil-excel-timesheet' || github.event.inputs.service == 'all' }}
-      prompt_builder: ${{ steps.filter.outputs.prompt_builder || github.event.inputs.service == 'prompt-builder' || github.event.inputs.service == 'all' }}
+      cashly-frontend: ${{ steps.filter.outputs.cashly-frontend == 'true' || github.event.inputs.service == 'cashly-frontend' || github.event.inputs.service == 'all' }}
+      cashly-backend: ${{ steps.filter.outputs.cashly-backend == 'true' || github.event.inputs.service == 'cashly-backend' || github.event.inputs.service == 'all' }}
+      nginx: ${{ steps.filter.outputs.nginx == 'true' || github.event.inputs.service == 'nginx' || github.event.inputs.service == 'all' }}
+      fortil-excel-timesheet: ${{ steps.filter.outputs.fortil-excel-timesheet == 'true' || github.event.inputs.service == 'fortil-excel-timesheet' || github.event.inputs.service == 'all' }}
+      mr-white-frontend: ${{ steps.filter.outputs.mr-white-frontend == 'true' || github.event.inputs.service == 'mr-white-frontend' || github.event.inputs.service == 'all' }}
+      mr-white-backend: ${{ steps.filter.outputs.mr-white-backend == 'true' || github.event.inputs.service == 'mr-white-backend' || github.event.inputs.service == 'all' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -40,25 +43,27 @@ jobs:
         if: github.event_name == 'push'
         with:
           filters: |
-            frontend:
+            cashly-frontend:
               - 'cashly/front-end/**'
-            backend:
+            cashly-backend:
               - 'cashly/back-end/**'
             nginx:
               - 'nginx/**'
-            fortil_timesheet:
+            fortil-excel-timesheet:
               - 'fortil-excel-timesheet/**'
-            prompt_builder:
-              - 'prompt-builder/**'
+            mr-white-frontend:
+              - 'mr-white/frontend/**'
+            mr-white-backend:
+              - 'mr-white/backend/**'
 
-  deploy-frontend:
+  deploy-cashly-frontend:
     needs: check-changes
-    if: needs.check-changes.outputs.frontend == 'true'
+    if: needs.check-changes.outputs.cashly-frontend == 'true'
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy frontend
+      - name: Deploy cashly-frontend
         run: |
           docker compose build --no-cache cashly-front-end
           docker compose up -d cashly-front-end
@@ -67,17 +72,17 @@ jobs:
         run: |
           docker image prune -f
 
-  deploy-backend:
+  deploy-cashly-backend:
     needs: check-changes
-    if: needs.check-changes.outputs.backend == 'true'
+    if: needs.check-changes.outputs.cashly-backend == 'true'
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy backend
+      - name: Deploy cashly-backend
         run: |
           set -a
-          source /home/ingenitor/docker-projects/.env
+          source /mnt/storage/projects/docker-projects/.env
           set +a
           docker compose build --no-cache cashly-back-end
           docker compose up -d cashly-back-end
@@ -99,7 +104,7 @@ jobs:
 
   deploy-fortil-timesheet:
     needs: check-changes
-    if: needs.check-changes.outputs.fortil_timesheet == 'true'
+    if: needs.check-changes.outputs.fortil-excel-timesheet == 'true'
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
@@ -113,17 +118,33 @@ jobs:
         run: |
           docker image prune -f
 
-  deploy-prompt-builder:
+  deploy-mr-white-backend:
     needs: check-changes
-    if: needs.check-changes.outputs.prompt_builder == 'true'
+    if: needs.check-changes.outputs.mr-white-backend == 'true'
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy prompt-builder
+      - name: Deploy mr-white-backend
         run: |
-          docker compose build --no-cache prompt-builder
-          docker compose up -d prompt-builder
+          docker compose build --no-cache mr-white-backend
+          docker compose up -d mr-white-backend
+
+      - name: Clean old images
+        run: |
+          docker image prune -f
+
+  deploy-mr-white-frontend:
+    needs: check-changes
+    if: needs.check-changes.outputs.mr-white-frontend == 'true'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy mr-white-frontend
+        run: |
+          docker compose build --no-cache mr-white-frontend
+          docker compose up -d mr-white-frontend
 
       - name: Clean old images
         run: |

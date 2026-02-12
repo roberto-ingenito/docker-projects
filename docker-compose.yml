@@ -47,7 +47,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings__DefaultConnection=Host=cashly-database;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Host=cashly-database;Database=${CASHLY_POSTGRES_DB};Username=${CASHLY_POSTGRES_USER};Password=${CASHLY_POSTGRES_PASSWORD}
     networks:
       - common-network
     restart: always
@@ -59,9 +59,9 @@ services:
     expose:
       - "5432"
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${CASHLY_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${CASHLY_POSTGRES_PASSWORD}
+      - POSTGRES_DB=${CASHLY_POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data # Persistenza dei dati DB
     networks:
