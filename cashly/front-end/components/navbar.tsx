@@ -29,7 +29,7 @@ export const Navbar = () => {
   }
 
   return (
-    <HeroUINavbar maxWidth="xl" position="sticky" isBordered shouldHideOnScroll>
+    <HeroUINavbar maxWidth="xl" position="sticky" isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
       <NavbarContent justify="start">
         <NavbarMenuToggle aria-label={isMenuOpen ? "Close menu" : "Open menu"} className="sm:hidden" />
         <NavbarBrand>
@@ -75,6 +75,9 @@ export const Navbar = () => {
           return (
             <NavbarMenuItem key={`${item.label}-${index}`}>
               <Link
+                onClick={() => {
+                  setIsMenuOpen(false);
+                }}
                 aria-current={isActive ? "page" : undefined}
                 href={item.href}
                 color={isActive ? "primary" : "foreground"}
