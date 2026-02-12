@@ -1,9 +1,5 @@
 import { CategoryResponseDto } from "@/lib/types/category";
-import { Card, CardBody } from "@heroui/card";
-import { Button } from "@heroui/button";
-import { Chip } from "@heroui/chip";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal";
-
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Card, CardBody, Button, Chip } from "@heroui/react";
 import { TrashIcon, ExclamationTriangleIcon, PencilIcon } from "@heroicons/react/24/solid";
 import { getCategoryIcon } from "../../../../components/category_form_modal/iconSelector";
 import CategoryFormModal from "@/components/category_form_modal/categoryFormModal";

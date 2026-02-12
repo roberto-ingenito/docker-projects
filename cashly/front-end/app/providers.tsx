@@ -3,10 +3,9 @@
 import type { ThemeProviderProps } from "next-themes";
 
 import * as React from "react";
-import { HeroUIProvider } from "@heroui/system";
+import { HeroUIProvider, ToastProvider } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { ToastProvider } from "@heroui/toast";
 import { Provider as ReduxProvider } from "react-redux";
 import store from "@/lib/redux/store";
 import AuthProvider from "./authProvider";

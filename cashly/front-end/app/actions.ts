@@ -1,6 +1,6 @@
 "use server";
 
-import { User } from "@/lib/types/auth";
+import { User, UserCreateDto } from "@/lib/types/auth";
 import { cookies } from "next/headers";
 
 const jwt_token_cookie_key = "token";
@@ -25,8 +25,7 @@ export async function getJwtToken(): Promise<string | undefined> {
   return (await cookies()).get(jwt_token_cookie_key)?.value;
 }
 
-
-export async function saveUser(user: User) {
+export async function saveUser(user: Omit<User, "password">) {
   (await cookies()).set(user_cookie_key, JSON.stringify(user), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -50,5 +49,4 @@ export async function getUser(): Promise<User | undefined> {
   } catch {
     return undefined;
   }
-
 }

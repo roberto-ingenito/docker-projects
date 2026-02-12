@@ -1,4 +1,4 @@
-import { Chip } from "@heroui/chip";
+import { Chip } from "@heroui/react";
 import { Transaction } from "@/lib/types/transaction";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { useMemo } from "react";
@@ -24,7 +24,7 @@ export default function TopTransactionsList({ transactions, emptyMessage = "Ness
 
   if (transactions.length === 0) {
     return (
-      <div className="flex items-center justify-center h-[250px]">
+      <div className="flex items-center justify-center h-62.5">
         <p className="text-default-400">{emptyMessage}</p>
       </div>
     );

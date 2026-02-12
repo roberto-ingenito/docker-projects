@@ -3,10 +3,7 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { fetchCategories } from "@/lib/redux/slices/categoriesSlice";
-import { Card, CardBody } from "@heroui/card";
-import { Button } from "@heroui/button";
-import { useDisclosure } from "@heroui/use-disclosure";
-import { Spinner } from "@heroui/spinner";
+import { Card, CardBody, Button, useDisclosure, Spinner } from "@heroui/react";
 
 import { PlusIcon, TagIcon } from "@heroicons/react/24/solid";
 import CategoryCard from "./(components)/categoryCard";

@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
-import { Card, CardHeader, CardBody } from "@heroui/card";
-import { Button } from "@heroui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { Card, CardHeader, Button, CardBody } from "@heroui/react";
 
 interface ChartCardProps {
   title: string;
