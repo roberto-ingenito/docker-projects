@@ -10,6 +10,8 @@ public class CategoryData
 
 public class WordService
 {
+    private readonly JsonSerializerOptions options = new() { PropertyNameCaseInsensitive = true };
+
     // Lista di fallback se il file non esiste
     private Dictionary<string, CategoryData> _categories = new()
     {
@@ -54,13 +56,12 @@ public class WordService
     {
         // Cerca il file nella directory di esecuzione
         var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "words.json");
-
         if (File.Exists(path))
         {
             try
             {
                 string json = File.ReadAllText(path);
-                var loadedCategories = JsonSerializer.Deserialize<Dictionary<string, CategoryData>>(json);
+                var loadedCategories = JsonSerializer.Deserialize<Dictionary<string, CategoryData>>(json, options);
 
                 if (loadedCategories != null && loadedCategories.Count > 0)
                 {
@@ -94,7 +95,7 @@ public class WordService
 
         // Gestione caso dizionario vuoto o nessuna corrispondenza
         if (allPossibleWords.Count == 0)
-            return ("gioia", "emozioni");
+            return ("WORD-ERROR", "CATEGORY-ERROR");
 
         // Selezione casuale
         return allPossibleWords[Random.Shared.Next(allPossibleWords.Count)];
@@ -105,13 +106,13 @@ public class WordService
         // Controlla se la categoria esiste
         if (!_categories.TryGetValue(category, out var categoryData))
         {
-            return "oggetto"; // Hint generico di fallback
+            return "HINT-ERROR"; // Hint generico di fallback
         }
 
         // Controlla se ci sono hints disponibili
         if (categoryData.Hints.Count == 0)
         {
-            return "cosa"; // Hint generico di fallback
+            return "HINT-ERROR"; // Hint generico di fallback
         }
 
         // Restituisce un hint casuale dalla categoria
