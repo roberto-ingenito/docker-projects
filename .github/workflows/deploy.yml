@@ -8,8 +8,8 @@ on:
       - "cashly/back-end/**"
       - "nginx/**"
       - "fortil-excel-timesheet/**"
-      - "mr-white/frontend/**"
-      - "mr-white/backend/**"
+      - "mr-white-game/frontend/**"
+      - "mr-white-game/backend/**"
   workflow_dispatch:
     inputs:
       service:
@@ -52,9 +52,9 @@ jobs:
             fortil-excel-timesheet:
               - 'fortil-excel-timesheet/**'
             mr-white-frontend:
-              - 'mr-white/frontend/**'
+              - 'mr-white-game/frontend/**'
             mr-white-backend:
-              - 'mr-white/backend/**'
+              - 'mr-white-game/backend/**'
 
   deploy-cashly-frontend:
     needs: check-changes
