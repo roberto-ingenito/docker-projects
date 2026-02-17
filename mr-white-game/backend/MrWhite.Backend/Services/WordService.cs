@@ -2,35 +2,48 @@ using System.Text.Json;
 
 namespace MrWhite.Backend.Services;
 
+public class CategoryData
+{
+    public List<string> Hints { get; set; } = [];
+    public List<string> Words { get; set; } = [];
+}
+
 public class WordService
 {
+    private readonly JsonSerializerOptions options = new() { PropertyNameCaseInsensitive = true };
+
     // Lista di fallback se il file non esiste
-    private Dictionary<string, List<string>> _words = new()
+    private Dictionary<string, CategoryData> _categories = new()
     {
         {
             "emozioni",
-            [
-                "gioia",
-                "tristezza",
-                "rabbia",
-                "paura",
-                "sorpresa",
-                "disgusto",
-                "amore",
-                "odio",
-                "felicità",
-                "nostalgia",
-                "ansia",
-                "serenità",
-                "entusiasmo",
-                "noia",
-                "vergogna",
-                "orgoglio",
-                "invidia",
-                "gelosia",
-                "gratitudine",
-                "rimpianto",
-            ]
+            new CategoryData
+            {
+                Hints = ["sentimento", "cuore", "animo", "stato d'animo", "sensazione"],
+                Words =
+                [
+                    "gioia",
+                    "tristezza",
+                    "rabbia",
+                    "paura",
+                    "sorpresa",
+                    "disgusto",
+                    "amore",
+                    "odio",
+                    "felicità",
+                    "nostalgia",
+                    "ansia",
+                    "serenità",
+                    "entusiasmo",
+                    "noia",
+                    "vergogna",
+                    "orgoglio",
+                    "invidia",
+                    "gelosia",
+                    "gratitudine",
+                    "rimpianto",
+                ],
+            }
         },
     };
 
@@ -43,17 +56,16 @@ public class WordService
     {
         // Cerca il file nella directory di esecuzione
         var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "words.json");
-
         if (File.Exists(path))
         {
             try
             {
                 string json = File.ReadAllText(path);
-                var loadedWords = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json);
+                var loadedCategories = JsonSerializer.Deserialize<Dictionary<string, CategoryData>>(json, options);
 
-                if (loadedWords != null && loadedWords.Count > 0)
+                if (loadedCategories != null && loadedCategories.Count > 0)
                 {
-                    _words = loadedWords;
+                    _categories = loadedCategories;
                 }
             }
             catch (Exception ex)
@@ -67,22 +79,43 @@ public class WordService
         }
     }
 
-    public List<string> Categories() => [.. _words.Keys];
+    public List<string> Categories() => [.. _categories.Keys];
 
-    public string GetRandomWord(List<string> categories)
+    public (string word, string category) GetRandomWord(List<string> categories)
     {
         // Determiniamo quali categorie usare
         // Se la lista in ingresso è vuota o nulla, usiamo tutte le chiavi del dizionario
-        var targetCategories = (categories == null || !categories.Intersect(_words.Keys).Any()) ? _words.Keys : categories.Intersect(_words.Keys);
+        var targetCategories =
+            (categories == null || !categories.Intersect(_categories.Keys).Any())
+                ? _categories.Keys.ToList()
+                : [.. categories.Intersect(_categories.Keys)];
 
         // Raccogliamo tutte le parole possibili dalle categorie filtrate
-        var allPossibleWords = targetCategories.SelectMany(category => _words[category]).ToList();
+        var allPossibleWords = targetCategories.SelectMany(category => _categories[category].Words.Select(word => (word, category))).ToList();
 
         // Gestione caso dizionario vuoto o nessuna corrispondenza
         if (allPossibleWords.Count == 0)
-            return "Pizza";
+            return ("WORD-ERROR", "CATEGORY-ERROR");
 
         // Selezione casuale
         return allPossibleWords[Random.Shared.Next(allPossibleWords.Count)];
+    }
+
+    public string GetRandomHint(string category)
+    {
+        // Controlla se la categoria esiste
+        if (!_categories.TryGetValue(category, out var categoryData))
+        {
+            return "HINT-ERROR"; // Hint generico di fallback
+        }
+
+        // Controlla se ci sono hints disponibili
+        if (categoryData.Hints.Count == 0)
+        {
+            return "HINT-ERROR"; // Hint generico di fallback
+        }
+
+        // Restituisce un hint casuale dalla categoria
+        return categoryData.Hints[Random.Shared.Next(categoryData.Hints.Count)];
     }
 }

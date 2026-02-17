@@ -16,4 +16,10 @@ public class GameRoom
 
     public GamePhase GamePhase { get; set; } = GamePhase.Lobby;
     public string Word { get; set; } = null!;
+
+    public HashSet<string> ReadyPlayers { get; set; } = [];
+
+    // Sistema Indizi per Mr. White
+    public bool HintEnabled { get; set; } = false;
+    public string? Hint { get; set; } = null;
 }

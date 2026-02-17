@@ -8,9 +8,14 @@ export interface GameRoom {
   // value: Player object
   players: Record<string, Player>;
 
+  readyPlayers: string[];
+
   // key: ConnectionId
   // value: voted ConnectionId
   voting: Record<string, string>;
   gamePhase: GamePhase;
   word: string;
+
+  hintEnabled: boolean;
+  hint?: string;
 }

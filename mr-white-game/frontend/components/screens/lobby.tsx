@@ -3,8 +3,8 @@
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import Button from "../ui/button";
 import { signalRBridge } from "@/lib/services/signarHubService";
-import { Copy, Users, Crown, User, Layers } from "lucide-react"; // Aggiunto icona Layers
-import { setSelectedCategories } from "@/lib/redux/slices/gameRoomSlice";
+import { Copy, Users, Crown, User, Layers, Lightbulb, Check } from "lucide-react";
+import { setSelectedCategories, toggleHintEnabled } from "@/lib/redux/slices/gameRoomSlice";
 
 export default function LobbyScreen() {
   const dispatch = useAppDispatch();
@@ -13,6 +13,7 @@ export default function LobbyScreen() {
   const connectionId = useAppSelector((state) => state.gameRoom.connectionId);
   const categories = useAppSelector((state) => state.gameRoom.categories);
   const selectedCategories = useAppSelector((state) => state.gameRoom.selectedCategories);
+  const hintEnabled = useAppSelector((state) => state.gameRoom.room.hintEnabled);
 
   const playerList = Object.values(players);
   const me = players[connectionId];
@@ -21,7 +22,7 @@ export default function LobbyScreen() {
 
   function handleStartGame() {
     if (canStart) {
-      signalRBridge.invoke("StartGame", roomCode, selectedCategories);
+      signalRBridge.invoke("StartGame", roomCode, selectedCategories, hintEnabled);
     }
   }
 
@@ -115,6 +116,33 @@ export default function LobbyScreen() {
                 );
               })}
             </div>
+          </div>
+        )}
+        {isHost && (
+          <div className="flex items-center justify-between px-2">
+            <h2 className="text-lg font-bold text-slate-200 flex items-center gap-2">
+              <Lightbulb className="w-5 h-5 text-orange-500" />
+              Indizio {hintEnabled ? "abilitato" : "disabilitato"}
+            </h2>
+
+            <label className="cursor-pointer select-none">
+              {/* Input Nascosto */}
+              <input type="checkbox" className="sr-only" checked={hintEnabled} onChange={() => dispatch(toggleHintEnabled())} />
+
+              {/* Check Box */}
+              <div
+                className={`w-7 h-7 rounded-lg border-2 transition-all duration-300 flex items-center justify-center ${
+                  hintEnabled
+                    ? "bg-orange-500/20 border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.7)]"
+                    : "bg-slate-800 border-slate-700 group-hover:border-slate-500"
+                }`}>
+                {/* Icona Check */}
+                <Check
+                  className={`w-4 h-4 text-orange-500 transition-all duration-300 transform ${hintEnabled ? "scale-110 opacity-100" : "scale-0 opacity-0"}`}
+                  strokeWidth={4}
+                />
+              </div>
+            </label>
           </div>
         )}
 
