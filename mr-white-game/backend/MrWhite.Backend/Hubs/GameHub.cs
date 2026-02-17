@@ -308,6 +308,7 @@ public class GameHub(GameService gameService, WordService wordService) : Hub
         {
             // PAREGGIO: Resetta i voti e torna alla fase di votazione
             gameRoom.Voting.Clear();
+            gameRoom.GamePhase = GamePhase.Voting;
 
             // Notifica il pareggio con i giocatori coinvolti
             await Clients.Group(roomCode).SendAsync("VotingTie", playersWithMaxVotes);
