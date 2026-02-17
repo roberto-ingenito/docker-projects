@@ -5,11 +5,13 @@ import {
   hostChanged,
   joinedGameRoom,
   playerEliminated,
+  playerIsReady,
   playerVoted,
   receiveRole,
   roomCreated,
   userJoined,
   userLeft,
+  votingTie,
   winnerIs,
 } from "../redux/slices/gameRoomSlice";
 import { AppDispatch } from "../redux/store";
@@ -91,8 +93,18 @@ class SignalRService {
         playerVoted({
           voter: vote.voter,
           voted: vote.voted,
-        })
+        }),
       );
+    });
+
+    this.connection.on("PlayerIsReady", (readyPlayers: string[]) => {
+      console.log("PlayerIsReady: ", readyPlayers);
+      dispatch(playerIsReady(readyPlayers));
+    });
+
+    this.connection.on("VotingTie", (playersWithMaxVotes: string[]) => {
+      console.log("VotingTie: ", playersWithMaxVotes);
+      dispatch(votingTie(playersWithMaxVotes));
     });
 
     this.connection.start().catch(console.error);

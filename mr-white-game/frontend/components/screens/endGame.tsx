@@ -10,7 +10,7 @@ import { GamePhase } from "@/lib/types/gamePhase.enum";
 export default function ResultScreen() {
   const dispatch = useAppDispatch();
 
-  const { roomCode, players } = useAppSelector((state) => state.gameRoom.room);
+  const { roomCode, players, word } = useAppSelector((state) => state.gameRoom.room);
   const { winner } = useAppSelector((state) => state.gameRoom);
   const connectionId = useAppSelector((state) => state.gameRoom.connectionId);
 
@@ -103,6 +103,17 @@ export default function ResultScreen() {
                   </div>
                 ))}
             </div>
+          </div>
+        </div>
+
+        {/* La Parola */}
+        <div className="bg-slate-800/50 rounded-2xl p-4 mb-8 border border-slate-700 text-center">
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">La Parola era</p>
+          <div
+            className={`inline-block px-6 py-3 rounded-xl font-black text-2xl ${
+              civiliansWon ? "bg-cyan-500/10 text-cyan-300" : "bg-rose-500/10  text-rose-300"
+            }`}>
+            {word}
           </div>
         </div>
 

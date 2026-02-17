@@ -11,6 +11,7 @@ const initialState: {
   eliminatedPlayer: string | undefined;
   categories: string[] | undefined;
   selectedCategories: string[];
+  playersInTie: string[];
 } = {
   room: {
     gamePhase: GamePhase.Lobby,
@@ -18,12 +19,16 @@ const initialState: {
     players: {},
     voting: {},
     roomCode: "",
+    hintEnabled: false,
+    hint: undefined,
+    readyPlayers: [],
   },
   connectionId: "",
   winner: undefined,
   eliminatedPlayer: undefined,
   categories: [],
   selectedCategories: [],
+  playersInTie: [],
 };
 
 const slice = createSlice({
@@ -45,11 +50,16 @@ const slice = createSlice({
       // quando la partita inizia, il vincitore si annulla (nel caso in cui ne viene avviata una nuova)
       if (action.payload === GamePhase.RoleAssignment) {
         state.winner = undefined;
+        state.playersInTie = [];
       }
       // quando si passa alla fase di votazione, i voti vengono ripristinati
       else if (action.payload === GamePhase.Voting) {
         state.room.voting = {};
         state.eliminatedPlayer = undefined;
+      }
+      // quando si passa alla fase di rivelazione, la lista dei giocatori in pareggio viene pulita
+      else if (action.payload === GamePhase.Revelation) {
+        state.playersInTie = [];
       }
     },
     playerEliminated(state, action: PayloadAction<string>) {
@@ -79,9 +89,17 @@ const slice = createSlice({
     playerVoted(state, action: PayloadAction<{ voter: string; voted: string }>) {
       state.room.voting[action.payload.voter] = action.payload.voted;
     },
-
     setSelectedCategories(state, action: PayloadAction<string[]>) {
       state.selectedCategories = action.payload;
+    },
+    toggleHintEnabled(state) {
+      state.room.hintEnabled = !state.room.hintEnabled;
+    },
+    playerIsReady(state, action: PayloadAction<string[]>) {
+      state.room.readyPlayers = action.payload;
+    },
+    votingTie(state, action: PayloadAction<string[]>) {
+      state.playersInTie = action.payload;
     },
   },
   extraReducers(builder) {
@@ -127,5 +145,8 @@ export const {
   winnerIs,
   playerVoted,
   setSelectedCategories,
+  toggleHintEnabled,
+  playerIsReady,
+  votingTie,
 } = slice.actions;
 export default slice.reducer;

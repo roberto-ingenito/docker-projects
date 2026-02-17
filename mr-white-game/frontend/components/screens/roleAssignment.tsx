@@ -2,20 +2,19 @@
 
 import { useAppSelector } from "@/lib/redux/hooks";
 import Button from "../ui/button";
-import { ShieldCheck, UserSearch, MessageCircle } from "lucide-react";
+import { ShieldCheck, UserSearch, CircleCheckBig } from "lucide-react";
 import { signalRBridge } from "@/lib/services/signarHubService";
 
 export default function RoleAssignmentScreen() {
-  const { roomCode, players, word } = useAppSelector((state) => state.gameRoom.room);
+  const { roomCode, players, word, hintEnabled, hint, readyPlayers } = useAppSelector((state) => state.gameRoom.room);
   const connectionId = useAppSelector((state) => state.gameRoom.connectionId);
 
   const me = players[connectionId];
   const isMrWhite = me?.role === "MrWhite";
-  const isHost = me?.isHost;
 
-  const handleStartTalking = () => {
-    signalRBridge.invoke("StartTalking", roomCode);
-  };
+  function handleReady() {
+    signalRBridge.invoke("PlayerReady", roomCode);
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-slate-950 p-6">
@@ -39,23 +38,22 @@ export default function RoleAssignmentScreen() {
           </div>
         )}
 
+        {/* Box Indizio (Solo per MrWhite) */}
+        {isMrWhite && hintEnabled && (
+          <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 shadow-inner">
+            <p className="text-slate-500 text-xs font-bold uppercase mb-2">Indizio:</p>
+            <p className="text-3xl font-black text-white tracking-widest uppercase">{hint}</p>
+          </div>
+        )}
+
         <div className="border-t rounded-full border-slate-800 my-8"></div>
 
         {/* Footer con Azioni */}
-        <div>
-          {isHost ? (
-            <div className="space-y-4">
-              <Button onClick={handleStartTalking} fullWidth variant="primary" className="gap-2">
-                <MessageCircle className="w-5 h-5" />
-                Inizia la Discussione
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center gap-3 text-slate-400 animate-bounce">
-              <span className="w-2 h-2 bg-slate-600 rounded-full"></span>
-              <p className="text-sm font-medium">L&apos;host sta per avviare il round...</p>
-            </div>
-          )}
+        <div className="space-y-4">
+          <Button onClick={handleReady} fullWidth variant="primary" className="gap-2" disabled={readyPlayers.includes(me.connectionId)}>
+            <CircleCheckBig className="w-5 h-5" />
+            Pronto {readyPlayers.length}/{Object.keys(players).length}
+          </Button>
         </div>
       </div>
     </div>
