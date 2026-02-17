@@ -1,5 +1,4 @@
 using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.SignalR;
 using MrWhite.Backend.Entity;
 using MrWhite.Backend.Services;
@@ -123,7 +122,7 @@ public class GameHub(GameService gameService, WordService wordService) : Hub
         await Clients.Caller.SendAsync("RoomCreated", gameRoom);
     }
 
-    public async Task StartGame(string roomCode, List<string> categories)
+    public async Task StartGame(string roomCode, List<string> categories, bool hintEnabled)
     {
         var gameRoom = await Check(roomCode);
 
@@ -137,11 +136,26 @@ public class GameHub(GameService gameService, WordService wordService) : Hub
             return;
         }
 
-        // Parola da indovinare
-        gameRoom.Word = wordService.GetRandomWord(categories);
+        // Parola da indovinare e categoria
+        var (word, category) = wordService.GetRandomWord(categories);
+        gameRoom.Word = word;
+
+        // Gestione hint per Mr. White
+        gameRoom.HintEnabled = hintEnabled;
+        if (hintEnabled)
+        {
+            gameRoom.Hint = wordService.GetRandomHint(category);
+        }
+        else
+        {
+            gameRoom.Hint = null;
+        }
 
         // Pulisce i voti fatti nella partita precedente
         gameRoom.Voting.Clear();
+
+        // Pulisce la lista dei giocatori pronti
+        gameRoom.ReadyPlayers.Clear();
 
         // Assegnazione Ruoli
         var players = gameRoom.Players.Values.ToList();
@@ -159,9 +173,9 @@ public class GameHub(GameService gameService, WordService wordService) : Hub
         await Clients.Group(roomCode).SendAsync("ReceiveRole", gameRoom);
     }
 
-    public async Task StartTalking(string roomCode)
+    public async Task PlayerReady(string roomCode)
     {
-        var gameRoom = await Check(roomCode);
+        var gameRoom = await Check(roomCode: roomCode, isHostOperation: false);
 
         if (gameRoom == null)
             return;
@@ -173,9 +187,30 @@ public class GameHub(GameService gameService, WordService wordService) : Hub
             return;
         }
 
-        gameRoom.GamePhase = GamePhase.Talking;
+        // controlla se il giocatore ha già confermato
+        if (gameRoom.ReadyPlayers.Contains(Context.ConnectionId))
+        {
+            await Clients.Caller.SendAsync("ReceiveMessage", "you-are-already-ready");
+            return;
+        }
 
-        await Clients.Group(roomCode).SendAsync("GamePhaseChanged", gameRoom.GamePhase);
+        // Aggiungi il giocatore alla lista dei pronti
+        gameRoom.ReadyPlayers.Add(Context.ConnectionId);
+
+        // Notifica tutti che questo giocatore è pronto
+        await Clients.Group(roomCode).SendAsync("PlayerIsReady", gameRoom.ReadyPlayers.ToList());
+
+        // Controlla se tutti i giocatori sono pronti
+        if (gameRoom.ReadyPlayers.Count == gameRoom.Players.Count)
+        {
+            // Tutti pronti: passa automaticamente alla fase Talking
+            gameRoom.GamePhase = GamePhase.Talking;
+
+            // Reset della lista dei pronti per eventuali fasi successive
+            gameRoom.ReadyPlayers.Clear();
+
+            await Clients.Group(roomCode).SendAsync("GamePhaseChanged", gameRoom.GamePhase);
+        }
     }
 
     public async Task StartVoting(string roomCode)
@@ -262,8 +297,26 @@ public class GameHub(GameService gameService, WordService wordService) : Hub
             return;
         }
 
-        // Calcolo del più votato
-        string mostVotedId = gameRoom.Voting.Values.GroupBy(id => id).OrderByDescending(g => g.Count()).Select(g => g.Key).First();
+        // Calcolo dei voti per ciascun giocatore
+        var voteGroups = gameRoom.Voting.Values.GroupBy(id => id).OrderByDescending(g => g.Count()).ToList();
+
+        // Controlla se c'è un pareggio tra i più votati
+        int maxVotes = voteGroups.First().Count();
+        var playersWithMaxVotes = voteGroups.Where(g => g.Count() == maxVotes).Select(g => g.Key).ToList();
+
+        if (playersWithMaxVotes.Count > 1)
+        {
+            // PAREGGIO: Resetta i voti e torna alla fase di votazione
+            gameRoom.Voting.Clear();
+
+            // Notifica il pareggio con i giocatori coinvolti
+            await Clients.Group(roomCode).SendAsync("VotingTie", playersWithMaxVotes);
+            await Clients.Group(roomCode).SendAsync("GamePhaseChanged", GamePhase.Voting);
+            return;
+        }
+
+        // Nessun pareggio: procedi con l'eliminazione
+        string mostVotedId = playersWithMaxVotes.First();
 
         if (gameRoom.Players.TryGetValue(mostVotedId, out var eliminatedPlayer))
         {
