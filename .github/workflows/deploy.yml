@@ -36,6 +36,12 @@ jobs:
       mr-white-frontend: ${{ steps.filter.outputs.mr-white-frontend == 'true' || github.event.inputs.service == 'mr-white-frontend' || github.event.inputs.service == 'all' }}
       mr-white-backend: ${{ steps.filter.outputs.mr-white-backend == 'true' || github.event.inputs.service == 'mr-white-backend' || github.event.inputs.service == 'all' }}
     steps:
+      - name: Force Fix Permissions for Runner
+        run: |
+          # Usiamo sudo per assicurarci che l'utente del runner sia il proprietario
+          # della cartella, altrimenti il cleanup fallirà sempre.
+          sudo chown -R $USER:$USER ${{ github.workspace }} || true
+
       - uses: actions/checkout@v4
 
       - uses: dorny/paths-filter@v3
