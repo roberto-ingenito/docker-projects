@@ -100,7 +100,7 @@ jobs:
 
       - name: Restart nginx
         run: |
-          docker compose up -d nginx
+          docker compose restart nginx
 
   deploy-fortil-timesheet:
     needs: check-changes
