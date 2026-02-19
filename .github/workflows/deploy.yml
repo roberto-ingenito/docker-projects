@@ -98,9 +98,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Restart nginx
+      - name: Reload Nginx Configuration
         run: |
-          docker compose restart nginx
+          docker exec cashly-nginx nginx -t         # Verifica che la sintassi sia corretta prima di ricaricare
+          docker exec cashly-nginx nginx -s reload  # Ricarica a caldo senza downtime
 
   deploy-fortil-timesheet:
     needs: check-changes
