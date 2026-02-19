@@ -620,11 +620,25 @@
         </div>
 
         <div class="field">
-          <label id="labelVersamento">Versamento mensile</label>
+          <label id="labelVersamento"
+            >Versamento mensile
+            <span id="labelVersamentoSub" style="opacity: 0.5; text-transform: none; letter-spacing: 0; font-size: 9px">(primo anno)</span></label
+          >
           <div class="input-row">
             <input type="number" id="versamento" placeholder="200" min="0" step="10" />
             <span class="unit">€</span>
           </div>
+        </div>
+
+        <div class="field" style="margin-bottom: 26px">
+          <label>Versamento rivalutato con inflazione?</label>
+          <div class="toggle-group">
+            <button class="toggle-btn" id="btnNoGrow" onclick="setGrow(false)">No, fisso</button>
+            <button class="toggle-btn active" id="btnGrow" onclick="setGrow(true)">Sì, rivalutato</button>
+          </div>
+          <p id="growNote" style="margin-top: 10px; font-size: 10px; color: var(--muted); line-height: 1.65">
+            Il versamento aumenta ogni anno del tasso d'inflazione — stesso sacrificio reale nel tempo.
+          </p>
         </div>
 
         <div class="field">
@@ -807,6 +821,7 @@
    PAGE 2 — PIANO DI ACCUMULO
 ═══════════════════════════════ */
       let period = "mensile";
+      let growMode = true;
 
       function setPeriod(p) {
         period = p;
@@ -816,10 +831,39 @@
         calcPAC();
       }
 
-      /* Future Value of an ordinary annuity: PMT × ((1+r)^n − 1) / r */
+      function setGrow(v) {
+        growMode = v;
+        document.getElementById("btnGrow").classList.toggle("active", v);
+        document.getElementById("btnNoGrow").classList.toggle("active", !v);
+        const sub = document.getElementById("labelVersamentoSub");
+        const note = document.getElementById("growNote");
+        if (v) {
+          sub.textContent = "(primo anno)";
+          note.textContent = "Il versamento aumenta ogni anno del tasso d'inflazione — stesso sacrificio reale nel tempo.";
+          note.style.display = "block";
+        } else {
+          sub.textContent = "";
+          note.style.display = "none";
+        }
+        calcPAC();
+      }
+
+      /* Future Value of an ordinary annuity */
       function fvAnnuity(pmt, r, n) {
         if (r === 0) return pmt * n;
         return (pmt * (Math.pow(1 + r, n) - 1)) / r;
+      }
+
+      /* Future Value of a growing annuity: versamento cresce del g% ogni periodo */
+      function fvGrowingAnnuity(pmt, r, g, n) {
+        if (Math.abs(r - g) < 1e-10) return pmt * n * Math.pow(1 + r, n - 1); // edge case r=g
+        return (pmt * (Math.pow(1 + r, n) - Math.pow(1 + g, n))) / (r - g);
+      }
+
+      /* Totale effettivamente versato con crescita g per n periodi */
+      function totalVersatoGrowing(pmt, g, n) {
+        if (g === 0) return pmt * n;
+        return (pmt * (Math.pow(1 + g, n) - 1)) / g;
       }
 
       function calcPAC() {
@@ -850,12 +894,25 @@
         if (period === "mensile") {
           const r = rendimento / 100 / 12;
           const n = anni * 12;
-          nominalFV = fvAnnuity(versamento, r, n);
-          totalVersato = versamento * n;
+          if (growMode) {
+            // crescita mensile equivalente al tasso annuo d'inflazione
+            const g = Math.pow(1 + inflation / 100, 1 / 12) - 1;
+            nominalFV = fvGrowingAnnuity(versamento, r, g, n);
+            totalVersato = totalVersatoGrowing(versamento, g, n);
+          } else {
+            nominalFV = fvAnnuity(versamento, r, n);
+            totalVersato = versamento * n;
+          }
         } else {
           const r = rendimento / 100;
-          nominalFV = fvAnnuity(versamento, r, anni);
-          totalVersato = versamento * anni;
+          if (growMode) {
+            const g = inflation / 100;
+            nominalFV = fvGrowingAnnuity(versamento, r, g, anni);
+            totalVersato = totalVersatoGrowing(versamento, g, anni);
+          } else {
+            nominalFV = fvAnnuity(versamento, r, anni);
+            totalVersato = versamento * anni;
+          }
         }
 
         const inflFactor = Math.pow(1 + inflation / 100, anni);
@@ -865,8 +922,9 @@
         const rendimentoReale = rendimento - inflation; // approssimazione
 
         document.getElementById("pacNominale").textContent = "€ " + fmt(nominalFV);
+        const growDesc = growMode ? `, rivalutato ogni anno del ${fmtD(inflation)}%` : "";
         document.getElementById("pacSub").textContent =
-          `Versando € ${fmt(versamento)} ${period} per ${anni} ann${anni === 1 ? "o" : "i"} ` +
+          `Versando € ${fmt(versamento)} ${period}${growDesc} per ${anni} ann${anni === 1 ? "o" : "i"} ` +
           `al ${fmtD(rendimento)}% lordo con inflazione al ${fmtD(inflation)}%.`;
         document.getElementById("pacReale").textContent = "€ " + fmt(realFV);
         document.getElementById("pacVersato").textContent = "€ " + fmt(totalVersato);
@@ -892,18 +950,33 @@
           realSeries = [],
           liqSeries = [];
         for (let y = 0; y <= anni; y++) {
-          let nom;
+          let nom, liq;
           if (period === "mensile") {
             const r = rendimento / 100 / 12;
-            nom = fvAnnuity(versamento, r, y * 12);
+            const n = y * 12;
+            if (growMode) {
+              const g = Math.pow(1 + inflation / 100, 1 / 12) - 1;
+              nom = fvGrowingAnnuity(versamento, r, g, n);
+              liq = totalVersatoGrowing(versamento, g, n);
+            } else {
+              nom = fvAnnuity(versamento, r, n);
+              liq = versamento * n;
+            }
           } else {
-            nom = fvAnnuity(versamento, rendimento / 100, y);
+            const r = rendimento / 100;
+            if (growMode) {
+              const g = inflation / 100;
+              nom = fvGrowingAnnuity(versamento, r, g, y);
+              liq = totalVersatoGrowing(versamento, g, y);
+            } else {
+              nom = fvAnnuity(versamento, r, y);
+              liq = versamento * y;
+            }
           }
           const inf = Math.pow(1 + inflation / 100, y);
-          const liq = period === "mensile" ? versamento * 12 * y : versamento * y;
           nomSeries.push(nom);
           realSeries.push(nom / inf);
-          liqSeries.push(liq);
+          liqSeries.push(liq / inf); // valore reale della liquidità
         }
 
         const maxVal = Math.max(...nomSeries, ...realSeries, ...liqSeries, 1);
