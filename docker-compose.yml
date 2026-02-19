@@ -11,6 +11,7 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro # Configurazione dei virtual host
       - ./nginx/certbot/conf:/etc/letsencrypt:ro # Certificati SSL generati da Certbot
       - ./nginx/certbot/www:/var/www/certbot:ro # Necessario per la validazione ACME
+      - ./calcolatore-finanze:/home/calcolatore-finanze:ro
     networks:
       - common-network
     restart: always
