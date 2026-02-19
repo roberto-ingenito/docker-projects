@@ -100,7 +100,12 @@ jobs:
 
       - name: Restart nginx
         run: |
-          docker compose restart nginx
+          docker compose build --no-cache nginx
+          docker compose up -d nginx
+
+      - name: Clean old images
+        run: |
+          docker image prune -f
 
   deploy-fortil-timesheet:
     needs: check-changes
