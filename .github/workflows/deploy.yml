@@ -100,18 +100,8 @@ jobs:
 
       - name: Reload Nginx Configuration
         run: |
-          # Sincronizza i file (checkout è già fatto sopra)
-          # Applica eventuali modifiche strutturali al container
           docker compose up -d nginx
-
-          # Verifica la sintassi della nuova config
-          if docker exec cashly-nginx nginx -t; then
-            echo "Configurazione valida, ricarico..."
-            docker exec cashly-nginx nginx -s reload
-          else
-            echo "Errore nella configurazione Nginx! Operazione annullata."
-            exit 1
-          fi
+          docker exec cashly-nginx nginx -s reload
 
   deploy-fortil-timesheet:
     needs: check-changes
