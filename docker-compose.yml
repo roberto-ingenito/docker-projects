@@ -12,6 +12,7 @@ services:
       - ./nginx/certbot/conf:/etc/letsencrypt # Certificati SSL generati da Certbot
       - ./nginx/certbot/www:/var/www/certbot # Necessario per la validazione ACME
       - ./calcolatore-finanze:/var/www/calcolatore-finanze
+      - ./calcolatore-tasse:/var/www/calcolatore-tasse
     networks:
       - common-network
     restart: always
