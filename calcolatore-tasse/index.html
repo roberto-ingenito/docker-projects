@@ -815,7 +815,7 @@
           <div class="field">
             <label for="c1">Coefficiente</label>
             <div class="input-row">
-              <input type="number" id="c1" placeholder="67" min="1" max="100" step="0.01" />
+              <input type="number" id="c1" placeholder="67" min="1" max="100" step="0.01" value="67" />
               <span class="unit">%</span>
             </div>
           </div>
@@ -885,7 +885,7 @@
           <div class="field">
             <label for="c2">Coefficiente</label>
             <div class="input-row">
-              <input type="number" id="c2" placeholder="67" min="1" max="100" step="0.01" />
+              <input type="number" id="c2" placeholder="67" min="1" max="100" step="0.01" value="67" />
               <span class="unit">%</span>
             </div>
           </div>
@@ -1104,27 +1104,38 @@
 
       /* ─── YEAR ROWS ─── */
       let yc = 0;
-      function addRow(val) {
+      function addRow() {
         yc++;
         const base = parseInt(document.getElementById("y0").value) || new Date().getFullYear();
-        const idx = document.querySelectorAll("#yrows .yr-row").length;
-        const anno = base + idx;
+
+        // 1. Recupera l'ultimo valore inserito (se esiste)
+        const currentRows = document.querySelectorAll("#yrows .yr-row input");
+        let lastValue = "";
+        if (currentRows.length > 0) {
+          lastValue = currentRows[currentRows.length - 1].value;
+        }
+
+        const rowsCount = document.querySelectorAll("#yrows .yr-row").length;
+        const anno = base + rowsCount;
+
         const d = document.createElement("div");
         d.className = "yr-row";
         d.id = "yr" + yc;
         d.dataset.idx = yc;
         d.innerHTML = `
-    <div class="yr-head">
-      <span class="yr-label">Anno <em>${anno}</em></span>
-      ${yc > 1 ? `<button class="btn-rm" onclick="rmRow(${yc})">rimuovi</button>` : ""}
-    </div>
-    <div class="field">
-      <label for="yi${yc}">Incassi annui</label>
-      <div class="input-row">
-        <input type="number" id="yi${yc}" placeholder="24000" min="0" max="85000" step="100" value="${val || ""}">
-        <span class="unit">€</span>
-      </div>
-    </div>`;
+          <div class="yr-head">
+            <span class="yr-title">Anno <span>${anno}</span></span>
+            ${yc > 1 ? `<button class="btn-rm" onclick="rmRow(${yc})">✕</button>` : ""}
+          </div>
+          <div class="yr-body">
+            <div class="form-group">
+              <label class="field-label" for="yi${yc}">Incassi annui</label>
+              <div class="input-wrap">
+                <span class="pfx">€</span>
+                <input type="number" id="yi${yc}" placeholder="24000" min="0" max="85000" step="100" value="${lastValue}">
+              </div>
+            </div>
+          </div>`;
         document.getElementById("yrows").appendChild(d);
       }
       function rmRow(id) {
