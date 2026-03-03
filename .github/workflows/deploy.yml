@@ -6,7 +6,7 @@ on:
     paths:
       - "cashly/front-end/**"
       - "cashly/back-end/**"
-      - "nginx/**"
+      - "main-nginx/**"
       - "fortil-excel-timesheet/**"
       - "mr-white-game/frontend/**"
       - "mr-white-game/backend/**"
@@ -20,7 +20,7 @@ on:
           - all
           - cashly-frontend
           - cashly-backend
-          - nginx
+          - main-nginx
           - fortil-excel-timesheet
           - mr-white-frontend
           - mr-white-backend
@@ -31,7 +31,7 @@ jobs:
     outputs:
       cashly-frontend: ${{ steps.filter.outputs.cashly-frontend == 'true' || github.event.inputs.service == 'cashly-frontend' || github.event.inputs.service == 'all' }}
       cashly-backend: ${{ steps.filter.outputs.cashly-backend == 'true' || github.event.inputs.service == 'cashly-backend' || github.event.inputs.service == 'all' }}
-      nginx: ${{ steps.filter.outputs.nginx == 'true' || github.event.inputs.service == 'nginx' || github.event.inputs.service == 'all' }}
+      main-nginx: ${{ steps.filter.outputs.main-nginx == 'true' || github.event.inputs.service == 'main-nginx' || github.event.inputs.service == 'all' }}
       fortil-excel-timesheet: ${{ steps.filter.outputs.fortil-excel-timesheet == 'true' || github.event.inputs.service == 'fortil-excel-timesheet' || github.event.inputs.service == 'all' }}
       mr-white-frontend: ${{ steps.filter.outputs.mr-white-frontend == 'true' || github.event.inputs.service == 'mr-white-frontend' || github.event.inputs.service == 'all' }}
       mr-white-backend: ${{ steps.filter.outputs.mr-white-backend == 'true' || github.event.inputs.service == 'mr-white-backend' || github.event.inputs.service == 'all' }}
@@ -47,8 +47,8 @@ jobs:
               - 'cashly/front-end/**'
             cashly-backend:
               - 'cashly/back-end/**'
-            nginx:
-              - 'nginx/**'
+            main-nginx:
+              - 'main-nginx/**'
             fortil-excel-timesheet:
               - 'fortil-excel-timesheet/**'
             mr-white-frontend:
@@ -91,17 +91,17 @@ jobs:
         run: |
           docker image prune -f
 
-  deploy-nginx:
+  deploy-main-nginx:
     needs: check-changes
-    if: needs.check-changes.outputs.nginx == 'true'
+    if: needs.check-changes.outputs.main-nginx == 'true'
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
-      - name: Reload Nginx Configuration
+      - name: Reload main-nginx Configuration
         run: |
-          docker compose up -d nginx
-          docker exec cashly-nginx nginx -s reload
+          docker compose up -d main-nginx
+          docker exec main-nginx nginx -s reload
 
   deploy-fortil-timesheet:
     needs: check-changes

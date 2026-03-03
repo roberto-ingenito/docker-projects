@@ -1,16 +1,16 @@
 services:
   # --- REVERSE PROXY ---
   # Nginx funge da porta d'ingresso per tutto il traffico (HTTP/HTTPS)
-  nginx:
+  main-nginx:
     image: nginx:alpine
-    container_name: cashly-nginx
+    container_name: main-nginx
     ports:
       - "80:80" # Espone la porta 80 per HTTP (e rinnovo Certbot)
       - "443:443" # Espone la porta 443 per traffico HTTPS criptato
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d # Configurazione dei virtual host
-      - ./nginx/certbot/conf:/etc/letsencrypt # Certificati SSL generati da Certbot
-      - ./nginx/certbot/www:/var/www/certbot # Necessario per la validazione ACME
+      - ./main-nginx/conf.d:/etc/nginx/conf.d # Configurazione dei virtual host
+      - ./main-nginx/certbot/conf:/etc/letsencrypt # Certificati SSL generati da Certbot
+      - ./main-nginx/certbot/www:/var/www/certbot # Necessario per la validazione ACME
       - ./calcolatore-finanze:/var/www/calcolatore-finanze
       - ./calcolatore-tasse:/var/www/calcolatore-tasse
     networks:
@@ -28,8 +28,8 @@ services:
     image: certbot/certbot
     container_name: certbot
     volumes:
-      - ./nginx/certbot/conf:/etc/letsencrypt
-      - ./nginx/certbot/www:/var/www/certbot
+      - ./main-nginx/certbot/conf:/etc/letsencrypt
+      - ./main-nginx/certbot/www:/var/www/certbot
     # Script entrypoint: controlla il rinnovo ogni 12 ore
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     restart: always
