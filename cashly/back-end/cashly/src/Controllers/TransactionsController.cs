@@ -16,16 +16,7 @@ public class TransactionsController(ITransactionService transactionService) : Co
     public async Task<ActionResult<TransactionResponseDto>> CreateTransaction([FromBody] TransactionCreateDto createTransactionDto)
     {
         var userId = User.GetUserId();
-        Transaction newTransaction;
-
-        try
-        {
-            newTransaction = await transactionService.CreateTransactionAsync(createTransactionDto, userId);
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
+        var newTransaction = await transactionService.CreateTransactionAsync(createTransactionDto, userId);
 
         return Ok(newTransaction.ToDto());
     }
@@ -34,18 +25,7 @@ public class TransactionsController(ITransactionService transactionService) : Co
     public async Task<ActionResult<IEnumerable<TransactionResponseDto>>> GetTransactions()
     {
         var userId = User.GetUserId();
-
-        IEnumerable<Transaction> transactions;
-
-        try
-        {
-            transactions = await transactionService.GetTransactionsByUserIdAsync(userId);
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
-
+        var transactions = await transactionService.GetTransactionsByUserIdAsync(userId);
         var transactionResponse = transactions.Select(t => t.ToDto());
 
         return Ok(transactionResponse);
@@ -55,49 +35,17 @@ public class TransactionsController(ITransactionService transactionService) : Co
     public async Task<ActionResult<TransactionResponseDto>> UpdateTransaction(int transactionId, [FromBody] TransactionUpdateDto updateTransactionDto)
     {
         var userId = User.GetUserId();
+        var updatedTransaction = await transactionService.UpdateTransactionAsync(transactionId, updateTransactionDto, userId);
 
-        try
-        {
-            var updatedTransaction = await transactionService.UpdateTransactionAsync(transactionId, updateTransactionDto, userId);
-            return Ok(updatedTransaction.ToDto()); // 200
-        }
-        catch (InvalidOperationException ex)
-        {
-            if (ex.Message == "transaction-not-found" || ex.Message == "category-not-found")
-            {
-                return NotFound(new { message = ex.Message }); // 404
-            }
-
-            return BadRequest(new { message = ex.Message }); // 400
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { message = "Si è verificato un errore interno" });
-        }
+        return Ok(updatedTransaction.ToDto()); // 200
     }
 
     [HttpDelete("{transactionId}")]
     public async Task<IActionResult> DeleteTransactions(int transactionId)
     {
         var userId = User.GetUserId();
+        await transactionService.DeleteTransaction(transactionId, userId);
 
-        try
-        {
-            await transactionService.DeleteTransaction(transactionId, userId);
-
-            return NoContent(); // 204 - Eliminazione avvenuta con successo
-        }
-        catch (InvalidOperationException ex)
-        {
-            if (ex.Message == "transaction-not-found")
-            {
-                return NotFound(new { message = "Transazione non trovata" }); // 404
-            }
-            return BadRequest(new { message = ex.Message }); // 400
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { message = "Si è verificato un errore interno" });
-        }
+        return NoContent(); // 204 - Eliminazione avvenuta con successo
     }
 }

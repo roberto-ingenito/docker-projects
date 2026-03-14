@@ -43,22 +43,7 @@ public class CategoriesController(ICategoryService categoryService) : Controller
     {
         var userId = User.GetUserId();
 
-        try
-        {
-            var updatedCategory = await categoryService.Update(categoryId, categoryDto, userId);
-            return Ok(updatedCategory.ToDto()); // 200
-        }
-        catch (InvalidOperationException ex)
-        {
-            if (ex.Message == "category-not-found")
-            {
-                return NotFound(new { message = "Categoria non trovata" }); // 404
-            }
-            return BadRequest(new { message = ex.Message }); // 400
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { message = "Si è verificato un errore interno" });
-        }
+        var updatedCategory = await categoryService.Update(categoryId, categoryDto, userId);
+        return Ok(updatedCategory.ToDto()); // 200
     }
 }
