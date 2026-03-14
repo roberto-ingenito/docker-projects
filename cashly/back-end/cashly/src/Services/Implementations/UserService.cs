@@ -1,12 +1,12 @@
-using cashly.src.Data;
-using cashly.src.Data.Entities;
-using cashly.src.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
+using cashly.src.Data;
+using cashly.src.Data.Entities;
+using cashly.src.DTOs;
 using cashly.src.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace cashly.src.Services.Implementations;
 
@@ -19,20 +19,18 @@ public class UserService(AppDbContext dbContext, IConfiguration configuration) :
 
     public async Task<User> SignIn(UserLoginDto dto)
     {
-
         // Trova l'utente tramite email
         User? user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
 
         // Se l'utente non esiste o la password è errata, restituisci null
         if (user == null)
         {
-            throw new InvalidOperationException("user-not-found");
+            throw new InvalidOperationException("wrong-credentials");
         }
-
         // controlla se la password è errata
         else if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.HashedPassword))
         {
-            throw new InvalidOperationException("wrong-password");
+            throw new InvalidOperationException("wrong-credentials");
         }
 
         return user;
@@ -47,11 +45,7 @@ public class UserService(AppDbContext dbContext, IConfiguration configuration) :
         }
 
         // Crea un nuovo utente e esegui l'hashing della password
-        User newUser = new()
-        {
-            Email = dto.Email,
-            HashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password)
-        };
+        User newUser = new() { Email = dto.Email, HashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password) };
 
         // Salva l'utente nel database
         dbContext.Users.Add(newUser);
@@ -76,7 +70,7 @@ public class UserService(AppDbContext dbContext, IConfiguration configuration) :
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()), // 'Subject' -> ID dell'utente
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // ID univoco per il token
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // ID univoco per il token
         };
 
         // Imposta la scadenza del token (es. 1 giorno)
@@ -94,5 +88,4 @@ public class UserService(AppDbContext dbContext, IConfiguration configuration) :
         // Scrivi il token come stringa
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-
 }
