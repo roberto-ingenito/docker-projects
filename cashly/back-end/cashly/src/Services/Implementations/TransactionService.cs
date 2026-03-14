@@ -10,24 +10,26 @@ public class TransactionService(AppDbContext context) : ITransactionService
 {
     public async Task<Transaction> CreateTransactionAsync(TransactionCreateDto transactionDto, int userId)
     {
-        // 1. Ottieni la strategia di esecuzione dal DbContext
         var strategy = context.Database.CreateExecutionStrategy();
 
-        // 2. Esegui il tuo codice all'interno della strategia
         return await strategy.ExecuteAsync(async () =>
         {
-            // Iniziamo una transazione di database. O va tutto a buon fine, o non viene salvato nulla.
             await using var dbTransaction = await context.Database.BeginTransactionAsync();
 
             try
             {
-                // 1. Controlla l'utente esista all'utente
-                User? user = await context.Users.Where(u => u.UserId == userId).SingleOrDefaultAsync() ?? throw new InvalidOperationException("user-not-found");
+                // 1. Verifica esistenza utente (Senza caricarlo tutto in memoria/tracking)
+                if (!await context.Users.AnyAsync(u => u.UserId == userId))
+                    throw new InvalidOperationException("user-not-found");
 
-                if (transactionDto.CategoryId is not null && !await context.Categories.AnyAsync(c => c.CategoryId == transactionDto.CategoryId && c.UserId == userId))
+                // 2. Verifica categoria
+                if (
+                    transactionDto.CategoryId is not null
+                    && !await context.Categories.AnyAsync(c => c.CategoryId == transactionDto.CategoryId && c.UserId == userId)
+                )
                     throw new InvalidOperationException("category-not-found");
 
-                // 2. Crea la nuova entità Transaction
+                // 3. Crea la transazione
                 Transaction newTransaction = new()
                 {
                     Amount = transactionDto.Amount,
@@ -38,22 +40,17 @@ public class TransactionService(AppDbContext context) : ITransactionService
                     UserId = userId,
                 };
 
-                // 3. Aggiorna il saldo
-                switch (newTransaction.Type)
-                {
-                    case TransactionType.income:
-                        user.CurrentBalance += newTransaction.Amount;
-                        break;
-                    case TransactionType.expense:
-                        user.CurrentBalance -= newTransaction.Amount;
-                        break;
-                }
+                // 4. Aggiorna il saldo in modo ATOMICO sul Database
+                decimal balanceAdjustment = newTransaction.Type == TransactionType.income ? newTransaction.Amount : -newTransaction.Amount;
 
-                // 4. Aggiungi la transazione e salva tutte le modifiche (sia alla transazione che al saldo)
+                await context
+                    .Users.Where(u => u.UserId == userId)
+                    .ExecuteUpdateAsync(s => s.SetProperty(u => u.CurrentBalance, u => u.CurrentBalance + balanceAdjustment));
+
+                // 5. Salva la transazione
                 context.Transactions.Add(newTransaction);
                 await context.SaveChangesAsync();
 
-                // 5. Se tutto è andato bene, conferma la transazione di database
                 await dbTransaction.CommitAsync();
 
                 return newTransaction;
@@ -77,66 +74,44 @@ public class TransactionService(AppDbContext context) : ITransactionService
 
             try
             {
-                // 1. Trova la transazione esistente
-                var transaction = await context.Transactions
-                    .Include(t => t.User)
-                    .FirstOrDefaultAsync(t => t.TransactionId == transactionId && t.UserId == userId);
+                // 1. Trova la transazione (Senza caricare l'utente per evitare conflitti di tracking sul saldo)
+                var transaction =
+                    await context.Transactions.FirstOrDefaultAsync(t => t.TransactionId == transactionId && t.UserId == userId)
+                    ?? throw new InvalidOperationException("transaction-not-found");
 
-                if (transaction == null)
-                {
-                    throw new InvalidOperationException("transaction-not-found");
-                }
-
-                // 2. Verifica che la categoria appartenga all'utente (se specificata)
-                if (transactionDto.CategoryId is not null &&
-                    !await context.Categories.AnyAsync(c => c.CategoryId == transactionDto.CategoryId && c.UserId == userId))
-                {
+                if (
+                    transactionDto.CategoryId is not null
+                    && !await context.Categories.AnyAsync(c => c.CategoryId == transactionDto.CategoryId && c.UserId == userId)
+                )
                     throw new InvalidOperationException("category-not-found");
-                }
 
-                // 3. Calcola la differenza di saldo
-                var user = transaction.User;
+                // 2. Calcola il DELTA per l'aggiornamento atomico
+                // Es: Vecchia = -10 (Uscita), Nuova = -15 (Uscita) -> Delta = -5
+                // Es: Vecchia = -10 (Uscita), Nuova = +20 (Entrata) -> Delta = +30
+                decimal oldAdjustment = transaction.Type == TransactionType.income ? transaction.Amount : -transaction.Amount;
+                decimal newAdjustment = transactionDto.Type == TransactionType.income ? transactionDto.Amount : -transactionDto.Amount;
+                decimal delta = newAdjustment - oldAdjustment;
 
-                // Rimuovi l'effetto della vecchia transazione dal saldo
-                switch (transaction.Type)
-                {
-                    case TransactionType.income:
-                        user.CurrentBalance -= transaction.Amount;
-                        break;
-                    case TransactionType.expense:
-                        user.CurrentBalance += transaction.Amount;
-                        break;
-                }
-
-                // 4. Aggiorna i campi della transazione
+                // 3. Aggiorna i campi della transazione
                 transaction.Amount = transactionDto.Amount;
                 transaction.Type = transactionDto.Type;
                 transaction.TransactionDate = transactionDto.TransactionDate.ToUniversalTime();
                 transaction.Description = transactionDto.Description;
                 transaction.CategoryId = transactionDto.CategoryId;
 
-                // 5. Applica l'effetto della nuova transazione al saldo
-                switch (transaction.Type)
+                // 4. Applica il delta al saldo in modo atomico
+                if (delta != 0)
                 {
-                    case TransactionType.income:
-                        user.CurrentBalance += transaction.Amount;
-                        break;
-                    case TransactionType.expense:
-                        user.CurrentBalance -= transaction.Amount;
-                        break;
+                    await context
+                        .Users.Where(u => u.UserId == userId)
+                        .ExecuteUpdateAsync(s => s.SetProperty(u => u.CurrentBalance, u => u.CurrentBalance + delta));
                 }
 
-                // 6. Salva le modifiche
                 await context.SaveChangesAsync();
-
-                // 7. Conferma la transazione
                 await dbTransaction.CommitAsync();
 
-                // 8. Ricarica la transazione con la categoria per restituirla completa
-                await context.Entry(transaction)
-                    .Reference(t => t.Category)
-                    .LoadAsync();
-
+                // Ricarica per restituire l'oggetto completo
+                await context.Entry(transaction).Reference(t => t.Category).LoadAsync();
                 return transaction;
             }
             catch (Exception)
@@ -149,10 +124,7 @@ public class TransactionService(AppDbContext context) : ITransactionService
 
     public async Task<IEnumerable<Transaction>> GetTransactionsByUserIdAsync(int userId)
     {
-        return await context.Transactions
-            .Where(t => t.UserId == userId)
-            .OrderByDescending(t => t.TransactionDate)
-            .ToListAsync();
+        return await context.Transactions.Where(t => t.UserId == userId).OrderByDescending(t => t.TransactionDate).ToListAsync();
     }
 
     public async Task DeleteTransaction(int id, int userId)
@@ -165,35 +137,21 @@ public class TransactionService(AppDbContext context) : ITransactionService
 
             try
             {
-                // 1. Trova la transazione con l'utente
-                var transaction = await context.Transactions
-                    .Include(t => t.User)
-                    .FirstOrDefaultAsync(t => t.TransactionId == id && t.UserId == userId);
+                var transaction =
+                    await context.Transactions.FirstOrDefaultAsync(t => t.TransactionId == id && t.UserId == userId)
+                    ?? throw new InvalidOperationException("transaction-not-found");
 
-                if (transaction == null)
-                {
-                    throw new InvalidOperationException("transaction-not-found");
-                }
+                // 1. Revert del saldo in modo atomico
+                decimal balanceRevert = transaction.Type == TransactionType.income ? -transaction.Amount : transaction.Amount;
 
-                // 2. Aggiorna il saldo dell'utente
-                var user = transaction.User;
-                switch (transaction.Type)
-                {
-                    case TransactionType.income:
-                        user.CurrentBalance -= transaction.Amount;
-                        break;
-                    case TransactionType.expense:
-                        user.CurrentBalance += transaction.Amount;
-                        break;
-                }
+                await context
+                    .Users.Where(u => u.UserId == userId)
+                    .ExecuteUpdateAsync(s => s.SetProperty(u => u.CurrentBalance, u => u.CurrentBalance + balanceRevert));
 
-                // 3. Elimina la transazione
+                // 2. Elimina la transazione
                 context.Transactions.Remove(transaction);
 
-                // 4. Salva le modifiche
                 await context.SaveChangesAsync();
-
-                // 5. Conferma la transazione
                 await dbTransaction.CommitAsync();
             }
             catch (Exception)
