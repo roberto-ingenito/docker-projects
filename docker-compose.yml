@@ -58,6 +58,8 @@ services:
   cashly-database:
     container_name: cashly-database
     image: postgres:18-alpine3.22
+    ports:
+      - "5116:5432"
     expose:
       - "5432"
     environment:
@@ -83,7 +85,6 @@ services:
       - "3000"
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=https://roberto-ingenito.ddns.net/api
     networks:
       - common-network
     restart: always
@@ -220,7 +221,6 @@ services:
       - "3000"
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=https://roberto-ingenito.ddns.net/mr-white-api
     networks:
       - common-network
     restart: always

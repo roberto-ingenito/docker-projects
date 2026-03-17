@@ -103,6 +103,7 @@ builder
 
             // Valida la scadenza del token
             ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
         };
     });
 

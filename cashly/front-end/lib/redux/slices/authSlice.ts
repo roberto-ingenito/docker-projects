@@ -6,6 +6,7 @@ import * as actions from '@/app/actions';
 const initialState: AuthState = {
     user: null,
     token: null,
+    refreshToken: null,
     isAuthenticated: false,
     isLoading: false,
     error: null,
@@ -16,6 +17,7 @@ export const login = createAsyncThunk(
     async (credentials: UserLoginDto) => {
         const response = await authApi.login(credentials);
         await actions.saveJwtToken(response.token);
+        await actions.saveRefreshToken(response.refreshToken);
         await actions.saveUser(response.user);
         return response;
     }
@@ -26,6 +28,7 @@ export const signup = createAsyncThunk(
     async (userData: UserCreateDto) => {
         const response = await authApi.signup(userData);
         await actions.saveJwtToken(response.token);
+        await actions.saveRefreshToken(response.refreshToken);
         await actions.saveUser(response.user);
         return response;
     }
@@ -33,6 +36,7 @@ export const signup = createAsyncThunk(
 
 export const logout = createAsyncThunk('auth/logout', async () => {
     await actions.deleteJwtToken();
+    await actions.deleteRefreshToken();
     await actions.deleteUser();
 });
 
@@ -40,11 +44,18 @@ const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        setUser: (state, action: PayloadAction<{ user: User | null, token: string }>) => {
+        setUser: (state, action: PayloadAction<{ user: User | null, token: string, refreshToken?: string }>) => {
             state.user = action.payload.user;
             state.token = action.payload.token;
+            state.refreshToken = action.payload.refreshToken || null;
             state.isLoading = false;
-            state.isAuthenticated = true;
+            state.isAuthenticated = !!action.payload.user;
+        },
+        setToken: (state, action: PayloadAction<string>) => {
+            state.token = action.payload;
+        },
+        setRefreshToken: (state, action: PayloadAction<string>) => {
+            state.refreshToken = action.payload;
         },
     },
     extraReducers: (builder) => {
@@ -58,6 +69,7 @@ const authSlice = createSlice({
                 state.isLoading = false;
                 state.user = action.payload.user;
                 state.token = action.payload.token;
+                state.refreshToken = action.payload.refreshToken;
                 state.isAuthenticated = true;
             })
             .addCase(login.rejected, (state, action) => {
@@ -75,6 +87,7 @@ const authSlice = createSlice({
                 state.isLoading = false;
                 state.user = action.payload.user;
                 state.token = action.payload.token;
+                state.refreshToken = action.payload.refreshToken;
                 state.isAuthenticated = true;
             })
             .addCase(signup.rejected, (state, action) => {
@@ -85,10 +98,15 @@ const authSlice = createSlice({
         // Logout
         builder
             .addCase(logout.fulfilled, (state) => {
-                state = initialState;
+                state.user = null;
+                state.token = null;
+                state.refreshToken = null;
+                state.isAuthenticated = false;
+                state.isLoading = false;
+                state.error = null;
             });
     },
 });
 
-export const { setUser } = authSlice.actions
+export const { setUser, setToken, setRefreshToken } = authSlice.actions;
 export default authSlice.reducer;

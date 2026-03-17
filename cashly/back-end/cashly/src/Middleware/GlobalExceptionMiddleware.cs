@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using cashly.src.Exceptions;
 
 namespace cashly.src.Middleware;
 
@@ -10,6 +11,12 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
         try
         {
             await next(context);
+        }
+        catch (AppException ex)
+        {
+            // Business logic errors are logged as information/warning or not at all
+            logger.LogWarning("Richiesta non valida: {Message}", ex.Message);
+            await HandleExceptionAsync(context, ex);
         }
         catch (Exception ex)
         {
@@ -23,17 +30,10 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
         var code = HttpStatusCode.InternalServerError; // 500 di default
         var result = "Si è verificato un errore interno al server.";
 
-        // Mappatura delle eccezioni di business (InvalidOperationException usate nei servizi)
-        if (exception is InvalidOperationException invEx)
+        if (exception is AppException appEx)
         {
-            (code, result) = invEx.Message switch
-            {
-                "wrong-credentials" => (HttpStatusCode.Unauthorized, "Credenziali non valide"),
-                "category-not-found" => (HttpStatusCode.NotFound, "Categoria non trovata"),
-                "transaction-not-found" => (HttpStatusCode.NotFound, "Transazione non trovata"),
-                "user-already-exists" => (HttpStatusCode.Conflict, "L'utente esiste già"),
-                _ => (HttpStatusCode.BadRequest, invEx.Message),
-            };
+            code = appEx.StatusCode;
+            result = appEx.Message;
         }
 
         context.Response.ContentType = "application/json";

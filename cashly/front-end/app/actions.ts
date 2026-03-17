@@ -4,6 +4,7 @@ import { User, UserCreateDto } from "@/lib/types/auth";
 import { cookies } from "next/headers";
 
 const jwt_token_cookie_key = "token";
+const refresh_token_cookie_key = "refreshToken";
 const user_cookie_key = "user";
 
 export async function saveJwtToken(token: string) {
@@ -12,7 +13,7 @@ export async function saveJwtToken(token: string) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 60 * 60 * 24 * 1, // 1 giorni
+    maxAge: 60 * 15, // 15 minuti (corrisponde alla scadenza del server)
     path: "/",
   });
 }
@@ -23,6 +24,24 @@ export async function deleteJwtToken() {
 
 export async function getJwtToken(): Promise<string | undefined> {
   return (await cookies()).get(jwt_token_cookie_key)?.value;
+}
+
+export async function saveRefreshToken(token: string) {
+  (await cookies()).set(refresh_token_cookie_key, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 60 * 60 * 24 * 30, // 1 mese
+    path: "/",
+  });
+}
+
+export async function deleteRefreshToken() {
+  (await cookies()).delete(refresh_token_cookie_key);
+}
+
+export async function getRefreshToken(): Promise<string | undefined> {
+  return (await cookies()).get(refresh_token_cookie_key)?.value;
 }
 
 export async function saveUser(user: Omit<User, "password">) {

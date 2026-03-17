@@ -5,13 +5,9 @@ namespace cashly.src.Services.Interfaces;
 
 public interface IUserService
 {
-
     Task<User> SignUp(UserCreateDto dto);
-
     Task<User> SignIn(UserLoginDto dto);
-
     Task Delete(int userId);
-
-    string GenerateJwtToken(User user);
-
+    Task<UserLoginResponseDto> GenerateTokens(User user);
+    Task<UserLoginResponseDto> RefreshToken(string refreshToken);
 }

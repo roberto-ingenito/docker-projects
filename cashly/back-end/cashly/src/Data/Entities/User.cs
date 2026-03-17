@@ -22,8 +22,10 @@ public class User
     [MaxLength(10)]
     public string Currency { get; set; } = "EUR";
 
-
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public string? RefreshToken { get; set; }
+    public DateTime? RefreshTokenExpiry { get; set; }
 
     public virtual ICollection<Transaction> Transactions { get; set; } = [];
     public virtual ICollection<Category> Categories { get; set; } = [];

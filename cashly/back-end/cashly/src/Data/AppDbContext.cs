@@ -14,24 +14,27 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         base.OnModelCreating(modelBuilder);
 
         /* RELAZIONI */
-        modelBuilder.Entity<Category>()
+        modelBuilder
+            .Entity<Category>() //
             .HasOne(c => c.User)
             .WithMany(u => u.Categories)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<Transaction>()
+        modelBuilder
+            .Entity<Transaction>() //
             .HasOne(t => t.Category)
             .WithMany(c => c.Transactions)
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Transaction>()
+        modelBuilder
+            .Entity<Transaction>() //
             .HasOne(t => t.User)
             .WithMany(u => u.Transactions)
             .OnDelete(DeleteBehavior.Cascade);
 
-
         // imposta la email come unique
-        modelBuilder.Entity<User>()
+        modelBuilder
+            .Entity<User>() //
             .HasIndex(u => u.Email)
             .IsUnique();
 

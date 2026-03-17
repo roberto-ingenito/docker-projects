@@ -1,6 +1,8 @@
+using System.Net;
 using cashly.src.Data;
 using cashly.src.Data.Entities;
 using cashly.src.DTOs;
+using cashly.src.Exceptions;
 using cashly.src.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,7 +30,9 @@ public class CategoryService(AppDbContext dbContext) : ICategoryService
     public async Task<Category> Update(int categoryId, CategoryUpdateDto dto, int userId)
     {
         // Trova la categoria esistente
-        var category = await dbContext.Categories.FirstOrDefaultAsync(c => c.CategoryId == categoryId && c.UserId == userId) ?? throw new InvalidOperationException("category-not-found");
+        var category =
+            await dbContext.Categories.FirstOrDefaultAsync(c => c.CategoryId == categoryId && c.UserId == userId)
+            ?? throw new AppException("category-not-found", HttpStatusCode.NotFound);
 
         // Aggiorna i campi
         category.CategoryName = dto.CategoryName;
@@ -43,9 +47,7 @@ public class CategoryService(AppDbContext dbContext) : ICategoryService
 
     public async Task Delete(int categoryId, int userId)
     {
-        await dbContext.Categories
-            .Where(c => c.CategoryId == categoryId && c.UserId == userId)
-            .ExecuteDeleteAsync();
+        await dbContext.Categories.Where(c => c.CategoryId == categoryId && c.UserId == userId).ExecuteDeleteAsync();
     }
 
     public async Task<IEnumerable<Category>> GetAll(int userId)

@@ -1,5 +1,4 @@
 using cashly.src.DTOs;
-using cashly.src.Extensions;
 using cashly.src.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,20 +14,29 @@ public class UsersController(IUserService userService) : ControllerBase
     public async Task<ActionResult<UserLoginResponseDto>> SignUp([FromBody] UserCreateDto dto)
     {
         var newUser = await userService.SignUp(dto);
-
-        UserLoginResponseDto userResponse = new() { User = newUser.ToDto(), Token = userService.GenerateJwtToken(newUser) };
-
-        return StatusCode(201, userResponse);
+        var response = await userService.GenerateTokens(newUser);
+        return StatusCode(201, response);
     }
 
     [HttpPost("signin")]
     public async Task<ActionResult<UserLoginResponseDto>> SignIn([FromBody] UserLoginDto dto)
     {
-        // Chiama il servizio per tentare il login
         var user = await userService.SignIn(dto);
+        var response = await userService.GenerateTokens(user);
+        return Ok(response);
+    }
 
-        UserLoginResponseDto userResponse = new() { User = user.ToDto(), Token = userService.GenerateJwtToken(user) };
-
-        return Ok(userResponse); // 200
+    [HttpPost("refresh")]
+    public async Task<ActionResult<UserLoginResponseDto>> Refresh([FromBody] RefreshTokenRequestDto dto)
+    {
+        try
+        {
+            var response = await userService.RefreshToken(dto.RefreshToken);
+            return Ok(response);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized(new { message = "invalid-refresh-token" });
+        }
     }
 }

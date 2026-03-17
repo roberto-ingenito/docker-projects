@@ -1,6 +1,8 @@
+using System.Net;
 using cashly.src.Data;
 using cashly.src.Data.Entities;
 using cashly.src.DTOs;
+using cashly.src.Exceptions;
 using cashly.src.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,14 +22,14 @@ public class TransactionService(AppDbContext context) : ITransactionService
             {
                 // 1. Verifica esistenza utente (Senza caricarlo tutto in memoria/tracking)
                 if (!await context.Users.AnyAsync(u => u.UserId == userId))
-                    throw new InvalidOperationException("user-not-found");
+                    throw new AppException("user-not-found", HttpStatusCode.NotFound);
 
                 // 2. Verifica categoria
                 if (
                     transactionDto.CategoryId is not null
                     && !await context.Categories.AnyAsync(c => c.CategoryId == transactionDto.CategoryId && c.UserId == userId)
                 )
-                    throw new InvalidOperationException("category-not-found");
+                    throw new AppException("category-not-found", HttpStatusCode.NotFound);
 
                 // 3. Crea la transazione
                 Transaction newTransaction = new()
@@ -77,13 +79,13 @@ public class TransactionService(AppDbContext context) : ITransactionService
                 // 1. Trova la transazione (Senza caricare l'utente per evitare conflitti di tracking sul saldo)
                 var transaction =
                     await context.Transactions.FirstOrDefaultAsync(t => t.TransactionId == transactionId && t.UserId == userId)
-                    ?? throw new InvalidOperationException("transaction-not-found");
+                    ?? throw new AppException("transaction-not-found", HttpStatusCode.NotFound);
 
                 if (
                     transactionDto.CategoryId is not null
                     && !await context.Categories.AnyAsync(c => c.CategoryId == transactionDto.CategoryId && c.UserId == userId)
                 )
-                    throw new InvalidOperationException("category-not-found");
+                    throw new AppException("category-not-found", HttpStatusCode.NotFound);
 
                 // 2. Calcola il DELTA per l'aggiornamento atomico
                 // Es: Vecchia = -10 (Uscita), Nuova = -15 (Uscita) -> Delta = -5
@@ -139,7 +141,7 @@ public class TransactionService(AppDbContext context) : ITransactionService
             {
                 var transaction =
                     await context.Transactions.FirstOrDefaultAsync(t => t.TransactionId == id && t.UserId == userId)
-                    ?? throw new InvalidOperationException("transaction-not-found");
+                    ?? throw new AppException("transaction-not-found", HttpStatusCode.NotFound);
 
                 // 1. Revert del saldo in modo atomico
                 decimal balanceRevert = transaction.Type == TransactionType.income ? -transaction.Amount : transaction.Amount;

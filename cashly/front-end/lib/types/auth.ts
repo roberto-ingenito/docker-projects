@@ -12,12 +12,14 @@ export type UserLoginDto = Pick<User, "email" | "password">;
 
 export interface UserLoginResponseDto {
   token: string;
+  refreshToken: string;
   user: Omit<User, "password">;
 }
 
 export interface AuthState {
   user: Omit<User, "password"> | null;
   token: string | null;
+  refreshToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;

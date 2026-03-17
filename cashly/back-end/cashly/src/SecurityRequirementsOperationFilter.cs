@@ -9,14 +9,20 @@ public class SecurityRequirementsOperationFilter : IOperationFilter
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
         // Controlla se l'endpoint ha l'attributo [AllowAnonymous]
-        var hasAnonymous = (context.MethodInfo.DeclaringType?.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any() ?? false) || context.MethodInfo.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any();
+        var hasAnonymous =
+            (context.MethodInfo.DeclaringType?.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any() ?? false)
+            || context.MethodInfo.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any();
 
-        if (hasAnonymous) return; // Se è anonimo, non fare nulla
+        if (hasAnonymous)
+            return; // Se è anonimo, non fare nulla
 
         // Controlla se l'endpoint ha l'attributo [Authorize] (o a livello di controller)
-        var hasAuthorize = (context.MethodInfo.DeclaringType?.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any() ?? false) || context.MethodInfo.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any();
+        var hasAuthorize =
+            (context.MethodInfo.DeclaringType?.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any() ?? false)
+            || context.MethodInfo.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any();
 
-        if (!hasAuthorize) return; // Se non è esplicitamente autorizzato, non fare nulla
+        if (!hasAuthorize)
+            return; // Se non è esplicitamente autorizzato, non fare nulla
 
         // Se l'endpoint è protetto, aggiungi il requisito di sicurezza (il lucchetto)
         operation.Security =
@@ -29,12 +35,12 @@ public class SecurityRequirementsOperationFilter : IOperationFilter
                         Reference = new OpenApiReference
                         {
                             Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer" // Assicurati che l'ID corrisponda a quello in AddSecurityDefinition
-                        }
+                            Id = "Bearer", // Assicurati che l'ID corrisponda a quello in AddSecurityDefinition
+                        },
                     },
                     Array.Empty<string>()
-                }
-            }
+                },
+            },
         ];
     }
 }
