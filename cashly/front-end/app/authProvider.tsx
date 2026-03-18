@@ -20,7 +20,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       const jwtToken = await actions.getJwtToken();
       const userData = await actions.getUser();
 
-      if (userData && authState.user === null) {
+      if (userData && !authState.user) {
         setIsLoading(true);
         dispatch(setUser({ user: userData, token: jwtToken || "" }));
         setIsLoading(false);

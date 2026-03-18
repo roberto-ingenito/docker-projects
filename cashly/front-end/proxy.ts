@@ -1,5 +1,4 @@
 import { NextResponse, NextRequest } from "next/server";
-import { getJwtToken, getRefreshToken } from "./app/actions";
 
 const AUTH_ROUTES = ["/login", "/signup"];
 const PROTECTED_ROUTES = ["/dashboard", "/transactions", "/categories"];
@@ -25,8 +24,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = await getJwtToken();
-  const refreshToken = await getRefreshToken();
+  const token = request.cookies.get("token")?.value;
+  const refreshToken = request.cookies.get("refreshToken")?.value;
 
   // Redirect non autenticati dalle pagine protette
   if (!token && !refreshToken && isProtectedPage) {
