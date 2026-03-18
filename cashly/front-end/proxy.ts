@@ -6,6 +6,23 @@ const PROTECTED_ROUTES = ["/dashboard", "/transactions", "/categories"];
 // Ottieni il basePath dalla configurazione
 const BASE_PATH = "/cashly";
 
+function debugLog(data: Record<string, unknown>, request: NextRequest) {
+  const baseUrl = request.nextUrl.origin;
+
+  // fire and forget, non blocca il middleware
+  fetch(`${baseUrl}/cashly/api/middleware-log`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...data, ts: Date.now() }),
+  })
+    .then((v) => {
+      // console.log("risultato: ", v);
+    })
+    .catch((e) => {
+      console.log("Errore: ", e);
+    });
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -26,6 +43,16 @@ export async function proxy(request: NextRequest) {
 
   const token = request.cookies.get("token")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
+
+  debugLog(
+    {
+      pathname: request.nextUrl.pathname,
+      hasToken: !!token,
+      hasRefresh: !!refreshToken,
+      isProtectedPage,
+    },
+    request,
+  );
 
   // Redirect non autenticati dalle pagine protette
   if (!token && !refreshToken && isProtectedPage) {
