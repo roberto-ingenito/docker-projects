@@ -18,18 +18,16 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     async function loadUserData() {
       const jwtToken = await actions.getJwtToken();
+      const userData = await actions.getUser();
 
-      if (jwtToken && authState.user === null) {
+      if (userData && authState.user === null) {
         setIsLoading(true);
-        const userData = await actions.getUser();
-        if (userData) {
-          dispatch(setUser({ user: userData, token: jwtToken }));
-        }
+        dispatch(setUser({ user: userData, token: jwtToken || "" }));
         setIsLoading(false);
       }
     }
     loadUserData();
-  }, [authState]);
+  }, [authState, dispatch]);
 
   if (isLoading) {
     return (

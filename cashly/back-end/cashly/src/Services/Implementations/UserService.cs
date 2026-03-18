@@ -109,7 +109,7 @@ public class UserService(AppDbContext dbContext, IConfiguration configuration) :
         };
 
         // Access token lifespan: 15 minutes for better security
-        var expires = DateTime.UtcNow.AddMinutes(15);
+        var expires = DateTime.UtcNow.AddSeconds(2);
 
         // Crea il token
         var token = new JwtSecurityToken(
