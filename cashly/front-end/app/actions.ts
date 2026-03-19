@@ -12,7 +12,7 @@ export async function saveJwtToken(token: string) {
   (await cookies()).set(jwt_token_cookie_key, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax",
     maxAge: 60 * 15, // 15 minuti (corrisponde alla scadenza del server)
     path: "/",
   });
@@ -30,7 +30,7 @@ export async function saveRefreshToken(token: string) {
   (await cookies()).set(refresh_token_cookie_key, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax",
     maxAge: 60 * 60 * 24 * 30, // 1 mese
     path: "/",
   });
