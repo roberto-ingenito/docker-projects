@@ -7,10 +7,8 @@ const PROTECTED_ROUTES = ["/dashboard", "/transactions", "/categories"];
 const BASE_PATH = "/cashly";
 
 function debugLog(data: Record<string, unknown>, request: NextRequest) {
-  const baseUrl = request.nextUrl.origin;
-
   // fire and forget, non blocca il middleware
-  fetch(`${baseUrl}/cashly/api/middleware-log`, {
+  fetch(`https://roberto-ingenito.ddns.net/cashly/api/middleware-log`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ...data, ts: Date.now() }),
