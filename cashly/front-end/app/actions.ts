@@ -48,7 +48,7 @@ export async function saveUser(user: Omit<User, "password">) {
   (await cookies()).set(user_cookie_key, JSON.stringify(user), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax",
     maxAge: 60 * 60 * 24 * 365 * 10, // 10 anni
     path: "/",
   });
