@@ -72,7 +72,12 @@ jobs:
             "NEXTCLOUD_DB_PASSWORD=${{ secrets.NEXTCLOUD_DB_PASSWORD }}" \
             "COUCHDB_OBSIDIAN_USER=${{ secrets.COUCHDB_OBSIDIAN_USER }}" \
             "COUCHDB_OBSIDIAN_PASSWORD=${{ secrets.COUCHDB_OBSIDIAN_PASSWORD }}" \
-            > /mnt/storage/projects/docker-projects/env.txt
+            > $GITHUB_WORKSPACE/.env
+
+      - name: debug 1
+        run : |
+            pwd
+            ls -la
 
   deploy-cashly-frontend:
     needs: [check-changes, create-env]
