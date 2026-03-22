@@ -78,17 +78,12 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Create .env file
-        run: |
-          printf '%s\n' \
-            "CASHLY_POSTGRES_USER=${{ secrets.CASHLY_POSTGRES_USER }}" \
-            "CASHLY_POSTGRES_PASSWORD=${{ secrets.CASHLY_POSTGRES_PASSWORD }}" \
-            "CASHLY_POSTGRES_DB=${{ secrets.CASHLY_POSTGRES_DB }}" \
-            > $GITHUB_WORKSPACE/.env
 
       - name: Deploy cashly-backend
         run: |
+          set -a
+          source /mnt/storage/projects/docker-projects/.env
+          set +a
           docker compose build --no-cache cashly-back-end
           docker compose up -d cashly-back-end
 
