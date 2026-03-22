@@ -227,6 +227,21 @@ services:
     depends_on:
       - mr-white-back-end
 
+  # --- COUCHDB (Obsidian LiveSync) ---
+  couchdb-obsidian:
+    image: couchdb:3
+    container_name: couchdb-obsidian
+    restart: unless-stopped
+    environment:
+      COUCHDB_USER: ${COUCHDB_OBSIDIAN_USER}
+      COUCHDB_PASSWORD: ${COUCHDB_OBSIDIAN_PASSWORD}
+    volumes:
+      - couchdb_obsidian_data:/opt/couchdb/data
+    expose:
+      - "5984"
+    networks:
+      - common-network
+
 # --- NETWORKS ---
 # Rete isolata per la comunicazione interna tra container
 networks:
@@ -242,3 +257,5 @@ volumes:
     name: nextcloud-db_data
   nextcloud_data:
     name: nextcloud_app_data
+  couchdb_obsidian_data:
+    name: couchdb_obsidian_data
