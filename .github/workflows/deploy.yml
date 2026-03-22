@@ -56,8 +56,24 @@ jobs:
             mr-white-backend:
               - 'mr-white-game/backend/**'
 
+  create-env:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create .env file
+        run: |
+          cat > $GITHUB_WORKSPACE/.env << 'EOF'
+          CASHLY_POSTGRES_USER=${{ secrets.CASHLY_POSTGRES_USER }}
+          CASHLY_POSTGRES_PASSWORD=${{ secrets.CASHLY_POSTGRES_PASSWORD }}
+          CASHLY_POSTGRES_DB=${{ secrets.CASHLY_POSTGRES_DB }}
+          NEXTCLOUD_DB_PASSWORD=${{ secrets.NEXTCLOUD_DB_PASSWORD }}
+          COUCHDB_OBSIDIAN_USER=${{ secrets.COUCHDB_OBSIDIAN_USER }}
+          COUCHDB_OBSIDIAN_PASSWORD=${{ secrets.COUCHDB_OBSIDIAN_PASSWORD }}
+          EOF
+
   deploy-cashly-frontend:
-    needs: check-changes
+    needs: [check-changes, create-env]
     if: needs.check-changes.outputs.cashly-frontend == 'true'
     runs-on: self-hosted
     steps:
@@ -73,7 +89,7 @@ jobs:
           docker image prune -f
 
   deploy-cashly-backend:
-    needs: check-changes
+    needs: [check-changes, create-env]
     if: needs.check-changes.outputs.cashly-backend == 'true'
     runs-on: self-hosted
     steps:
@@ -81,9 +97,6 @@ jobs:
 
       - name: Deploy cashly-backend
         run: |
-          set -a
-          source /mnt/storage/projects/docker-projects/.env
-          set +a
           docker compose build --no-cache cashly-back-end
           docker compose up -d cashly-back-end
 
@@ -92,7 +105,7 @@ jobs:
           docker image prune -f
 
   deploy-main-nginx:
-    needs: check-changes
+    needs: [check-changes, create-env]
     if: needs.check-changes.outputs.main-nginx == 'true'
     runs-on: self-hosted
     steps:
@@ -104,7 +117,7 @@ jobs:
           docker exec main-nginx nginx -s reload
 
   deploy-fortil-timesheet:
-    needs: check-changes
+    needs: [check-changes, create-env]
     if: needs.check-changes.outputs.fortil-excel-timesheet == 'true'
     runs-on: self-hosted
     steps:
@@ -120,7 +133,7 @@ jobs:
           docker image prune -f
 
   deploy-mr-white-backend:
-    needs: check-changes
+    needs: [check-changes, create-env]
     if: needs.check-changes.outputs.mr-white-backend == 'true'
     runs-on: self-hosted
     steps:
@@ -136,7 +149,7 @@ jobs:
           docker image prune -f
 
   deploy-mr-white-frontend:
-    needs: check-changes
+    needs: [check-changes, create-env]
     if: needs.check-changes.outputs.mr-white-frontend == 'true'
     runs-on: self-hosted
     steps:
