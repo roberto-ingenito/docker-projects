@@ -63,14 +63,14 @@ jobs:
       
       - name: Create .env file
         run: |
-          cat > $GITHUB_WORKSPACE/.env << 'EOF'
-          CASHLY_POSTGRES_USER=${{ secrets.CASHLY_POSTGRES_USER }}
-          CASHLY_POSTGRES_PASSWORD=${{ secrets.CASHLY_POSTGRES_PASSWORD }}
-          CASHLY_POSTGRES_DB=${{ secrets.CASHLY_POSTGRES_DB }}
-          NEXTCLOUD_DB_PASSWORD=${{ secrets.NEXTCLOUD_DB_PASSWORD }}
-          COUCHDB_OBSIDIAN_USER=${{ secrets.COUCHDB_OBSIDIAN_USER }}
-          COUCHDB_OBSIDIAN_PASSWORD=${{ secrets.COUCHDB_OBSIDIAN_PASSWORD }}
-          EOF
+          printf '%s\n' \
+            "CASHLY_POSTGRES_USER=${{ secrets.CASHLY_POSTGRES_USER }}" \
+            "CASHLY_POSTGRES_PASSWORD=${{ secrets.CASHLY_POSTGRES_PASSWORD }}" \
+            "CASHLY_POSTGRES_DB=${{ secrets.CASHLY_POSTGRES_DB }}" \
+            "NEXTCLOUD_DB_PASSWORD=${{ secrets.NEXTCLOUD_DB_PASSWORD }}" \
+            "COUCHDB_OBSIDIAN_USER=${{ secrets.COUCHDB_OBSIDIAN_USER }}" \
+            "COUCHDB_OBSIDIAN_PASSWORD=${{ secrets.COUCHDB_OBSIDIAN_PASSWORD }}" \
+            > $GITHUB_WORKSPACE/.env
 
   deploy-cashly-frontend:
     needs: [check-changes, create-env]
