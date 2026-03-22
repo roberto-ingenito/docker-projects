@@ -58,6 +58,7 @@ jobs:
 
   create-env:
     runs-on: self-hosted
+    environment: docker-projects-env
     steps:
       - uses: actions/checkout@v4
       
