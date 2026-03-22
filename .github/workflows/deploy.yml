@@ -56,31 +56,8 @@ jobs:
             mr-white-backend:
               - 'mr-white-game/backend/**'
 
-  create-env:
-    needs: check-changes
-    runs-on: self-hosted
-    environment: docker-projects-env
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Create .env file
-        run: |
-          printf '%s\n' \
-            "CASHLY_POSTGRES_USER=${{ secrets.CASHLY_POSTGRES_USER }}" \
-            "CASHLY_POSTGRES_PASSWORD=${{ secrets.CASHLY_POSTGRES_PASSWORD }}" \
-            "CASHLY_POSTGRES_DB=${{ secrets.CASHLY_POSTGRES_DB }}" \
-            "NEXTCLOUD_DB_PASSWORD=${{ secrets.NEXTCLOUD_DB_PASSWORD }}" \
-            "COUCHDB_OBSIDIAN_USER=${{ secrets.COUCHDB_OBSIDIAN_USER }}" \
-            "COUCHDB_OBSIDIAN_PASSWORD=${{ secrets.COUCHDB_OBSIDIAN_PASSWORD }}" \
-            > $GITHUB_WORKSPACE/.env
-
-      - name: debug 1
-        run : |
-            pwd
-            ls -la
-
   deploy-cashly-frontend:
-    needs: [check-changes, create-env]
+    needs: check-changes
     if: needs.check-changes.outputs.cashly-frontend == 'true'
     runs-on: self-hosted
     steps:
@@ -96,11 +73,19 @@ jobs:
           docker image prune -f
 
   deploy-cashly-backend:
-    needs: [check-changes, create-env]
+    needs: check-changes
     if: needs.check-changes.outputs.cashly-backend == 'true'
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Create .env file
+        run: |
+          printf '%s\n' \
+            "CASHLY_POSTGRES_USER=${{ secrets.CASHLY_POSTGRES_USER }}" \
+            "CASHLY_POSTGRES_PASSWORD=${{ secrets.CASHLY_POSTGRES_PASSWORD }}" \
+            "CASHLY_POSTGRES_DB=${{ secrets.CASHLY_POSTGRES_DB }}" \
+            > $GITHUB_WORKSPACE/.env
 
       - name: Deploy cashly-backend
         run: |
@@ -112,7 +97,7 @@ jobs:
           docker image prune -f
 
   deploy-main-nginx:
-    needs: [check-changes, create-env]
+    needs: check-changes
     if: needs.check-changes.outputs.main-nginx == 'true'
     runs-on: self-hosted
     steps:
@@ -124,7 +109,7 @@ jobs:
           docker exec main-nginx nginx -s reload
 
   deploy-fortil-timesheet:
-    needs: [check-changes, create-env]
+    needs: check-changes
     if: needs.check-changes.outputs.fortil-excel-timesheet == 'true'
     runs-on: self-hosted
     steps:
@@ -140,7 +125,7 @@ jobs:
           docker image prune -f
 
   deploy-mr-white-backend:
-    needs: [check-changes, create-env]
+    needs: check-changes
     if: needs.check-changes.outputs.mr-white-backend == 'true'
     runs-on: self-hosted
     steps:
@@ -156,7 +141,7 @@ jobs:
           docker image prune -f
 
   deploy-mr-white-frontend:
-    needs: [check-changes, create-env]
+    needs: check-changes
     if: needs.check-changes.outputs.mr-white-frontend == 'true'
     runs-on: self-hosted
     steps:
