@@ -9,8 +9,8 @@ services:
       - "443:443" # Espone la porta 443 per traffico HTTPS criptato
     volumes:
       - ./main-nginx/conf.d:/etc/nginx/conf.d # Configurazione dei virtual host
-      - ./main-nginx/certbot/conf:/etc/letsencrypt # Certificati SSL generati da Certbot
-      - ./main-nginx/certbot/www:/var/www/certbot # Necessario per la validazione ACME
+      - letsencrypt_conf:/etc/letsencrypt # Certificati SSL generati da Certbot
+      - letsencrypt_www:/var/www/certbot # Necessario per la validazione ACME
       - ./calcolatore-finanze:/var/www/calcolatore-finanze
       - ./calcolatore-tasse:/var/www/calcolatore-tasse
     networks:
@@ -28,8 +28,8 @@ services:
     image: certbot/certbot
     container_name: certbot
     volumes:
-      - ./main-nginx/certbot/conf:/etc/letsencrypt
-      - ./main-nginx/certbot/www:/var/www/certbot
+      - letsencrypt_conf:/etc/letsencrypt
+      - letsencrypt_www:/var/www/certbot
     # Script entrypoint: controlla il rinnovo ogni 12 ore
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     restart: always
@@ -259,3 +259,7 @@ volumes:
     name: nextcloud_app_data
   couchdb_obsidian_data:
     name: couchdb_obsidian_data
+  letsencrypt_conf:
+    name: letsencrypt_conf
+  letsencrypt_www:
+    name: letsencrypt_www
