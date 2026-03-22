@@ -57,6 +57,7 @@ jobs:
               - 'mr-white-game/backend/**'
 
   create-env:
+    needs: check-changes
     runs-on: self-hosted
     environment: docker-projects-env
     steps:
