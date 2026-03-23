@@ -237,6 +237,8 @@ services:
       COUCHDB_PASSWORD: ${COUCHDB_OBSIDIAN_PASSWORD}
     volumes:
       - couchdb_obsidian_data:/opt/couchdb/data
+    ports:
+      - "5984:5984"
     expose:
       - "5984"
     networks:
