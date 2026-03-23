@@ -586,6 +586,9 @@
 
 /* ── RESPONSIVE ─────────────────────────────────── */
 @media (max-width: 768px) {
+  .cursor {
+    display: none;
+  }
   .nav {
     padding: 1.5rem 1.5rem;
   }
@@ -604,6 +607,15 @@
   }
   .service-item {
     grid-template-columns: 2.5rem 1fr 2rem;
+    margin: 0 -1.5rem;
+    padding: 2rem 1.5rem;
+  }
+  .service-item::before {
+    left: -1.5rem;
+    right: -1.5rem;
+  }
+  .service-item::after {
+    left: -1.5rem;
   }
   .service-item__meta {
     display: none;
