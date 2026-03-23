@@ -1,4 +1,5 @@
 import { NAV_LINKS } from "../constants/data";
+import "../styles/NavBar.css";
 
 interface NavbarProps {
   mounted: boolean;

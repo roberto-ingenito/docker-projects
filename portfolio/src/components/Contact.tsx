@@ -1,5 +1,6 @@
 import { Reveal } from "./Reveal";
 import { EMAIL } from "../constants/data";
+import "../styles/Contact.css";
 
 export function Contact() {
   return (

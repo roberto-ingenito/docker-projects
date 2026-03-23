@@ -1,0 +1,10 @@
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.divider {
+  color: var(--gold);
+  margin: 0 1rem;
+}

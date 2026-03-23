@@ -1,5 +1,6 @@
 import type { RevealProps } from "../types";
 import { useInView } from "../hooks/useInView";
+import "../styles/Reveal.css";
 
 export function Reveal({ children, delay = 0, className = "" }: RevealProps) {
   const [ref, inView] = useInView();

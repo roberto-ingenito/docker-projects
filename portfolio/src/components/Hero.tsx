@@ -1,3 +1,5 @@
+import "../styles/Hero.css";
+
 interface HeroProps {
   mounted: boolean;
 }

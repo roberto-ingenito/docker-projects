@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Reveal } from "./Reveal";
 import { INTERACTIVE_SERVICES, INFRA_SERVICES } from "../constants/data";
+import "../styles/Services.css";
 
 export function Services() {
   const [activeService, setActiveService] = useState<string | null>(null);

@@ -1,0 +1,41 @@
+.marquee-strip {
+  z-index: 1;
+  overflow: hidden;
+  padding: 1rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(90deg, var(--midnight-deep), var(--midnight-mid));
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-style: italic;
+  letter-spacing: 0.05em;
+  color: var(--silver);
+  opacity: 0.5;
+  align-items: center;
+}
+.marquee-set {
+  display: flex;
+  align-items: center;
+  gap: 2.8rem;
+  padding-right: 2.8rem;
+}
+.marquee-dot {
+  background-color: var(--gold);
+  height: 6px;
+  width: 6px;
+  border-radius: 10px;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}

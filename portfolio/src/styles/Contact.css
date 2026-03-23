@@ -1,0 +1,47 @@
+.cta {
+  border-top: 1px solid var(--border);
+}
+.cta__inner {
+  max-width: 680px;
+}
+.cta__label {
+  color: var(--gold);
+  opacity: 0.8;
+}
+.cta__title {
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  font-weight: 300;
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  margin: 1.5rem 0 2.5rem;
+  color: var(--platinum);
+}
+
+.cta__title em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.cta__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.3rem;
+  font-weight: 300;
+  color: var(--silver);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease,
+    gap 0.3s ease;
+}
+.cta__link:hover {
+  color: var(--gold-light);
+  border-color: var(--gold);
+  gap: 1.6rem;
+}
+.cta__arrow {
+  font-size: 1.5rem;
+}

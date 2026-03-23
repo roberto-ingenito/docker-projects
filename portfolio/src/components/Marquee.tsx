@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { MARQUEE_WORDS } from "../constants/data";
+import "../styles/Marquee.css";
 
 export function Marquee() {
   return (

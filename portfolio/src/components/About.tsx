@@ -1,5 +1,6 @@
 import { Reveal } from "./Reveal";
 import { STATS } from "../constants/data";
+import "../styles/About.css";
 
 export function About() {
   return (
