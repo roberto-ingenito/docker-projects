@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - "portfolio/**"
       - "cashly/front-end/**"
       - "cashly/back-end/**"
       - "main-nginx/**"
@@ -18,6 +19,7 @@ on:
         type: choice
         options:
           - all
+          - portfolio
           - cashly-frontend
           - cashly-backend
           - main-nginx
@@ -29,6 +31,7 @@ jobs:
   check-changes:
     runs-on: self-hosted
     outputs:
+      portfolio: ${{ steps.filter.outputs.portfolio == 'true' || github.event.inputs.service == 'portfolio' || github.event.inputs.service == 'all' }}
       cashly-frontend: ${{ steps.filter.outputs.cashly-frontend == 'true' || github.event.inputs.service == 'cashly-frontend' || github.event.inputs.service == 'all' }}
       cashly-backend: ${{ steps.filter.outputs.cashly-backend == 'true' || github.event.inputs.service == 'cashly-backend' || github.event.inputs.service == 'all' }}
       main-nginx: ${{ steps.filter.outputs.main-nginx == 'true' || github.event.inputs.service == 'main-nginx' || github.event.inputs.service == 'all' }}
@@ -43,6 +46,8 @@ jobs:
         if: github.event_name == 'push'
         with:
           filters: |
+            portfolio:
+              - 'portfolio/**'
             cashly-frontend:
               - 'cashly/front-end/**'
             cashly-backend:
@@ -55,6 +60,22 @@ jobs:
               - 'mr-white-game/frontend/**'
             mr-white-backend:
               - 'mr-white-game/backend/**'
+
+  deploy-portfolio:
+    needs: check-changes
+    if: needs.check-changes.outputs.portfolio == 'true'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy portfolio
+        run: |
+          docker compose build --no-cache portfolio
+          docker compose up -d portfolio
+
+      - name: Clean old images
+        run: |
+          docker image prune -f
 
   deploy-cashly-frontend:
     needs: check-changes

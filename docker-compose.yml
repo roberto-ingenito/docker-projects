@@ -17,10 +17,24 @@ services:
       - common-network
     restart: always
     depends_on: # Assicura che i servizi destinatari siano avviati prima di Nginx
+      - portfolio
       - cashly-front-end
       - fortil-excel-timesheet
       - nextcloud
       - mr-white-front-end
+
+  # --- PORTFOLIO APPLICATION ---
+  portfolio:
+    build:
+      context: ./portfolio
+      dockerfile: Dockerfile
+    image: portfolio-app
+    container_name: portfolio-app
+    expose:
+      - "80"
+    networks:
+      - common-network
+    restart: always
 
   # --- SSL MANAGEMENT ---
   # Certbot gestisce il rilascio e il rinnovo automatico dei certificati Let's Encrypt
