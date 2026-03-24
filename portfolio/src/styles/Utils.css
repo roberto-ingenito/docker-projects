@@ -5,6 +5,9 @@
   text-transform: uppercase;
 }
 .divider {
-  color: var(--gold);
+  background-color: var(--gold);
+  height: 2px;
+  width: 1rem;
+  border-radius: 4px;
   margin: 0 1rem;
 }
