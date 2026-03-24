@@ -30,9 +30,9 @@ export function About() {
           <Reveal delay={300}>
             <div className="about__stats">
               {STATS.map(([num, label]) => (
-                <div key={label} className="stat">
-                  <span className="stat__num">{num}</span>
-                  <span className="stat__label mono">{label}</span>
+                <div key={label} className="about__stat">
+                  <span className="about_stat__num">{num}</span>
+                  <span className="about_stat__label mono">{label}</span>
                 </div>
               ))}
             </div>

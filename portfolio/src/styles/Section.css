@@ -1,6 +1,6 @@
 .section {
   z-index: 1;
-  padding: 7rem 4rem;
+  padding: 6rem 3rem;
 }
 .section__header {
   display: flex;

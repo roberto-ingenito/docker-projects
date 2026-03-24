@@ -1,15 +1,16 @@
 .footer {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
+
   padding: 2rem 4rem;
+
   border-top: 1px solid var(--border);
-  position: relative;
-  z-index: 1;
 }
 .footer__copy {
   color: var(--silver);
-  opacity: 0.3;
+  opacity: 0.5;
 }
 .footer__links {
   display: flex;
@@ -17,7 +18,7 @@
 }
 .footer__link {
   color: var(--silver);
-  opacity: 0.4;
+  opacity: 0.5;
   text-decoration: none;
   transition:
     opacity 0.3s ease,

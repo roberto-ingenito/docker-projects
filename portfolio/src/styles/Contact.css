@@ -1,47 +1,59 @@
-.cta {
+.contact {
   border-top: 1px solid var(--border);
 }
-.cta__inner {
+
+.contact__inner {
   max-width: 680px;
+
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2rem;
 }
-.cta__label {
+
+.contact__label {
   color: var(--gold);
   opacity: 0.8;
 }
-.cta__title {
+
+.contact__title {
   font-size: clamp(3rem, 7vw, 6.5rem);
   font-weight: 300;
   line-height: 0.95;
   letter-spacing: -0.025em;
-  margin: 1.5rem 0 2.5rem;
   color: var(--platinum);
 }
 
-.cta__title em {
-  font-style: italic;
+.contact__title em {
   color: var(--gold);
 }
 
-.cta__link {
+.contact__link {
   display: inline-flex;
   align-items: center;
   gap: 1rem;
+
   font-size: 1.3rem;
   font-weight: 300;
-  color: var(--silver);
   text-decoration: none;
+  color: var(--silver);
+
   border-bottom: 1px solid var(--border);
+
   padding-bottom: 0.5rem;
+  margin-top: 1rem;
+
   transition:
     color 0.3s ease,
     border-color 0.3s ease,
     gap 0.3s ease;
 }
-.cta__link:hover {
+
+.contact__link:hover {
   color: var(--gold-light);
   border-color: var(--gold);
   gap: 1.6rem;
 }
-.cta__arrow {
+
+.contact__arrow {
   font-size: 1.5rem;
 }

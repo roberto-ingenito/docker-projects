@@ -97,7 +97,7 @@
   justify-content: space-between;
   align-items: center;
   color: var(--silver);
-  margin-top: auto;
+  margin-top: 1.5rem;
 
   opacity: 1;
 }
