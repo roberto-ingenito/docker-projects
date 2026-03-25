@@ -61,18 +61,6 @@ jobs:
             mr-white-backend:
               - 'mr-white-game/backend/**'
 
-  load_env_file:
-    needs: check-changes
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Loading
-        run: |
-          set -a
-          source /mnt/storage/projects/docker-projects/.env
-          set +a
-
   deploy-portfolio:
     needs: check-changes
     if: needs.check-changes.outputs.portfolio == 'true'
@@ -106,11 +94,15 @@ jobs:
           docker image prune -f
 
   deploy-cashly-backend:
-    needs: load_env_file
+    needs: check-changes
     if: needs.check-changes.outputs.cashly-backend == 'true'
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
+
+      - name: Load Environment
+        run: |
+          cat /mnt/storage/projects/docker-projects/.env >> $GITHUB_ENV
 
       - name: Deploy cashly-backend
         run: |
@@ -122,11 +114,15 @@ jobs:
           docker image prune -f
 
   deploy-main-nginx:
-    needs: load_env_file
+    needs: check-changes
     if: needs.check-changes.outputs.main-nginx == 'true'
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
+
+      - name: Load Environment
+        run: |
+          cat /mnt/storage/projects/docker-projects/.env >> $GITHUB_ENV
 
       - name: Reload main-nginx Configuration
         run: |
