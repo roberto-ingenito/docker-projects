@@ -1,0 +1,147 @@
+.hero {
+  min-height: calc(100svh - 4rem);
+  display: flex;
+  flex-direction: column;
+
+  margin-top: 4rem;
+  padding: 4rem;
+}
+
+.hero__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3rem;
+  max-width: 960px;
+}
+
+.hero_content__eyebrow {
+  display: flex;
+  align-items: center;
+  color: var(--silver);
+
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: fade-in 1.2s ease 1s forwards;
+}
+
+.hero_content__title {
+  font-size: clamp(5rem, 13vw, 12rem);
+  font-weight: 300;
+  line-height: 0.9;
+  letter-spacing: -0.025em;
+  margin-bottom: 2.5rem;
+  display: flex;
+  flex-direction: column;
+
+  opacity: 0;
+  transform: translateY(40px);
+  animation: fade-in 1.4s ease 0.2s forwards;
+}
+
+.hero_content__title-line {
+  display: block;
+  color: var(--platinum);
+}
+
+.hero_content__title-line--gold {
+  color: var(--gold);
+  font-style: italic;
+}
+
+.hero_content__sub {
+  font-size: 1.2rem;
+  font-weight: 300;
+  color: var(--silver);
+  line-height: 1.75;
+  max-width: 460px;
+
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fade-in 1.2s ease 1s forwards;
+}
+
+.hero__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+
+  text-decoration: none; /* remove underline of "a" tag */
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+
+  color: var(--midnight-deep);
+  background: var(--gold);
+
+  padding: 1rem 1.5rem;
+
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fade-in 1.2s ease 1s forwards;
+
+  transition: all 0.3s ease;
+}
+.hero__btn:hover {
+  background: var(--gold-light);
+  gap: 1.3rem;
+}
+.hero__btn-arrow {
+  font-size: 1rem;
+}
+
+.hero_footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--silver);
+  margin-top: 1.5rem;
+
+  opacity: 1;
+}
+
+.hero_footer__scroll-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hero_footer__scroll-line {
+  width: 40px;
+  height: 2px;
+  border-radius: 4px;
+  background: var(--gold);
+  transform-origin: left;
+  transform: scaleX(0);
+  animation: extendLine 1.2s ease 0.4s forwards;
+}
+@keyframes extendLine {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.hero_footer__label {
+  opacity: 0;
+  animation: fadeIn 1.6s ease 0.4s forwards;
+}
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 1.5rem 1.5rem 4rem;
+  }
+}

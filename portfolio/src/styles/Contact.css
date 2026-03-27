@@ -1,0 +1,59 @@
+.contact {
+  border-top: 1px solid var(--border);
+}
+
+.contact__inner {
+  max-width: 680px;
+
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.contact__label {
+  color: var(--gold);
+  opacity: 0.8;
+}
+
+.contact__title {
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  font-weight: 300;
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  color: var(--platinum);
+}
+
+.contact__title em {
+  color: var(--gold);
+}
+
+.contact__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+
+  font-size: 1.3rem;
+  font-weight: 300;
+  text-decoration: none;
+  color: var(--silver);
+
+  border-bottom: 1px solid var(--border);
+
+  padding-bottom: 0.5rem;
+  margin-top: 1rem;
+
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease,
+    gap 0.3s ease;
+}
+
+.contact__link:hover {
+  color: var(--gold-light);
+  border-color: var(--gold);
+  gap: 1.6rem;
+}
+
+.contact__arrow {
+  font-size: 1.5rem;
+}

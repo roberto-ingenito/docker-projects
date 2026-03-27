@@ -39,7 +39,7 @@ jobs:
       mr-white-frontend: ${{ steps.filter.outputs.mr-white-frontend == 'true' || github.event.inputs.service == 'mr-white-frontend' || github.event.inputs.service == 'all' }}
       mr-white-backend: ${{ steps.filter.outputs.mr-white-backend == 'true' || github.event.inputs.service == 'mr-white-backend' || github.event.inputs.service == 'all' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: dorny/paths-filter@v3
         id: filter
@@ -66,7 +66,7 @@ jobs:
     if: needs.check-changes.outputs.portfolio == 'true'
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Deploy portfolio
         run: |
@@ -82,7 +82,7 @@ jobs:
     if: needs.check-changes.outputs.cashly-frontend == 'true'
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Deploy cashly-frontend
         run: |
@@ -98,13 +98,14 @@ jobs:
     if: needs.check-changes.outputs.cashly-backend == 'true'
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+
+      - name: Load Environment
+        run: |
+          cat /mnt/storage/projects/docker-projects/.env >> $GITHUB_ENV
 
       - name: Deploy cashly-backend
         run: |
-          set -a
-          source /mnt/storage/projects/docker-projects/.env
-          set +a
           docker compose build --no-cache cashly-back-end
           docker compose up -d cashly-back-end
 
@@ -117,7 +118,11 @@ jobs:
     if: needs.check-changes.outputs.main-nginx == 'true'
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+
+      - name: Load Environment
+        run: |
+          cat /mnt/storage/projects/docker-projects/.env >> $GITHUB_ENV
 
       - name: Reload main-nginx Configuration
         run: |
@@ -129,7 +134,7 @@ jobs:
     if: needs.check-changes.outputs.fortil-excel-timesheet == 'true'
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Deploy fortil-excel-timesheet
         run: |
@@ -145,7 +150,7 @@ jobs:
     if: needs.check-changes.outputs.mr-white-backend == 'true'
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Deploy mr-white-backend
         run: |
@@ -161,7 +166,7 @@ jobs:
     if: needs.check-changes.outputs.mr-white-frontend == 'true'
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Deploy mr-white-frontend
         run: |

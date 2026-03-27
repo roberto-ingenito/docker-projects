@@ -1,20 +1,21 @@
 import { Reveal } from "./Reveal";
 import { EMAIL } from "../constants/data";
+import "../styles/Contact.css";
 
 export function Contact() {
   return (
-    <section className="section cta" id="contatti">
+    <section className="section contact" id="contatti">
       <Reveal>
-        <div className="cta__inner">
-          <span className="mono cta__label">Vuoi metterti in contatto?</span>
-          <h2 className="cta__title">
+        <div className="contact__inner">
+          <span className="mono contact__label">Vuoi metterti in contatto?</span>
+          <h2 className="contact__title">
             Scrivimi
             <br />
             <em>pure.</em>
           </h2>
-          <a href={`mailto:${EMAIL}`} className="cta__link">
+          <a href={`mailto:${EMAIL}`} className="contact__link">
             <span>{EMAIL}</span>
-            <span className="cta__arrow">↗</span>
+            <span className="contact__arrow">↗</span>
           </a>
         </div>
       </Reveal>

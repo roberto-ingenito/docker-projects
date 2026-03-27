@@ -1,0 +1,25 @@
+.section {
+  z-index: 1;
+  padding: 6rem 3rem;
+}
+.section__header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 3.5rem;
+}
+.section__label {
+  color: var(--gold);
+  opacity: 0.85;
+}
+.section__line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 4.5rem 1.5rem;
+  }
+}
