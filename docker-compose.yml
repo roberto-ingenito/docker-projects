@@ -13,8 +13,6 @@ services:
       - letsencrypt_www:/var/www/certbot # Necessario per la validazione ACME
       - ./calcolatore-finanze:/var/www/calcolatore-finanze
       - ./calcolatore-tasse:/var/www/calcolatore-tasse
-      - nginx_logs:/var/log/nginx
-      - goaccess_report:/var/www/goaccess:ro
     networks:
       - common-network
     restart: always
@@ -260,26 +258,6 @@ services:
     networks:
       - common-network
 
-  goaccess:
-    image: allinurl/goaccess
-    container_name: goaccess
-    restart: always
-    volumes:
-      - nginx_logs:/opt/goaccess/log:ro
-      - goaccess_report:/var/www/goaccess 
-    networks:
-      - common-network
-    command: >
-      /opt/goaccess/log/access.log
-      --log-format=COMBINED
-      --real-time-html
-      --output=/var/www/goaccess/report.html
-      --addr=0.0.0.0
-      --port=7890
-      --ws-url=wss://roberto-ingenito.ddns.net/goaccess-ws
-    depends_on:
-      - main-nginx
-
 # --- NETWORKS ---
 # Rete isolata per la comunicazione interna tra container
 networks:
@@ -301,7 +279,3 @@ volumes:
     name: letsencrypt_conf
   letsencrypt_www:
     name: letsencrypt_www
-  nginx_logs:
-    name: nginx_shared_logs
-  goaccess_report:
-    name: goaccess_report
