@@ -1,4 +1,3 @@
-
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
 ## TypeScript Best Practices
@@ -41,6 +40,56 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Keep state transformations pure and predictable
 - Do NOT use `mutate` on signals, use `update` or `set` instead
 
+### Local State
+
+Lives inside a single component. Use when the data is not needed by others.
+
+```typescript
+@Component({ ... })
+export class ProductsComponent {
+  searchQuery = signal('');
+  isLoading   = signal(false);
+  products    = signal<Product[]>([]);
+}
+```
+
+### Global State — Service + Signals
+
+A shared injectable service used across multiple components. This is the recommended Angular-native approach.
+
+```typescript
+@Injectable({ providedIn: 'root' })
+export class AuthStore {
+  currentUser = signal<User | null>(null);
+  isLoggedIn = computed(() => this.currentUser() !== null);
+
+  login(user: User) {
+    this.currentUser.set(user);
+  }
+  logout() {
+    this.currentUser.set(null);
+  }
+}
+```
+
+```typescript
+// In any component
+export class NavbarComponent {
+  auth = inject(AuthStore);
+  // template: {{ auth.currentUser()?.name }}
+}
+```
+
+### When to Use What
+
+| Situation                              | Solution                    |
+| -------------------------------------- | --------------------------- |
+| Data used by a single component        | Local state with `signal()` |
+| Data shared across multiple components | Service + Signals           |
+| Enterprise app with complex logic      | NgRx or NgRx SignalStore    |
+
+---
+
 ## Templates
 
 - Keep templates simple and avoid complex logic
@@ -53,3 +102,85 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Design services around a single responsibility
 - Use the `providedIn: 'root'` option for singleton services
 - Use the `inject()` function instead of constructor injection
+
+---
+
+## Project Structure
+
+### Full Tree
+
+```
+src/app/
+│
+├── core/                        # exists only once in the app
+│   ├── guards/
+│   │   └── auth.guard.ts
+│   ├── interceptors/
+│   │   └── auth.interceptor.ts
+│   └── services/
+│       └── auth.store.ts
+│
+├── shared/                      # reusable across multiple features
+│   ├── components/
+│   │   ├── page-header/
+│   │   └── confirm-dialog/
+│   ├── pipes/
+│   │   └── currency-ita.pipe.ts
+│   └── utils/
+│       └── date.utils.ts
+│
+├── layout/                      # app shell
+│   ├── sidebar/
+│   ├── navbar/
+│   └── layout.component.ts
+│
+├── features/                    # one folder per domain
+│   ├── dashboard/
+│   │   ├── dashboard.component.ts
+│   │   └── dashboard.routes.ts
+│   │
+│   ├── users/
+│   │   ├── pages/
+│   │   │   ├── users-list/
+│   │   │   └── user-detail/
+│   │   ├── components/
+│   │   │   └── user-card/
+│   │   ├── users.store.ts
+│   │   └── users.routes.ts
+│   │
+│   └── reports/
+│       ├── pages/
+│       ├── reports.store.ts
+│       └── reports.routes.ts
+│
+├── app.routes.ts
+├── app.config.ts
+└── app.component.ts
+```
+
+### The Three Main Folders
+
+| Folder      | Rule                                                            | Examples                            |
+| ----------- | --------------------------------------------------------------- | ----------------------------------- |
+| `core/`     | Only one instance exists in the entire app                      | `AuthStore`, guards, interceptors   |
+| `shared/`   | Reusable across different features, zero business logic         | `PageHeaderComponent`, pipes, utils |
+| `features/` | Self-contained per domain, owns its pages, components and store | `users/`, `dashboard/`, `reports/`  |
+
+### Golden Rule
+
+> If a component is used in **two different features** → it belongs in `shared/`
+> If it is used **only within one feature** → it stays inside that feature
+> If it exists **only once** in the app → it belongs in `core/`
+
+### Internal Structure of a Feature
+
+```
+features/users/
+├── pages/                  # components tied to routes
+│   ├── users-list/
+│   └── user-detail/
+├── components/             # components used only within this feature
+│   └── user-card/
+├── users.store.ts          # feature state
+└── users.routes.ts         # feature routes
+```
