@@ -105,6 +105,171 @@ export class NavbarComponent {
 
 ---
 
+## UI Design System
+
+The UI must be **minimal and elegant** throughout the entire project. Every component, page, and layout must follow these guidelines consistently — no exceptions.
+
+### Philosophy
+
+- Less is more: remove anything that does not serve a clear purpose
+- Whitespace is a design element, use it generously
+- No decorative shadows, gradients, or borders unless they carry meaning
+- Prefer subtle transitions over flashy animations
+
+### Typography
+
+- **Primary font:** `Lora` (serif) — for headings and display text
+- **UI font:** `Inter` — for body text, labels, inputs, and data
+- Load both from Google Fonts
+
+```scss
+// styles/typography.scss
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&display=swap');
+
+:root {
+  --font-display: 'Lora', Georgia, serif;
+  --font-ui: 'Inter', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+body {
+  font-family: var(--font-ui);
+  font-weight: 400;
+}
+```
+
+### Color Palette
+
+Neutral palette only. The accent is a single, muted tone — never saturated.
+
+```scss
+// styles/tokens.scss
+
+:root {
+  // Neutrals
+  --color-white: #ffffff;
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f4f4f5;
+  --color-gray-200: #e4e4e7;
+  --color-gray-400: #a1a1aa;
+  --color-gray-600: #52525b;
+  --color-gray-800: #27272a;
+  --color-black: #09090b;
+
+  // Accent — muted warm gray with a hint of stone
+  --color-accent: #78716c;
+  --color-accent-subtle: #e7e5e4;
+
+  // Semantic
+  --color-danger: #dc2626;
+  --color-success: #16a34a;
+}
+```
+
+### Light & Dark Theme
+
+Define the theme via CSS custom properties on `[data-theme]`. Never hardcode colors in components — always reference tokens.
+
+```scss
+// styles/theme.scss
+
+[data-theme='light'] {
+  --bg-base: var(--color-white);
+  --bg-subtle: var(--color-gray-50);
+  --bg-muted: var(--color-gray-100);
+  --border: var(--color-gray-200);
+  --text-primary: var(--color-gray-800);
+  --text-muted: var(--color-gray-400);
+  --text-on-accent: var(--color-white);
+}
+
+[data-theme='dark'] {
+  --bg-base: var(--color-black);
+  --bg-subtle: #111113;
+  --bg-muted: #1c1c1f;
+  --border: #2a2a2e;
+  --text-primary: var(--color-gray-100);
+  --text-muted: var(--color-gray-600);
+  --text-on-accent: var(--color-white);
+}
+```
+
+Apply the theme attribute on the root element and toggle it via a service:
+
+```typescript
+@Injectable({ providedIn: 'root' })
+export class ThemeService {
+  theme = signal<'light' | 'dark'>('light');
+
+  toggle() {
+    this.theme.update((t) => (t === 'light' ? 'dark' : 'light'));
+    document.documentElement.setAttribute('data-theme', this.theme());
+  }
+
+  init() {
+    const preferred = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    this.theme.set(preferred);
+    document.documentElement.setAttribute('data-theme', preferred);
+  }
+}
+```
+
+### Spacing & Layout
+
+Use a consistent 4px base grid.
+
+```scss
+:root {
+  --space-1: 0.25rem; //  4px
+  --space-2: 0.5rem; //  8px
+  --space-3: 0.75rem; // 12px
+  --space-4: 1rem; // 16px
+  --space-6: 1.5rem; // 24px
+  --space-8: 2rem; // 32px
+  --space-12: 3rem; // 48px
+  --space-16: 4rem; // 64px
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+```
+
+### Components Style Rules
+
+- **Buttons:** flat, no shadow, 1px border using `--border`; accent fill only for the primary action
+- **Inputs:** minimal border-bottom or full border with `--radius-sm`; no background fill in light mode
+- **Cards:** `--bg-subtle` background, `--border` border, `--radius-md` radius, no shadow
+- **Dividers:** use `--border` color, 1px, never decorative
+- **Icons:** use a single icon library consistently (e.g. Lucide); size 16px or 20px only
+
+### SCSS File Structure
+
+```
+src/styles/
+├── _tokens.scss      # color and design tokens
+├── _typography.scss  # font imports and type scale
+├── _theme.scss       # light/dark theme maps
+├── _reset.scss       # minimal CSS reset
+├── _layout.scss      # global layout utilities
+└── styles.scss       # imports all partials
+```
+
+---
+
 ## Project Structure
 
 ### Full Tree
