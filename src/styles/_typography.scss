@@ -1,26 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&display=swap');
-
-:root {
-  --font-display: 'Lora', Georgia, serif;
-  --font-ui: 'Inter', system-ui, sans-serif;
-
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
+@font-face {
+    font-family: 'Lora';
+    src: url('/fonts/Lora-VariableFont_wght.ttf') format('truetype');
+    font-weight: 400 700; // range per i variable font
+    font-style: normal;
+    font-display: swap;
 }
 
-h1,
-h2,
-h3 {
-  font-family: var(--font-display);
-  font-weight: 600;
-}
-
-body {
-  font-family: var(--font-ui);
-  font-weight: 400;
+@font-face {
+    font-family: 'Lora';
+    src: url('/fonts/Lora-Italic-VariableFont_wght.ttf') format('truetype');
+    font-weight: 400 700;
+    font-style: italic;
+    font-display: swap;
 }

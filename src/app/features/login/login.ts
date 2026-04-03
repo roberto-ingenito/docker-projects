@@ -2,21 +2,21 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthStore } from '../../core/services/auth.store';
-import { FloatInput } from '../../shared/components/float-input/float-input';
+import { Input } from '../../shared/components/input/input';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, RouterLink, FloatInput],
+  imports: [ReactiveFormsModule, RouterLink, Input],
   templateUrl: './login.html',
   styleUrl: './login.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Login {
-  private fb = inject(FormBuilder);
-  private auth = inject(AuthStore);
+  private formBuilder = inject(FormBuilder);
+  private authStore = inject(AuthStore);
   private router = inject(Router);
 
-  form = this.fb.nonNullable.group({
+  form = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
@@ -31,7 +31,7 @@ export class Login {
 
     const { email } = this.form.getRawValue();
 
-    this.auth.login({
+    this.authStore.login({
       id: crypto.randomUUID(),
       email,
     });

@@ -1,3 +1,5 @@
+<h1>ciao 1</h1>
+<h2>ciao 2</h2>
 <div class="auth-layout">
   <div class="auth-card">
     <header class="auth-header">
@@ -10,7 +12,9 @@
         <div class="form-error" role="alert">{{ err }}</div>
       }
 
-      <app-float-input label="Email" type="email" autocomplete="email" formControlName="email">
+      <app-input></app-input>
+
+      <!--     <app-float-input label="Email" type="email" autocomplete="email" formControlName="email">
         @if (form.controls.email.touched && form.controls.email.errors) {
           <span role="alert">
             @if (form.controls.email.errors['required']) {
@@ -20,9 +24,9 @@
             }
           </span>
         }
-      </app-float-input>
+      </app-float-input> -->
 
-      <app-float-input
+      <!--    <app-float-input
         label="Password"
         type="password"
         autocomplete="current-password"
@@ -37,7 +41,7 @@
             }
           </span>
         }
-      </app-float-input>
+      </app-float-input> -->
 
       <button type="submit" class="btn-primary">Accedi</button>
     </form>

@@ -8,11 +8,10 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthStore } from '../../core/services/auth.store';
-import { FloatInput } from '../../shared/components/float-input/float-input';
 
 @Component({
   selector: 'app-signup',
-  imports: [ReactiveFormsModule, RouterLink, FloatInput],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './signup.html',
   styleUrl: './signup.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
