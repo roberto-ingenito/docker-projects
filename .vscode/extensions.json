@@ -5,6 +5,7 @@
     "bradlc.vscode-tailwindcss",
     "esbenp.prettier-vscode",
     "usernamehw.errorlens",
-    "yoavbls.pretty-ts-errors"
+    "yoavbls.pretty-ts-errors",
+    "mrmlnc.vscode-scss"
   ]
 }

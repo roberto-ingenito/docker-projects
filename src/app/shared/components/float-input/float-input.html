@@ -1,0 +1,17 @@
+<div class="float-field" [class.focused]="focused()" [class.filled]="filled()">
+  <input
+    #inputEl
+    [id]="inputId"
+    [type]="type()"
+    [autocomplete]="autocomplete()"
+    [disabled]="disabled()"
+    [attr.aria-describedby]="errorId"
+    (input)="onInput($event)"
+    (focus)="onFocus()"
+    (blur)="onBlur()"
+  />
+  <label [for]="inputId">{{ label() }}</label>
+</div>
+<div [id]="errorId" class="float-error">
+  <ng-content />
+</div>

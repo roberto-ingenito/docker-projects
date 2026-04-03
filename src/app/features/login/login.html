@@ -1,1 +1,47 @@
-<p>login works!</p>
+<div class="auth-layout">
+  <div class="auth-card">
+    <header class="auth-header">
+      <h1>Cash</h1>
+      <p>Accedi al tuo account</p>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+      @if (error(); as err) {
+        <div class="form-error" role="alert">{{ err }}</div>
+      }
+
+      <app-float-input label="Email" type="email" autocomplete="email" formControlName="email">
+        @if (form.controls.email.touched && form.controls.email.errors) {
+          <span role="alert">
+            @if (form.controls.email.errors['required']) {
+              L'email è obbligatoria
+            } @else if (form.controls.email.errors['email']) {
+              Inserisci un'email valida
+            }
+          </span>
+        }
+      </app-float-input>
+
+      <app-float-input
+        label="Password"
+        type="password"
+        autocomplete="current-password"
+        formControlName="password"
+      >
+        @if (form.controls.password.touched && form.controls.password.errors) {
+          <span role="alert">
+            @if (form.controls.password.errors['required']) {
+              La password è obbligatoria
+            } @else if (form.controls.password.errors['minlength']) {
+              Minimo 6 caratteri
+            }
+          </span>
+        }
+      </app-float-input>
+
+      <button type="submit" class="btn-primary">Accedi</button>
+    </form>
+
+    <p class="auth-footer">Non hai un account? <a routerLink="/signup">Registrati</a></p>
+  </div>
+</div>

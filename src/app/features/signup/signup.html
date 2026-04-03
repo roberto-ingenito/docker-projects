@@ -1,1 +1,64 @@
-<p>signup works!</p>
+<div class="auth-layout">
+  <div class="auth-card">
+    <header class="auth-header">
+      <h1>Cash</h1>
+      <p>Crea il tuo account</p>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+      @if (error(); as err) {
+        <div class="form-error" role="alert">{{ err }}</div>
+      }
+
+      <app-float-input label="Email" type="email" autocomplete="email" formControlName="email">
+        @if (form.controls.email.touched && form.controls.email.errors) {
+          <span role="alert">
+            @if (form.controls.email.errors['required']) {
+              L'email è obbligatoria
+            } @else if (form.controls.email.errors['email']) {
+              Inserisci un'email valida
+            }
+          </span>
+        }
+      </app-float-input>
+
+      <app-float-input
+        label="Password"
+        type="password"
+        autocomplete="new-password"
+        formControlName="password"
+      >
+        @if (form.controls.password.touched && form.controls.password.errors) {
+          <span role="alert">
+            @if (form.controls.password.errors['required']) {
+              La password è obbligatoria
+            } @else if (form.controls.password.errors['minlength']) {
+              Minimo 6 caratteri
+            }
+          </span>
+        }
+      </app-float-input>
+
+      <app-float-input
+        label="Conferma password"
+        type="password"
+        autocomplete="new-password"
+        formControlName="confirmPassword"
+      >
+        @if (form.controls.confirmPassword.touched && form.hasError('passwordsMismatch')) {
+          <span role="alert">Le password non coincidono</span>
+        }
+        @if (
+          form.controls.confirmPassword.touched &&
+          form.controls.confirmPassword.errors?.['required']
+        ) {
+          <span role="alert">Conferma la password</span>
+        }
+      </app-float-input>
+
+      <button type="submit" class="btn-primary">Registrati</button>
+    </form>
+
+    <p class="auth-footer">Hai già un account? <a routerLink="/login">Accedi</a></p>
+  </div>
+</div>
