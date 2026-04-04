@@ -12,9 +12,5 @@ body {
     background: $color-surface;
     color: $color-text;
     font-family: $font-serif;
-    font-weight: 300;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    height: 100dvh;
 }

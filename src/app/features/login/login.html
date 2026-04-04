@@ -1,51 +1,52 @@
-<h1>ciao 1</h1>
-<h2>ciao 2</h2>
-<div class="auth-layout">
-  <div class="auth-card">
-    <header class="auth-header">
-      <h1>Cash</h1>
-      <p>Accedi al tuo account</p>
-    </header>
+<div class="body">
+  <header>
+    <h1>Bentornato</h1>
+    <p>Accedi al tuo account per continuare</p>
+  </header>
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
-      @if (error(); as err) {
-        <div class="form-error" role="alert">{{ err }}</div>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    @if (error(); as err) {
+      <div class="form-error" role="alert">{{ err }}</div>
+    }
+
+    <app-input
+      label="Email"
+      type="email"
+      placeholder="mario@esempio.it"
+      autocomplete="email"
+      formControlName="email"
+      [hasError]="form.controls.email.touched && form.controls.email.invalid"
+    >
+      @if (form.controls.email.touched && form.controls.email.errors) {
+        @if (form.controls.email.errors['required']) {
+          L'email è obbligatoria
+        } @else if (form.controls.email.errors['email']) {
+          Inserisci un'email valida
+        }
       }
+    </app-input>
 
-      <app-input></app-input>
-
-      <!--     <app-float-input label="Email" type="email" autocomplete="email" formControlName="email">
-        @if (form.controls.email.touched && form.controls.email.errors) {
-          <span role="alert">
-            @if (form.controls.email.errors['required']) {
-              L'email è obbligatoria
-            } @else if (form.controls.email.errors['email']) {
-              Inserisci un'email valida
-            }
-          </span>
+    <app-input
+      label="Password"
+      type="password"
+      placeholder="••••••"
+      autocomplete="current-password"
+      formControlName="password"
+      [hasError]="form.controls.password.touched && form.controls.password.invalid"
+    >
+      @if (form.controls.password.touched && form.controls.password.errors) {
+        @if (form.controls.password.errors['required']) {
+          La password è obbligatoria
+        } @else if (form.controls.password.errors['minlength']) {
+          Minimo 6 caratteri
         }
-      </app-float-input> -->
+      }
+    </app-input>
 
-      <!--    <app-float-input
-        label="Password"
-        type="password"
-        autocomplete="current-password"
-        formControlName="password"
-      >
-        @if (form.controls.password.touched && form.controls.password.errors) {
-          <span role="alert">
-            @if (form.controls.password.errors['required']) {
-              La password è obbligatoria
-            } @else if (form.controls.password.errors['minlength']) {
-              Minimo 6 caratteri
-            }
-          </span>
-        }
-      </app-float-input> -->
+    <app-button type="submit" variant="primary">Accedi</app-button>
+  </form>
 
-      <button type="submit" class="btn-primary">Accedi</button>
-    </form>
-
-    <p class="auth-footer">Non hai un account? <a routerLink="/signup">Registrati</a></p>
-  </div>
+  <footer>
+    <p>Non hai un account? <a routerLink="/signup">Registrati</a></p>
+  </footer>
 </div>

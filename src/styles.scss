@@ -1,3 +1,8 @@
 @use 'typography';
 @use 'variables';
 @use 'reset';
+
+.no-transitions * {
+    transition: none !important;
+    animation: none !important;
+}

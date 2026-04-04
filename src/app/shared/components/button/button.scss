@@ -1,0 +1,49 @@
+@use "sass:color";
+@use 'variables' as *;
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    font-family: $font-serif;
+    font-weight: 400;
+    font-size: 1rem;
+    letter-spacing: 0.03em;
+    padding: 0.875rem 2.5rem;
+    border-radius: $radius-sm;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    &--primary {
+        color: $color-bg;
+        background: $color-accent;
+        border-color: $color-accent;
+
+        &:hover:not(:disabled) {
+            background: color.adjust($color-accent, $lightness: 8%);
+            border-color: color.adjust($color-accent, $lightness: 8%);
+            scale: 1.02;
+        }
+
+        &:active:not(:disabled) {
+            scale: 0.98;
+        }
+    }
+
+    &--secondary {
+        color: $color-text;
+        background: transparent;
+        border-color: $color-border;
+
+        &:hover:not(:disabled) {
+            border-color: $color-border-hover;
+        }
+    }
+}
