@@ -1,0 +1,49 @@
+@use 'variables' as *;
+
+@mixin input-base {
+    width: 100%;
+    background: transparent;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    padding: 0.75rem;
+    font-family: $font-serif;
+    font-weight: 300;
+    color: $color-text;
+    outline: none;
+    transition: all $transition;
+
+    &::placeholder {
+        color: $color-placeholder;
+        font-style: italic;
+    }
+
+    &:hover {
+        border-color: $color-border-hover;
+    }
+
+    &:focus {
+        border-color: $color-accent;
+        box-shadow: inset 0 0 0 1px $color-accent;
+    }
+
+    &[aria-invalid='true'] {
+        border-color: $color-error;
+        box-shadow: inset 0 0 0 1px $color-error;
+    }
+}
+
+@mixin input-group-base {
+    display: flex;
+    flex-direction: column;
+
+    label {
+        font-weight: 300;
+        color: $color-label;
+        margin-bottom: 0.5rem;
+        transition: color $transition;
+    }
+
+    &:focus-within label {
+        color: $color-accent;
+    }
+}

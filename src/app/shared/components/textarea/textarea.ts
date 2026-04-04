@@ -4,26 +4,25 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 let nextId = 0;
 
 @Component({
-  selector: 'app-input',
-  templateUrl: './input.html',
-  styleUrl: './input.scss',
+  selector: 'app-textarea',
+  templateUrl: './textarea.html',
+  styleUrl: './textarea.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => Input),
+      useExisting: forwardRef(() => Textarea),
       multi: true,
     },
   ],
 })
-export class Input implements ControlValueAccessor {
-  readonly inputId = `input-${nextId++}`;
+export class Textarea implements ControlValueAccessor {
+  readonly inputId = `textarea-${nextId++}`;
   readonly errorId = `${this.inputId}-error`;
 
   label = input('');
-  type = input<string>('text');
   placeholder = input('');
-  autocomplete = input('');
+  rows = input<number>(4);
   hasError = input(false);
 
   protected value = signal('');
@@ -53,7 +52,7 @@ export class Input implements ControlValueAccessor {
   }
 
   protected handleInput(event: Event): void {
-    const val = (event.target as HTMLInputElement).value;
+    const val = (event.target as HTMLTextAreaElement).value;
     this.value.set(val);
     this.onChange(val);
   }

@@ -4,8 +4,12 @@
 .input-group {
     @include input-group-base;
 
-    input {
+    textarea {
         @include input-base;
+
+        resize: vertical;
+        line-height: 1.7;
+        resize: none;
     }
 }
 
