@@ -3,43 +3,37 @@ import {
   ReactiveFormsModule,
   FormBuilder,
   Validators,
+  ValidatorFn,
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthStore } from '../../core/services/auth.store';
+import { Input } from '../../shared/components/input/input';
+import { Button } from '../../shared/components/button/button';
 
 @Component({
   selector: 'app-signup',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, Input, Button],
   templateUrl: './signup.html',
   styleUrl: './signup.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Signup {
-  private fb = inject(FormBuilder);
-  private auth = inject(AuthStore);
+  private formBuilder = inject(FormBuilder);
+  private authStore = inject(AuthStore);
   private router = inject(Router);
 
-  form = this.fb.nonNullable.group(
+  form = this.formBuilder.nonNullable.group(
     {
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]],
+      password: ['', [Validators.required]],
+      confirmPassword: [''],
     },
-    { validators: [this.passwordsMatch] },
+    { validators: confirmPasswordValidator },
   );
 
   error = signal('');
-
-  passwordsMatch(control: AbstractControl): ValidationErrors | null {
-    const password = control.get('password')?.value;
-    const confirm = control.get('confirmPassword')?.value;
-    if (password && confirm && password !== confirm) {
-      return { passwordsMismatch: true };
-    }
-    return null;
-  }
 
   onSubmit() {
     if (this.form.invalid) {
@@ -49,7 +43,7 @@ export class Signup {
 
     const { email } = this.form.getRawValue();
 
-    this.auth.login({
+    this.authStore.login({
       id: crypto.randomUUID(),
       email,
     });
@@ -57,3 +51,16 @@ export class Signup {
     this.router.navigate(['/dashboard']);
   }
 }
+
+const confirmPasswordValidator: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
+  const password = group.get('password')?.value;
+  const confirmPassword = group.get('confirmPassword');
+
+  if (password !== confirmPassword?.value) {
+    confirmPassword?.setErrors({ passwordMismatch: true });
+  } else {
+    confirmPassword?.setErrors(null);
+  }
+
+  return null;
+};

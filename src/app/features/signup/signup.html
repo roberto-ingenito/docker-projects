@@ -1,64 +1,65 @@
-<div class="auth-layout">
-  <div class="auth-card">
-    <header class="auth-header">
-      <h1>Cash</h1>
-      <p>Crea il tuo account</p>
-    </header>
+<div class="body">
+  <header>
+    <h1>Crea il tuo account</h1>
+    <p>Inserisci i tuoi dati per registrarti</p>
+  </header>
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
-      @if (error(); as err) {
-        <div class="form-error" role="alert">{{ err }}</div>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    @if (error(); as err) {
+      <div class="form-error" role="alert">{{ err }}</div>
+    }
+
+    <app-input
+      label="Email"
+      type="email"
+      placeholder="mario@gmail.com"
+      autocomplete="email"
+      formControlName="email"
+      [hasError]="form.controls.email.touched && form.controls.email.invalid"
+    >
+      @if (form.controls.email.touched && form.controls.email.errors) {
+        @if (form.controls.email.errors['required']) {
+          L'email è obbligatoria
+        } @else if (form.controls.email.errors['email']) {
+          Inserisci un'email valida
+        }
       }
+    </app-input>
 
-      <!--   <app-float-input label="Email" type="email" autocomplete="email" formControlName="email">
-        @if (form.controls.email.touched && form.controls.email.errors) {
-          <span role="alert">
-            @if (form.controls.email.errors['required']) {
-              L'email è obbligatoria
-            } @else if (form.controls.email.errors['email']) {
-              Inserisci un'email valida
-            }
-          </span>
+    <app-input
+      label="Password"
+      type="password"
+      placeholder="••••••"
+      autocomplete="new-password"
+      formControlName="password"
+      [hasError]="form.controls.password.touched && form.controls.password.invalid"
+    >
+      @if (form.controls.password.touched && form.controls.password.errors) {
+        @if (form.controls.password.errors['required']) {
+          La password è obbligatoria
         }
-      </app-float-input> -->
+      }
+    </app-input>
 
-      <!-- <app-float-input
-        label="Password"
-        type="password"
-        autocomplete="new-password"
-        formControlName="password"
-      >
-        @if (form.controls.password.touched && form.controls.password.errors) {
-          <span role="alert">
-            @if (form.controls.password.errors['required']) {
-              La password è obbligatoria
-            } @else if (form.controls.password.errors['minlength']) {
-              Minimo 6 caratteri
-            }
-          </span>
+    <app-input
+      label="Conferma Password"
+      type="password"
+      placeholder="••••••"
+      autocomplete="new-password"
+      formControlName="confirmPassword"
+      [hasError]="form.controls.confirmPassword.touched && form.controls.confirmPassword.invalid"
+    >
+      @if (form.controls.confirmPassword.touched && form.controls.confirmPassword.errors) {
+        @if (form.controls.confirmPassword.errors['passwordMismatch']) {
+          La password non coincidono
         }
-      </app-float-input> -->
+      }
+    </app-input>
 
-      <!--   <app-float-input
-        label="Conferma password"
-        type="password"
-        autocomplete="new-password"
-        formControlName="confirmPassword"
-      >
-        @if (form.controls.confirmPassword.touched && form.hasError('passwordsMismatch')) {
-          <span role="alert">Le password non coincidono</span>
-        }
-        @if (
-          form.controls.confirmPassword.touched &&
-          form.controls.confirmPassword.errors?.['required']
-        ) {
-          <span role="alert">Conferma la password</span>
-        }
-      </app-float-input> -->
+    <app-button type="submit" variant="primary">Registrati</app-button>
+  </form>
 
-      <button type="submit" class="btn-primary">Registrati</button>
-    </form>
-
-    <p class="auth-footer">Hai già un account? <a routerLink="/login">Accedi</a></p>
-  </div>
+  <footer>
+    <p>Hai già un account? <a routerLink="/login">Accedi</a></p>
+  </footer>
 </div>

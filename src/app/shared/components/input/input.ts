@@ -23,7 +23,7 @@ export class Input implements ControlValueAccessor {
   label = input('');
   type = input<string>('text');
   placeholder = input('');
-  autocomplete = input('');
+  autocomplete = input<HTMLInputElement['autocomplete']>('off');
   hasError = input(false);
 
   protected value = signal('');
