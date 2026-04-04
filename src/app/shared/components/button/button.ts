@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
 @Component({
   selector: 'app-button',
@@ -10,4 +10,5 @@ export class Button {
   type = input<'button' | 'submit' | 'reset'>('button');
   variant = input<'primary' | 'secondary'>('primary');
   disabled = input(false);
+  clicked = output<void>();
 }
