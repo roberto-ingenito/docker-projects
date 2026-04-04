@@ -37,8 +37,6 @@
       @if (form.controls.password.touched && form.controls.password.errors) {
         @if (form.controls.password.errors['required']) {
           La password è obbligatoria
-        } @else if (form.controls.password.errors['minlength']) {
-          Minimo 6 caratteri
         }
       }
     </app-input>

@@ -19,7 +19,7 @@ export class Login {
 
   form = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    password: ['', [Validators.required]],
   });
 
   error = signal('');
