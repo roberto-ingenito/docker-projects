@@ -30,13 +30,15 @@ export class Login {
       return;
     }
 
-    const { email } = this.form.getRawValue();
+    const { email, password } = this.form.getRawValue();
 
     this.authStore.login({
-      id: crypto.randomUUID(),
-      email,
+      email: email,
+      password: password,
     });
 
-    this.router.navigate(['/dashboard']);
+    if (this.authStore.isLoggedIn()) {
+      this.router.navigate(['/dashboard']);
+    }
   }
 }

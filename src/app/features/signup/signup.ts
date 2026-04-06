@@ -41,11 +41,11 @@ export class Signup {
       return;
     }
 
-    const { email } = this.form.getRawValue();
+    const { email, password } = this.form.getRawValue();
 
     this.authStore.login({
-      id: crypto.randomUUID(),
       email,
+      password,
     });
 
     this.router.navigate(['/dashboard']);

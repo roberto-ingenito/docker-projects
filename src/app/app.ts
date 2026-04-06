@@ -1,6 +1,6 @@
-import { afterNextRender, Component, inject, OnInit } from '@angular/core';
+import { afterNextRender, Component, effect, inject, OnInit } from '@angular/core';
 import { NavigationEnd, NavigationStart, Router, RouterOutlet } from '@angular/router';
-import { filter, takeUntil } from 'rxjs';
+import { filter } from 'rxjs';
 import { ThemeService } from './core/services/theme.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
