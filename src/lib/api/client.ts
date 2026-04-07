@@ -1,11 +1,12 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import { ApiError } from '../types/api';
 import { UserLoginResponseDto } from '../types/user';
-import { inject } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { AuthStore } from '../../app/core/services/auth.store';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.prod';
 
-class ApiClient {
+@Injectable({ providedIn: 'root' })
+export class ApiClient {
   private client: AxiosInstance;
   private isRefreshing = false;
   private failedQueue: any[] = [];
@@ -141,5 +142,3 @@ class ApiClient {
     return res.data;
   }
 }
-
-export const apiClient = new ApiClient();

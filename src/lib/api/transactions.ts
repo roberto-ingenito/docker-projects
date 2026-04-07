@@ -1,24 +1,30 @@
+import { inject, Injectable } from '@angular/core';
 import { Transaction, TransactionCreateDto, TransactionUpdateDto } from '../types/transaction';
-import { apiClient } from './client';
+import { ApiClient } from './client';
 
-export const getTransactions = async (): Promise<Transaction[]> => {
-  return apiClient.get<Transaction[]>(`/Transactions`);
-};
+@Injectable({ providedIn: 'root' })
+export class TransactionsApi {
+  private client = inject(ApiClient);
 
-export const createTransaction = async (data: TransactionCreateDto): Promise<Transaction> => {
-  return apiClient.post<Transaction>(`/Transactions`, data);
-};
+  getTransactions(): Promise<Transaction[]> {
+    return this.client.get<Transaction[]>(`/Transactions`);
+  }
 
-export const deleteTransaction = async (transactionId: number): Promise<void> => {
-  return apiClient.delete(`/Transactions/${transactionId}`);
-};
+  createTransaction(data: TransactionCreateDto): Promise<Transaction> {
+    return this.client.post<Transaction>(`/Transactions`, data);
+  }
 
-export function updateTransaction({
-  transactionId,
-  data,
-}: {
-  transactionId: number;
-  data: TransactionUpdateDto;
-}) {
-  return apiClient.put<Transaction>(`/Transactions/${transactionId}`, data);
+  deleteTransaction(transactionId: number): Promise<void> {
+    return this.client.delete(`/Transactions/${transactionId}`);
+  }
+
+  updateTransaction({
+    transactionId,
+    data,
+  }: {
+    transactionId: number;
+    data: TransactionUpdateDto;
+  }): Promise<Transaction> {
+    return this.client.put<Transaction>(`/Transactions/${transactionId}`, data);
+  }
 }

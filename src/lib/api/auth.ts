@@ -1,16 +1,27 @@
+import axios from 'axios';
 import { UserCreateDto, UserLoginResponseDto, UserLoginDto } from '../types/user';
-import { apiClient } from './client';
+import { environment } from '../../environments/environment.prod';
+
+// usa axios direttamente (le chiamate auth non hanno bisogno dell'interceptor)
+
+const authAxios = axios.create({
+  baseURL: environment.apiUrl,
+  headers: { 'Content-Type': 'application/json' },
+});
 
 export const signup = async (userData: UserCreateDto): Promise<UserLoginResponseDto> => {
-  return apiClient.post<UserLoginResponseDto>('/Users/signup', userData);
+  const res = await authAxios.post<UserLoginResponseDto>('/Users/signup', userData);
+  return res.data;
 };
 
 export const login = async (credentials: UserLoginDto): Promise<UserLoginResponseDto> => {
-  return apiClient.post<UserLoginResponseDto>('/Users/signin', credentials);
+  const res = await authAxios.post<UserLoginResponseDto>('/Users/signin', credentials);
+  return res.data;
 };
 
 export const refreshToken = async (refreshTokenValue: string): Promise<UserLoginResponseDto> => {
-  return apiClient.post<UserLoginResponseDto>('/Users/refresh', {
+  const res = await authAxios.post<UserLoginResponseDto>('/Users/refresh', {
     refreshToken: refreshTokenValue,
   });
+  return res.data;
 };

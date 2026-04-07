@@ -1,5 +1,6 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { User, UserLoginDto, UserLoginResponseDto } from '../../../lib/types/user';
+import * as auth from '../../../lib/api/auth';
 
 export interface AuthState {
   user: Omit<User, 'password'>;
@@ -23,19 +24,10 @@ export class AuthStore {
     }
   }
 
-  login(dto: UserLoginDto) {
-    // TODO: chiamata API
+  async login(dto: UserLoginDto) {
+    const responseDto = await auth.login(dto);
 
-    const newState: AuthState = {
-      user: {
-        createdAt: new Date().toISOString(),
-        currency: 'EUR',
-        email: dto.email,
-        userId: 1,
-      },
-      token: 'token',
-      refreshToken: 'refreshToken',
-    };
+    const newState: AuthState = responseDto;
 
     localStorage.setItem('auth_state', JSON.stringify(newState));
     this.state.set(newState);

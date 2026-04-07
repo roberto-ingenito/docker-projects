@@ -1,24 +1,30 @@
+import { inject, Injectable } from '@angular/core';
 import { CategoryResponseDto, CategoryCreateDto, CategoryUpdateDto } from '../types/category';
-import { apiClient } from './client';
+import { ApiClient } from './client';
 
-export const getCategories = async (): Promise<CategoryResponseDto[]> => {
-  return apiClient.get<CategoryResponseDto[]>('/Categories');
-};
+@Injectable({ providedIn: 'root' })
+export class CategoriesApi {
+  private client = inject(ApiClient);
 
-export const createCategory = async (data: CategoryCreateDto): Promise<CategoryResponseDto> => {
-  return apiClient.post<CategoryResponseDto>('/Categories', data);
-};
+  getCategories(): Promise<CategoryResponseDto[]> {
+    return this.client.get<CategoryResponseDto[]>('/Categories');
+  }
 
-export const updateCategory = async ({
-  categoryId,
-  data,
-}: {
-  categoryId: number;
-  data: CategoryUpdateDto;
-}): Promise<CategoryResponseDto> => {
-  return apiClient.put<CategoryResponseDto>(`/Categories/${categoryId}`, data);
-};
+  createCategory(data: CategoryCreateDto): Promise<CategoryResponseDto> {
+    return this.client.post<CategoryResponseDto>('/Categories', data);
+  }
 
-export const deleteCategory = async (categoryId: number): Promise<void> => {
-  return apiClient.delete(`/Categories/${categoryId}`);
-};
+  updateCategory({
+    categoryId,
+    data,
+  }: {
+    categoryId: number;
+    data: CategoryUpdateDto;
+  }): Promise<CategoryResponseDto> {
+    return this.client.put<CategoryResponseDto>(`/Categories/${categoryId}`, data);
+  }
+
+  deleteCategory(categoryId: number): Promise<void> {
+    return this.client.delete(`/Categories/${categoryId}`);
+  }
+}
