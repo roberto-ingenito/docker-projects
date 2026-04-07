@@ -24,7 +24,7 @@ export class Login {
 
   error = signal('');
 
-  onSubmit() {
+  async onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -32,13 +32,12 @@ export class Login {
 
     const { email, password } = this.form.getRawValue();
 
-    this.authStore.login({
-      email: email,
-      password: password,
-    });
-
-    if (this.authStore.isLoggedIn()) {
+    try {
+      await this.authStore.login({
+        email: email,
+        password: password,
+      });
       this.router.navigate(['/dashboard']);
-    }
+    } catch (error) {}
   }
 }
