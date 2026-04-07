@@ -13,12 +13,12 @@ export class AuthStore {
   isLoggedIn = computed(() => this.state() !== null);
 
   constructor() {
-    const stored = localStorage.getItem('user_data');
+    const stored = localStorage.getItem('auth_state');
     if (stored) {
       try {
         this.state.set(JSON.parse(stored) as UserLoginResponseDto);
       } catch {
-        localStorage.removeItem('user_data');
+        this.deleteSavedState();
       }
     }
   }
@@ -37,12 +37,51 @@ export class AuthStore {
       refreshToken: 'refreshToken',
     };
 
-    localStorage.setItem('user_data', JSON.stringify(newState));
+    localStorage.setItem('auth_state', JSON.stringify(newState));
     this.state.set(newState);
   }
 
   logout() {
-    localStorage.removeItem('user_data');
+    localStorage.removeItem('auth_state');
     this.state.set(null);
   }
+
+  private getSavedState() {
+    const userData = localStorage.getItem('auth_state');
+
+    if (userData) {
+      return JSON.parse(userData) as AuthState;
+    }
+
+    return null;
+  }
+
+  getJwtToken = () => this.getSavedState()?.token;
+  getRefreshToken = () => this.getSavedState()?.refreshToken;
+
+  saveJwtToken(newToken: string) {
+    const currentState = this.state();
+    if (!currentState) return;
+
+    const newState: AuthState = {
+      ...currentState,
+      token: newToken,
+    };
+
+    this.state.set(newState);
+  }
+
+  saveRefreshToken(newToken: string) {
+    const currentState = this.state();
+    if (!currentState) return;
+
+    const newState: AuthState = {
+      ...currentState,
+      refreshToken: newToken,
+    };
+
+    this.state.set(newState);
+  }
+
+  deleteSavedState = () => localStorage.removeItem('auth_state');
 }
