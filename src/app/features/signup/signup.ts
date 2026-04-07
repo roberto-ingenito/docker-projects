@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -8,7 +8,10 @@ import {
   ValidationErrors,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { isAxiosError } from 'axios';
+import { toast } from 'ngx-sonner';
 import { AuthStore } from '../../core/services/auth.store';
+import { ApiError } from '../../../lib/types/api';
 import { Input } from '../../shared/components/input/input';
 import { Button } from '../../shared/components/button/button';
 
@@ -33,9 +36,7 @@ export class Signup {
     { validators: confirmPasswordValidator },
   );
 
-  error = signal('');
-
-  onSubmit() {
+  async onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -43,12 +44,17 @@ export class Signup {
 
     const { email, password } = this.form.getRawValue();
 
-    this.authStore.login({
-      email,
-      password,
-    });
-
-    this.router.navigate(['/dashboard']);
+    try {
+      await this.authStore.signup({ email, password });
+      this.router.navigate(['/dashboard']);
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.data) {
+        const apiError = error.response.data as ApiError;
+        toast.error(apiError.message);
+      } else {
+        toast.error('Si è verificato un errore. Riprova.');
+      }
+    }
   }
 }
 

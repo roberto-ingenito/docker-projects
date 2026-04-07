@@ -5,10 +5,6 @@
   </header>
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    @if (error(); as err) {
-      <div class="form-error" role="alert">{{ err }}</div>
-    }
-
     <app-input
       label="Email"
       type="email"

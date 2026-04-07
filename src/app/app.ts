@@ -3,11 +3,12 @@ import { NavigationEnd, NavigationStart, Router, RouterOutlet } from '@angular/r
 import { filter } from 'rxjs';
 import { ThemeService } from './core/services/theme.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NgxSonnerToaster } from 'ngx-sonner';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  template: '<router-outlet />',
+  imports: [RouterOutlet, NgxSonnerToaster],
+  template: '<router-outlet /><ngx-sonner-toaster position="bottom-right" />',
 })
 export class App implements OnInit {
   private theme = inject(ThemeService);
