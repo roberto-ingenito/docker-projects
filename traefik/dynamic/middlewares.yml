@@ -1,0 +1,92 @@
+http:
+  middlewares:
+
+    # -----------------------------------------------
+    # SECURITY HEADERS
+    # -----------------------------------------------
+    security-headers:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        forceSTSHeader: true
+        customFrameOptionsValue: "SAMEORIGIN"
+        contentTypeNosniff: true
+
+    # -----------------------------------------------
+    # RATE LIMITING
+    # -----------------------------------------------
+    # REST API: 30 req/min per IP (protezione brute force e scraping)
+    rate-limit-api:
+      rateLimit:
+        average: 30
+        period: 1m
+        burst: 15
+
+    # Swagger UI: 10 req/min per IP
+    rate-limit-swagger:
+      rateLimit:
+        average: 10
+        period: 1m
+        burst: 5
+
+    # CouchDB sync: 120 req/min per IP (Obsidian invia richieste frequenti ma leggere)
+    rate-limit-couchdb:
+      rateLimit:
+        average: 120
+        period: 1m
+        burst: 50
+
+    # -----------------------------------------------
+    # STRIP PREFIX
+    # -----------------------------------------------
+    strip-timesheet:
+      stripPrefix:
+        prefixes:
+          - "/timesheet"
+
+    strip-cloud:
+      stripPrefix:
+        prefixes:
+          - "/cloud"
+
+    strip-couchdb:
+      stripPrefix:
+        prefixes:
+          - "/couchdb-obsidian"
+
+    # -----------------------------------------------
+    # CACHE HEADERS
+    # -----------------------------------------------
+    # Service Worker: non deve essere cachato aggressivamente
+    no-cache:
+      headers:
+        customResponseHeaders:
+          Cache-Control: "no-cache, no-store, must-revalidate"
+          Expires: "0"
+          Pragma: "no-cache"
+
+    # -----------------------------------------------
+    # NEXTCLOUD
+    # -----------------------------------------------
+    nextcloud-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Prefix: "/cloud"
+
+  # -----------------------------------------------
+  # SERVER TRANSPORTS
+  # Timeout estesi per Nextcloud (upload fino a 10G)
+  # e CouchDB (long-polling _changes feed)
+  # -----------------------------------------------
+  serversTransports:
+    nextcloud-transport:
+      forwardingTimeouts:
+        dialTimeout: "30s"
+        responseHeaderTimeout: "3600s"
+        readIdleTimeout: "3600s"
+
+    longpoll-transport:
+      forwardingTimeouts:
+        dialTimeout: "30s"
+        responseHeaderTimeout: "3600s"
+        readIdleTimeout: "3600s"

@@ -1,0 +1,34 @@
+api:
+  dashboard: true
+  insecure: true # dashboard su porta 8080 (solo localhost, non esposta pubblicamente)
+
+log:
+  level: INFO
+
+entrypoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entrypoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: ":443"
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: robe.ingenito@gmail.com
+      storage: /letsencrypt/acme.json
+      httpChallenge:
+        entryPoint: web
+
+providers:
+  docker:
+    exposedByDefault: false
+    network: common-network
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true

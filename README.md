@@ -1,103 +1,168 @@
 # 🚀 Docker Projects Hub
 
-Questo repository contiene una collezione di applicazioni e servizi self-hosted, orchestrati tramite Docker e configurati per essere eseguiti su un server domestico (es. Raspberry Pi o Ubuntu Server).
+Collezione di applicazioni e servizi self-hosted, orchestrati tramite Docker su un server domestico.
 
-## 🏗️ Architettura del Sistema
+## 🏗️ Architettura
 
-L'infrastruttura è progettata per essere modulare e sicura, utilizzando un reverse proxy centralizzato per la gestione del traffico e dei certificati SSL.
+L'infrastruttura usa un reverse proxy centralizzato per routing, SSL e sicurezza.
 
-### Componenti Principali:
-
-- **Reverse Proxy**: Nginx (Alpine) gestisce il routing del traffico HTTP/HTTPS.
-- **SSL**: Certbot per il rilascio e rinnovo automatico dei certificati Let's Encrypt.
-- **Database**: PostgreSQL (per le app principali) e CouchDB (per Obsidian).
-- **CI/CD**: GitHub Actions con Self-Hosted Runner per il deployment automatico.
+| Componente          | Tecnologia                                  |
+| ------------------- | ------------------------------------------- |
+| Reverse Proxy       | Traefik v3                                  |
+| SSL                 | Let's Encrypt via ACME (gestito da Traefik) |
+| Database principale | PostgreSQL                                  |
+| Database Obsidian   | CouchDB                                     |
+| Cache               | Redis (Nextcloud)                           |
 
 ---
 
-## 📱 Applicazioni Incluse
+## 📱 Applicazioni
 
 ### 💰 Cashly
 
-Un'applicazione completa per la gestione delle finanze personali.
+Gestione finanze personali.
 
-- **Backend**: .NET Core Web API.
-- **Frontend**: Next.js (React).
-- **Database**: PostgreSQL.
+- **Backend**: .NET Core Web API → `/api/`
+- **Frontend**: Next.js → `/cashly/`
+- **Database**: PostgreSQL
 
 ### 🎮 Mr. White Game
 
-Un gioco interattivo basato su ruoli e parole segrete.
+Gioco interattivo con ruoli e parole segrete.
 
-- **Backend**: .NET Core con SignalR per il tempo reale.
-- **Frontend**: Next.js.
+- **Backend**: .NET Core + SignalR (WebSocket) → `/mr-white-api/`
+- **Frontend**: Next.js → `/mr-white/`
 
 ### 📂 Nextcloud
 
-Suite completa per il cloud storage e la collaborazione.
+Cloud storage personale.
 
-- **Stack**: PHP/Apache, PostgreSQL, Redis (caching).
-- **Storage**: Configurato per utilizzare un'unità RAID esterna.
+- **Stack**: PHP/Apache, PostgreSQL, Redis
+- **Storage**: Unità RAID esterna (`/mnt/storage/nextcloud/data`)
+- **Path**: `/cloud/`
 
-### 📝 Altri Strumenti
+### 📊 Fortil Excel Timesheet
 
-- **Fortil Excel Timesheet**: Tool per la gestione dei fogli ore (Vite/React).
-- **CouchDB**: Database dedicato alla sincronizzazione di Obsidian (LiveSync).
-- **Calcolatori Statici**: Piccole utility HTML/JS per finanze e tasse.
-- **pgAdmin**: Interfaccia web per la gestione dei database PostgreSQL.
+Tool per la gestione dei fogli ore (Vite/React) → `/timesheet/`
+
+### 🔄 CouchDB
+
+Sincronizzazione Obsidian LiveSync → `/couchdb-obsidian/`
+
+### 🧮 Calcolatori Statici
+
+Utility HTML/JS servite da nginx interno:
+
+- `/calcolatore-finanze/`
+- `/calcolatore-tasse/`
+
+### 🗄️ pgAdmin
+
+Interfaccia web per PostgreSQL → porta `5050` (accesso diretto)
 
 ---
 
-## ⚙️ Configurazione e Installazione
+## ⚙️ Setup
 
 ### 1. Prerequisiti
 
-- Docker e Docker Compose installati.
-- Un nome di dominio (es. configurato tramite DDNS su NO-IP).
-- Porta 80 e 443 aperte sul router.
+- Docker e Docker Compose installati
+- Dominio configurato (es. DDNS su NO-IP)
+- Porte 80 e 443 aperte sul router
 
-### 2. Setup Ambiente
-
-Copia il file `.env-template` in `.env` e compila le variabili necessarie:
+### 2. Configurazione ambiente
 
 ```bash
 cp .env-template .env
 nano .env
 ```
 
-### 3. Avvio dei Servizi
+### 3. Avvio
 
-Per avviare l'intera infrastruttura in modalità detached:
+**Produzione:**
 
 ```bash
 docker compose up -d
 ```
 
-### 4. Generazione Certificati SSL
+Traefik ottiene automaticamente i certificati Let's Encrypt al primo avvio.
 
-Se è la prima installazione, esegui lo script per generare i certificati:
+**Sviluppo:**
 
 ```bash
-chmod +x generate-certificate.sh
-./generate-certificate.sh
+docker compose --env-file .env.dev up --build -d
+```
+
+Traefik genera un certificato self-signed automatico. Il browser mostrerà un avviso SSL — normale in locale.
+
+---
+
+## 📁 Struttura
+
+```
+.
+├── docker-compose.yml
+├── .env                        # Variabili produzione
+├── .env.dev                    # Variabili sviluppo
+├── .env-template               # Template per nuove installazioni
+├── traefik/
+│   ├── traefik.yml             # Configurazione statica (entrypoint, ACME, providers)
+│   └── dynamic/
+│       └── middlewares.yml     # Middleware condivisi (rate limit, headers, strip prefix)
+├── static-files/
+│   └── nginx.conf              # Server nginx per le SPA statiche
+├── cashly/
+├── mr-white-game/
+├── portfolio/
+├── fortil-excel-timesheet/
+├── calcolatore-finanze/
+└── calcolatore-tasse/
 ```
 
 ---
 
-## 📄 Documentazione Correlata
+## 🔀 Routing
 
-Per approfondimenti su configurazioni specifiche, consulta i seguenti documenti:
+| Path                    | Servizio               | Note                                  |
+| ----------------------- | ---------------------- | ------------------------------------- |
+| `/`                     | portfolio              |                                       |
+| `/api/`                 | cashly-back-end        | Rate limit: 30 req/min                |
+| `/swagger`              | cashly-back-end        | Rate limit: 10 req/min                |
+| `/cashly/`              | cashly-front-end       |                                       |
+| `/timesheet/`           | fortil-excel-timesheet | Strip prefix                          |
+| `/cloud/`               | nextcloud              | Strip prefix                          |
+| `/mr-white-api/`        | mr-white-back-end      | WebSocket (SignalR)                   |
+| `/mr-white/`            | mr-white-front-end     |                                       |
+| `/couchdb-obsidian/`    | couchdb-obsidian       | Strip prefix, rate limit: 120 req/min |
+| `/calcolatore-finanze/` | static-files           | SPA statica                           |
+| `/calcolatore-tasse/`   | static-files           | SPA statica                           |
 
-- [🛠️ Infrastructure & Host Setup](INFRASTRUCTURE.md): Configurazione IP statico, DDNS e Runner GitHub.
-- [🐳 Configurazione Docker per il RAID](configurazione_docker.md): Dettagli sulla struttura dei container.
-- [💾 Backup & Restore Postgres](backup_and_restore_postgres.md): Procedure per la messa in sicurezza dei dati.
-- [🗄️ Configurazione RAID](configurazione_raid.md): Setup del disco esterno per Nextcloud.
-- [📝 Obsidian Sync](configurazione_obsidian_sync.md): Guida al setup di CouchDB per Obsidian.
+Dashboard Traefik disponibile su `http://localhost:8080` (solo accesso locale).
 
 ---
 
-## 🛠️ Comandi Utili
+## 🛠️ Comandi utili
 
-- **Vedere i log di un servizio**: `docker compose logs -f [service-name]`
-- **Riavviare Nginx**: `docker compose restart main-nginx`
-- **Verificare lo stato dei container**: `docker ps`
+```bash
+# Log di un servizio
+docker compose logs -f [service-name]
+
+# Stato dei container
+docker ps
+
+# Riavviare un singolo servizio
+docker compose restart [service-name]
+
+# Aggiornare un servizio senza downtime degli altri
+docker compose up -d --build [service-name]
+```
+
+---
+
+## 📄 Documentazione correlata
+
+- [🛠️ Infrastructure & Host Setup](INFRASTRUCTURE.md)
+- [🐳 Configurazione Docker per il RAID](configurazione_docker.md)
+- [💾 Backup & Restore Postgres](backup_and_restore_postgres.md)
+- [🗄️ Configurazione RAID](configurazione_raid.md)
+- [📝 Obsidian Sync](configurazione_obsidian_sync.md)

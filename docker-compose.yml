@@ -1,27 +1,45 @@
 services:
   # --- REVERSE PROXY ---
-  # Nginx funge da porta d'ingresso per tutto il traffico (HTTP/HTTPS)
-  main-nginx:
-    image: nginx:alpine
-    container_name: main-nginx
+  # Traefik funge da porta d'ingresso per tutto il traffico (HTTP/HTTPS).
+  # Gestisce Let's Encrypt automaticamente e legge la configurazione dai label dei container.
+  # Dashboard disponibile su http://localhost:8080 (solo accesso locale)
+  traefik:
+    image: traefik:v3
+    container_name: traefik
     ports:
-      - "80:80" # Espone la porta 80 per HTTP (e rinnovo Certbot)
-      - "443:443" # Espone la porta 443 per traffico HTTPS criptato
+      - "80:80"
+      - "443:443"
+      - "127.0.0.1:8080:8080" # Dashboard: non esposta pubblicamente
     volumes:
-      - ./main-nginx/conf.d:/etc/nginx/conf.d # Configurazione dei virtual host
-      - letsencrypt_conf:/etc/letsencrypt # Certificati SSL generati da Certbot
-      - letsencrypt_www:/var/www/certbot # Necessario per la validazione ACME
-      - ./calcolatore-finanze:/var/www/calcolatore-finanze
-      - ./calcolatore-tasse:/var/www/calcolatore-tasse
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/dynamic:/etc/traefik/dynamic:ro
+      - traefik_letsencrypt:/letsencrypt
     networks:
       - common-network
     restart: always
-    depends_on: # Assicura che i servizi destinatari siano avviati prima di Nginx
-      - portfolio
-      - cashly-front-end
-      - fortil-excel-timesheet
-      - nextcloud
-      - mr-white-front-end
+
+  # --- STATIC FILE SERVER ---
+  # Serve le SPA statiche che non hanno un container dedicato.
+  # Traefik fa il routing verso questo container per i path specifici.
+  static-files:
+    image: nginx:alpine
+    container_name: static-files
+    volumes:
+      - ./calcolatore-finanze:/var/www/calcolatore-finanze:ro
+      - ./calcolatore-tasse:/var/www/calcolatore-tasse:ro
+      - ./static-files/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - common-network
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.static.rule=Host(`${DOMAIN}`) && (PathPrefix(`/calcolatore-finanze`) || PathPrefix(`/calcolatore-tasse`))"
+      - "traefik.http.routers.static.entrypoints=websecure"
+      - "traefik.http.routers.static.tls=true"
+      - "traefik.http.routers.static.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.routers.static.middlewares=security-headers@file"
+      - "traefik.http.services.static.loadbalancer.server.port=80"
 
   # --- PORTFOLIO APPLICATION ---
   portfolio:
@@ -35,18 +53,14 @@ services:
     networks:
       - common-network
     restart: always
-
-  # --- SSL MANAGEMENT ---
-  # Certbot gestisce il rilascio e il rinnovo automatico dei certificati Let's Encrypt
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - letsencrypt_conf:/etc/letsencrypt
-      - letsencrypt_www:/var/www/certbot
-    # Script entrypoint: controlla il rinnovo ogni 12 ore
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portfolio.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.portfolio.entrypoints=websecure"
+      - "traefik.http.routers.portfolio.tls=true"
+      - "traefik.http.routers.portfolio.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.routers.portfolio.middlewares=security-headers@file"
+      - "traefik.http.services.portfolio.loadbalancer.server.port=80"
 
   # --- CASHLY APPLICATION ---
   # Backend .NET Core
@@ -57,17 +71,35 @@ services:
     image: cashly-back-end
     container_name: cashly-back-end
     expose:
-      - "80" # Porta interna visibile solo agli altri container (Nginx)
+      - "80"
     depends_on:
       cashly-database:
         condition: service_healthy
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Host=cashly-database;Database=${CASHLY_POSTGRES_DB};Username=${CASHLY_POSTGRES_USER};Password=${CASHLY_POSTGRES_PASSWORD}
     networks:
       - common-network
     restart: always
+    labels:
+      - "traefik.enable=true"
+      # API endpoint
+      - "traefik.http.routers.cashly-api.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.cashly-api.entrypoints=websecure"
+      - "traefik.http.routers.cashly-api.tls=true"
+      - "traefik.http.routers.cashly-api.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.routers.cashly-api.middlewares=security-headers@file,rate-limit-api@file"
+      - "traefik.http.routers.cashly-api.service=cashly-back-end"
+      # Swagger UI
+      - "traefik.http.routers.swagger.rule=Host(`${DOMAIN}`) && PathPrefix(`/swagger`)"
+      - "traefik.http.routers.swagger.entrypoints=websecure"
+      - "traefik.http.routers.swagger.tls=true"
+      - "traefik.http.routers.swagger.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.routers.swagger.middlewares=security-headers@file,rate-limit-swagger@file"
+      - "traefik.http.routers.swagger.service=cashly-back-end"
+      # Service definition (condivisa dai due router sopra)
+      - "traefik.http.services.cashly-back-end.loadbalancer.server.port=80"
 
   # Database Postgres per Cashly
   cashly-database:
@@ -82,7 +114,7 @@ services:
       - POSTGRES_PASSWORD=${CASHLY_POSTGRES_PASSWORD}
       - POSTGRES_DB=${CASHLY_POSTGRES_DB}
     volumes:
-      - postgres_data:/var/lib/postgresql/data # Persistenza dei dati DB
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - common-network
     restart: always
@@ -99,18 +131,36 @@ services:
       context: ./cashly/front-end
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=https://roberto-ingenito.ddns.net/api
+        - NEXT_PUBLIC_API_URL=${CASHLY_API_URL}
     image: cashly-front-end
     container_name: cashly-front-end
     expose:
       - "3000"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV}
     networks:
       - common-network
     restart: always
     depends_on:
       - cashly-back-end
+    labels:
+      - "traefik.enable=true"
+      # Service Worker: no-cache (priorità alta per match esatto prima del PathPrefix /cashly)
+      - "traefik.http.routers.cashly-sw.rule=Host(`${DOMAIN}`) && Path(`/cashly/sw.js`)"
+      - "traefik.http.routers.cashly-sw.entrypoints=websecure"
+      - "traefik.http.routers.cashly-sw.tls=true"
+      - "traefik.http.routers.cashly-sw.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.routers.cashly-sw.middlewares=no-cache@file"
+      - "traefik.http.routers.cashly-sw.service=cashly-front-end"
+      # Main frontend
+      - "traefik.http.routers.cashly.rule=Host(`${DOMAIN}`) && PathPrefix(`/cashly`)"
+      - "traefik.http.routers.cashly.entrypoints=websecure"
+      - "traefik.http.routers.cashly.tls=true"
+      - "traefik.http.routers.cashly.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.routers.cashly.middlewares=security-headers@file"
+      - "traefik.http.routers.cashly.service=cashly-front-end"
+      # Service definition (condivisa dai due router sopra)
+      - "traefik.http.services.cashly-front-end.loadbalancer.server.port=3000"
 
   # --- ADDITIONAL APPS ---
   # Servizio Timesheet
@@ -125,6 +175,14 @@ services:
     networks:
       - common-network
     restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.timesheet.rule=Host(`${DOMAIN}`) && PathPrefix(`/timesheet`)"
+      - "traefik.http.routers.timesheet.entrypoints=websecure"
+      - "traefik.http.routers.timesheet.tls=true"
+      - "traefik.http.routers.timesheet.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.routers.timesheet.middlewares=security-headers@file,strip-timesheet@file"
+      - "traefik.http.services.timesheet.loadbalancer.server.port=3000"
 
   # Interfaccia grafica per la gestione dei database Postgres
   pgadmin:
@@ -135,7 +193,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - "5050:80" # Accessibile esternamente sulla porta 5050
+      - "5050:80"
     networks:
       - common-network
     depends_on:
@@ -160,19 +218,28 @@ services:
       - POSTGRES_USER=nextcloud
       - POSTGRES_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
       - REDIS_HOST=nextcloud-redis
-      - NEXTCLOUD_TRUSTED_DOMAINS=roberto-ingenito.ddns.net
+      - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_DOMAIN}
       - TRUSTED_PROXIES=172.16.0.0/12
-      - OVERWRITEHOST=roberto-ingenito.ddns.net
-      - OVERWRITEPROTOCOL=https
+      - OVERWRITEHOST=${NEXTCLOUD_DOMAIN}
+      - OVERWRITEPROTOCOL=${NEXTCLOUD_PROTOCOL}
       - OVERWRITEWEBROOT=/cloud
-      - OVERWRITECLIURL=https://roberto-ingenito.ddns.net/cloud
+      - OVERWRITECLIURL=${NEXTCLOUD_CLI_URL}
       - APACHE_DISABLE_REWRITE_IP=1
     volumes:
-      - nextcloud_data:/var/www/html # File di sistema dell'app
-      - /mnt/storage/nextcloud/data:/var/www/html/data # File utente su RAID esterno
+      - nextcloud_data:/var/www/html
+      - /mnt/storage/nextcloud/data:/var/www/html/data
     networks:
       - common-network
     restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextcloud.rule=Host(`${DOMAIN}`) && PathPrefix(`/cloud`)"
+      - "traefik.http.routers.nextcloud.entrypoints=websecure"
+      - "traefik.http.routers.nextcloud.tls=true"
+      - "traefik.http.routers.nextcloud.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.routers.nextcloud.middlewares=security-headers@file,strip-cloud@file,nextcloud-headers@file"
+      - "traefik.http.services.nextcloud.loadbalancer.server.port=80"
+      - "traefik.http.services.nextcloud.loadbalancer.serverstransport=nextcloud-transport@file"
 
   # Database Postgres specifico per Nextcloud
   nextcloud-db:
@@ -231,6 +298,7 @@ services:
       - common-network
     restart: always
 
+  # --- MR. WHITE GAME ---
   mr-white-back-end:
     build:
       context: ./mr-white-game/backend/MrWhite.Backend
@@ -240,31 +308,49 @@ services:
     expose:
       - "80"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - ASPNETCORE_URLS=http://+:80
     volumes:
       - ./mr-white-game/backend/MrWhite.Backend/words.json:/app/words.json
     networks:
       - common-network
     restart: always
+    labels:
+      - "traefik.enable=true"
+      # WebSocket (SignalR) gestito automaticamente da Traefik
+      - "traefik.http.routers.mr-white-api.rule=Host(`${DOMAIN}`) && PathPrefix(`/mr-white-api`)"
+      - "traefik.http.routers.mr-white-api.entrypoints=websecure"
+      - "traefik.http.routers.mr-white-api.tls=true"
+      - "traefik.http.routers.mr-white-api.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.routers.mr-white-api.middlewares=security-headers@file"
+      - "traefik.http.services.mr-white-back-end.loadbalancer.server.port=80"
+      - "traefik.http.services.mr-white-back-end.loadbalancer.serverstransport=longpoll-transport@file"
 
   mr-white-front-end:
     build:
       context: ./mr-white-game/frontend
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=https://roberto-ingenito.ddns.net/mr-white-api
+        - NEXT_PUBLIC_API_URL=${MR_WHITE_API_URL}
     image: mr-white-front-end
     container_name: mr-white-front-end
     expose:
       - "3000"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV}
     networks:
       - common-network
     restart: always
     depends_on:
       - mr-white-back-end
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mr-white.rule=Host(`${DOMAIN}`) && PathPrefix(`/mr-white`)"
+      - "traefik.http.routers.mr-white.entrypoints=websecure"
+      - "traefik.http.routers.mr-white.tls=true"
+      - "traefik.http.routers.mr-white.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.routers.mr-white.middlewares=security-headers@file"
+      - "traefik.http.services.mr-white-front-end.loadbalancer.server.port=3000"
 
   # --- COUCHDB (Obsidian LiveSync) ---
   couchdb-obsidian:
@@ -277,20 +363,29 @@ services:
     volumes:
       - couchdb_obsidian_data:/opt/couchdb/data
     ports:
-      - "5984:5984"
+      - "5984:5984" # Accesso diretto per configurazione e debug
     expose:
       - "5984"
     networks:
       - common-network
+    labels:
+      - "traefik.enable=true"
+      # WebSocket e long-polling (_changes feed) gestiti automaticamente da Traefik
+      - "traefik.http.routers.couchdb.rule=Host(`${DOMAIN}`) && PathPrefix(`/couchdb-obsidian`)"
+      - "traefik.http.routers.couchdb.entrypoints=websecure"
+      - "traefik.http.routers.couchdb.tls=true"
+      - "traefik.http.routers.couchdb.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.routers.couchdb.middlewares=security-headers@file,rate-limit-couchdb@file,strip-couchdb@file"
+      - "traefik.http.services.couchdb.loadbalancer.server.port=5984"
+      - "traefik.http.services.couchdb.loadbalancer.serverstransport=longpoll-transport@file"
 
 # --- NETWORKS ---
-# Rete isolata per la comunicazione interna tra container
 networks:
   common-network:
     driver: bridge
+    name: common-network # nome esplicito senza prefisso progetto, necessario per Traefik
 
 # --- VOLUMES ---
-# Volumi nominati per la persistenza dei dati anche se i container vengono ricreati
 volumes:
   postgres_data:
     name: cashly-db_postgres_data
@@ -300,7 +395,5 @@ volumes:
     name: nextcloud_app_data
   couchdb_obsidian_data:
     name: couchdb_obsidian_data
-  letsencrypt_conf:
-    name: letsencrypt_conf
-  letsencrypt_www:
-    name: letsencrypt_www
+  traefik_letsencrypt:
+    name: traefik_letsencrypt
