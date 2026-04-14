@@ -59,7 +59,8 @@ services:
     expose:
       - "80" # Porta interna visibile solo agli altri container (Nginx)
     depends_on:
-      - cashly-database
+      cashly-database:
+        condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
@@ -85,6 +86,12 @@ services:
     networks:
       - common-network
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${CASHLY_POSTGRES_USER} -d ${CASHLY_POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # Frontend Next.js
   cashly-front-end:
@@ -132,7 +139,8 @@ services:
     networks:
       - common-network
     depends_on:
-      - cashly-database
+      cashly-database:
+        condition: service_healthy
 
   # --- NEXTCLOUD SERVICES ---
   # Applicazione Nextcloud (Cloud storage)
@@ -142,8 +150,10 @@ services:
     expose:
       - "80"
     depends_on:
-      - nextcloud-db
-      - nextcloud-redis
+      nextcloud-db:
+        condition: service_healthy
+      nextcloud-redis:
+        condition: service_healthy
     environment:
       - POSTGRES_HOST=nextcloud-db
       - POSTGRES_DB=nextcloud
@@ -179,6 +189,12 @@ services:
     networks:
       - common-network
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nextcloud -d nextcloud"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # Redis per il caching e file locking di Nextcloud
   nextcloud-redis:
@@ -189,6 +205,12 @@ services:
     networks:
       - common-network
     restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   # Servizio Cron per le operazioni in background di Nextcloud
   nextcloud-cron:
@@ -196,9 +218,12 @@ services:
     image: nextcloud:stable-apache
     entrypoint: /cron.sh
     depends_on:
-      - nextcloud-db
-      - nextcloud-redis
-      - nextcloud
+      nextcloud-db:
+        condition: service_healthy
+      nextcloud-redis:
+        condition: service_healthy
+      nextcloud:
+        condition: service_started
     volumes:
       - nextcloud_data:/var/www/html
       - /mnt/storage/nextcloud/data:/var/www/html/data
