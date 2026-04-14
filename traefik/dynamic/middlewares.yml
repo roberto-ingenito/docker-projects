@@ -29,12 +29,12 @@ http:
         period: 1m
         burst: 5
 
-    # CouchDB sync: 120 req/min per IP (Obsidian invia richieste frequenti ma leggere)
+    # CouchDB sync: 500 req/min per IP (Obsidian invia richieste frequenti ma leggere)
     rate-limit-couchdb:
       rateLimit:
-        average: 120
+        average: 500
         period: 1m
-        burst: 50
+        burst: 100
 
     # -----------------------------------------------
     # STRIP PREFIX
