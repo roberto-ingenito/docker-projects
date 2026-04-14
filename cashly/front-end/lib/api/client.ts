@@ -3,7 +3,7 @@ import { ApiError } from "@/lib/types/api";
 import { getJwtToken, getRefreshToken, saveJwtToken, saveRefreshToken, deleteJwtToken, deleteRefreshToken, deleteUser } from "@/app/actions";
 import { UserLoginResponseDto } from "../types/auth";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5248/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5248/cashly-api";
 
 class ApiClient {
   private client: AxiosInstance;

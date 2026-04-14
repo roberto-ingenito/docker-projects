@@ -22,7 +22,7 @@ L'infrastruttura usa un reverse proxy centralizzato per routing, SSL e sicurezza
 
 Gestione finanze personali.
 
-- **Backend**: .NET Core Web API → `/api/`
+- **Backend**: .NET Core Web API → `/cashly-api/`
 - **Frontend**: Next.js → `/cashly/`
 - **Database**: PostgreSQL
 
@@ -126,7 +126,7 @@ Traefik genera un certificato self-signed automatico. Il browser mostrerà un av
 | Path                    | Servizio               | Note                                  |
 | ----------------------- | ---------------------- | ------------------------------------- |
 | `/`                     | portfolio              |                                       |
-| `/api/`                 | cashly-back-end        | Rate limit: 30 req/min                |
+| `/cashly-api/`          | cashly-back-end        | Rate limit: 30 req/min                |
 | `/swagger`              | cashly-back-end        | Rate limit: 10 req/min                |
 | `/cashly/`              | cashly-front-end       |                                       |
 | `/timesheet/`           | fortil-excel-timesheet | Strip prefix                          |

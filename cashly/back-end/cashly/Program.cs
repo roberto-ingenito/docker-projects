@@ -40,7 +40,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 
 // ===================================
-// SWAGGER - Configurato per /api/ path
+// SWAGGER
 // ===================================
 builder.Services.AddSwaggerGen(c =>
 {
@@ -118,10 +118,10 @@ var app = builder.Build();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // ===================================
-// PATH BASE: /api/
-// Questo fa sì che tutte le route siano prefissate con /api/
+// PATH BASE: /cashly-api/
+// Questo fa sì che tutte le route siano prefissate con /cashly-api/
 // ===================================
-app.UsePathBase("/api");
+app.UsePathBase("/cashly-api");
 
 // ===================================
 // FORWARDED HEADERS
@@ -138,7 +138,7 @@ app.UseForwardedHeaders(
 );
 
 // ===================================
-// SWAGGER - Configurato per funzionare con /api/
+// SWAGGER - Configurato per funzionare con /cashly-api/
 // ===================================
 app.UseSwagger(c =>
 {
@@ -146,15 +146,15 @@ app.UseSwagger(c =>
     c.PreSerializeFilters.Add(
         (swaggerDoc, httpReq) =>
         {
-            swaggerDoc.Servers = [new() { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}/api", Description = "API Server" }];
+            swaggerDoc.Servers = [new() { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}/cashly-api", Description = "API Server" }];
         }
     );
 });
 
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "Cashly API V1");
-    c.RoutePrefix = "swagger"; // Swagger sarà disponibile a /api/swagger
+    c.SwaggerEndpoint("/cashly-api/swagger/v1/swagger.json", "Cashly API V1");
+    c.RoutePrefix = "swagger"; // Swagger sarà disponibile a /cashly-api/swagger
 });
 
 // ===================================

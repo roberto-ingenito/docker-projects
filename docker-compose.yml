@@ -85,7 +85,7 @@ services:
     labels:
       - "traefik.enable=true"
       # API endpoint
-      - "traefik.http.routers.cashly-api.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.cashly-api.rule=Host(`${DOMAIN}`) && PathPrefix(`/cashly-api`)"
       - "traefik.http.routers.cashly-api.entrypoints=websecure"
       - "traefik.http.routers.cashly-api.tls=true"
       - "traefik.http.routers.cashly-api.tls.certresolver=${CERT_RESOLVER}"
