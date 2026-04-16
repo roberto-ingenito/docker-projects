@@ -3,14 +3,15 @@
 *,
 *::before,
 *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-    background: $color-surface;
-    color: $color-text;
-    font-family: $font-serif;
-    height: 100dvh;
+  background: $color-surface;
+  color: $color-text;
+  font-family: $font-serif;
+  height: 100dvh;
+  overflow: hidden;
 }

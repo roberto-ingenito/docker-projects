@@ -1,0 +1,33 @@
+@use 'variables' as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  overflow-y: auto;
+
+  // Nasconde la scrollbar ma mantiene lo scroll
+  scrollbar-width: none; // Firefox
+  &::-webkit-scrollbar {
+    display: none; // Chrome, Safari, Edge
+  }
+}
+
+nav {
+  height: $nav-height;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background-color: rgba($color-surface, 0.5);
+  backdrop-filter: blur(1rem);
+  -webkit-backdrop-filter: blur(1rem);
+  border-bottom: 1px solid $color-accent;
+}
+
+main {
+  flex: 1;
+  padding-top: calc($nav-height + 1px); // compensa l'altezza della navbar fixed + il bordo
+}

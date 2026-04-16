@@ -6,6 +6,7 @@ import { Signup } from './features/signup/signup';
 import { Dashboard } from './features/dashboard/dashboard';
 import { Categories } from './features/categories/categories';
 import { Transactions } from './features/transactions/transactions';
+import { Layout } from './features/layout/layout';
 
 export const routes: Routes = [
   {
@@ -19,20 +20,24 @@ export const routes: Routes = [
     component: Signup,
   },
   {
-    path: 'dashboard',
+    path: '',
     canActivate: [authGuard],
-    component: Dashboard,
+    component: Layout,
+    children: [
+      {
+        path: 'dashboard',
+        component: Dashboard,
+      },
+      {
+        path: 'categories',
+        component: Categories,
+      },
+      {
+        path: 'transactions',
+        component: Transactions,
+      },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+    ],
   },
-  {
-    path: 'categories',
-    canActivate: [authGuard],
-    component: Categories,
-  },
-  {
-    path: 'transactions',
-    canActivate: [authGuard],
-    component: Transactions,
-  },
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: '**', redirectTo: 'dashboard' },
+  { path: '**', redirectTo: 'login' },
 ];

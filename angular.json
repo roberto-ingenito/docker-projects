@@ -67,6 +67,7 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
+            "hmr": false,
             "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
