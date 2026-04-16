@@ -3,7 +3,7 @@ import { ApiError } from '../types/api';
 import { UserLoginResponseDto } from '../types/user';
 import { inject, Injectable } from '@angular/core';
 import { AuthStore } from '../../app/core/services/auth.store';
-import { environment } from '../../environments/environment.prod';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ApiClient {

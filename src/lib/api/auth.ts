@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { UserCreateDto, UserLoginResponseDto, UserLoginDto } from '../types/user';
-import { environment } from '../../environments/environment.prod';
+import { environment } from '../../environments/environment';
 
 // usa axios direttamente (le chiamate auth non hanno bisogno dell'interceptor)
 
