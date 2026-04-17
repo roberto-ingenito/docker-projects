@@ -25,6 +25,49 @@ nav {
   backdrop-filter: blur(1rem);
   -webkit-backdrop-filter: blur(1rem);
   border-bottom: 1px solid $color-accent;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+
+  a {
+    position: relative;
+    transition: all $transition;
+    cursor: pointer;
+    text-decoration: none;
+    color: $color-text;
+  }
+
+  a::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -0.25rem;
+    width: 100%;
+    height: 2px;
+    background: $color-accent;
+
+    transform: translateX(-50%) scaleX(0);
+    transform-origin: center;
+    transition:
+      transform $transition,
+      color $transition;
+
+    will-change: transform;
+  }
+
+  a:hover,
+  a.active {
+    transform: scale(1.1);
+    color: $color-accent;
+  }
+
+  a:hover::after,
+  a.active::after {
+    transform: translateX(-50%) scaleX(1);
+  }
 }
 
 main {
