@@ -1,13 +1,145 @@
-$color-bg: #0e0e10;
-$color-surface: #161618;
-$color-border: #28272a;
-$color-border-hover: #4b4945;
-$color-accent: #daae7a;
-$color-text: #ede9e2;
-$color-label: #888078;
-$color-placeholder: #3a3835;
+@use 'sass:map';
 
-$color-error: #dc2626;
+// ─────────────────────────────────────────────────────────────
+// THEME SWITCH
+// Cambia $theme e $mode per cambiare l'intera palette dell'app.
+// $theme: 'warm-cozy' | 'cool-minimal' | 'mono-neutro' | 'warm-muted'
+// $mode:  'light' | 'dark'
+// ─────────────────────────────────────────────────────────────
+
+$theme: 'warm-cozy' !default;
+$mode: 'light' !default;
+
+// ─────────────────────────────────────────────────────────────
+// PALETTES
+// Ogni palette definisce light + dark con contrasto bilanciato (WCAG AA).
+// ─────────────────────────────────────────────────────────────
+
+$palettes: (
+  // 1. Warm & Cozy — toni caldi beige/sabbia, accent dorato muted
+  'warm-cozy': (
+      'dark': (
+        'bg': #0e0e10,
+        'surface': #1a1816,
+        'border': #2a2724,
+        'border-hover': #4a443d,
+        'accent': #daae7a,
+        'text': #ede9e2,
+        'label': #948a7d,
+        'placeholder': #4a443d,
+        'error': #e35d5d,
+      ),
+      'light': (
+        'bg': #faf7f2,
+        'surface': #ffffff,
+        'border': #e8e2d8,
+        'border-hover': #b8a98f,
+        'accent': #a87a3e,
+        'text': #2a2520,
+        'label': #7a7268,
+        'placeholder': #c9bfae,
+        'error': #c1272d,
+      ),
+    ),
+
+  // 2. Cool & Minimal — grigi freddi slate, accent sobrio
+  'cool-minimal': (
+      'dark': (
+        'bg': #0a0b0d,
+        'surface': #15171a,
+        'border': #25282d,
+        'border-hover': #404550,
+        'accent': #94a3b8,
+        'text': #e6e8eb,
+        'label': #7a8190,
+        'placeholder': #404550,
+        'error': #f87171,
+      ),
+      'light': (
+        'bg': #f8fafc,
+        'surface': #ffffff,
+        'border': #e2e8f0,
+        'border-hover': #94a3b8,
+        'accent': #475569,
+        'text': #0f172a,
+        'label': #64748b,
+        'placeholder': #cbd5e1,
+        'error': #dc2626,
+      ),
+    ),
+
+  // 3. Mono Neutro — scala zinc pura, look editoriale
+  'mono-neutro': (
+      'dark': (
+        'bg': #09090b,
+        'surface': #18181b,
+        'border': #27272a,
+        'border-hover': #52525b,
+        'accent': #d4d4d8,
+        'text': #fafafa,
+        'label': #71717a,
+        'placeholder': #3f3f46,
+        'error': #f87171,
+      ),
+      'light': (
+        'bg': #ffffff,
+        'surface': #fafafa,
+        'border': #e4e4e7,
+        'border-hover': #a1a1aa,
+        'accent': #27272a,
+        'text': #18181b,
+        'label': #71717a,
+        'placeholder': #d4d4d8,
+        'error': #dc2626,
+      ),
+    ),
+
+  // 4. Warm Muted Contemporaneo — taupe sofisticato, calore con saturazione bassa
+  'warm-muted': (
+      'dark': (
+        'bg': #100f0d,
+        'surface': #1c1a17,
+        'border': #2e2a25,
+        'border-hover': #5a5046,
+        'accent': #c4a47c,
+        'text': #f0ebe2,
+        'label': #8a7f72,
+        'placeholder': #4a443d,
+        'error': #e57373,
+      ),
+      'light': (
+        'bg': #f5f1eb,
+        'surface': #fdfbf7,
+        'border': #e0d8c9,
+        'border-hover': #a89880,
+        'accent': #8b6f47,
+        'text': #2a241d,
+        'label': #786d5d,
+        'placeholder': #c9bfae,
+        'error': #b91c1c,
+      ),
+    )
+);
+
+// ─────────────────────────────────────────────────────────────
+// RESOLVE ACTIVE PALETTE
+// ─────────────────────────────────────────────────────────────
+
+$_active: map.get(map.get($palettes, $theme), $mode);
+
+$color-bg: map.get($_active, 'bg');
+$color-surface: map.get($_active, 'surface');
+$color-border: map.get($_active, 'border');
+$color-border-hover: map.get($_active, 'border-hover');
+$color-accent: map.get($_active, 'accent');
+$color-text: map.get($_active, 'text');
+$color-label: map.get($_active, 'label');
+$color-placeholder: map.get($_active, 'placeholder');
+$color-error: map.get($_active, 'error');
+
+// ─────────────────────────────────────────────────────────────
+// DESIGN TOKENS (non legati al tema)
+// ─────────────────────────────────────────────────────────────
 
 $font-serif: 'Lora', serif;
 

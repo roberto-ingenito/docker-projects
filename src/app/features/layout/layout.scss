@@ -1,16 +1,61 @@
 @use 'variables' as *;
+@use 'breakpoints' as *;
+
+$padding: 0.25rem;
+$outer-radius: 1rem;
+$inner-radius: calc($outer-radius - $padding);
 
 :host {
-  display: flex;
-  flex-direction: column;
+  display: block;
   height: 100%;
+}
 
+mat-sidenav-container {
+  height: 100%;
+  background-color: transparent;
+}
+
+mat-sidenav {
+  width: 16rem;
+  background-color: $color-surface;
+  padding: $padding;
+
+  border-top-right-radius: $outer-radius;
+  border-bottom-right-radius: $outer-radius;
+
+  mat-nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    padding: 0;
+
+    a {
+      --mat-list-list-item-label-text-color: #{$color-text};
+
+      text-decoration: none;
+
+      border-radius: $inner-radius;
+
+      transition:
+        background-color $transition,
+        color $transition;
+
+      &.active {
+        --mat-list-list-item-label-text-color: #{$color-accent};
+        background-color: rgba($color-accent, 0.08);
+      }
+    }
+  }
+}
+
+mat-sidenav-content {
   overflow-y: auto;
 
   // Nasconde la scrollbar ma mantiene lo scroll
-  scrollbar-width: none; // Firefox
+  scrollbar-width: none;
   &::-webkit-scrollbar {
-    display: none; // Chrome, Safari, Edge
+    display: none;
   }
 }
 
@@ -26,11 +71,60 @@ nav {
   -webkit-backdrop-filter: blur(1rem);
   border-bottom: 1px solid $color-accent;
 
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
+  padding: 0 1rem;
+
+  .nav-inner {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    max-width: 80rem;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .menu-button {
+    color: $color-text;
+    flex-shrink: 0;
+
+    @include breakpoint('sm') {
+      display: none;
+    }
+  }
+
+  .page-title {
+    font-size: 1.125rem;
+    color: $color-text;
+    flex: 1;
+
+    @include breakpoint('sm') {
+      display: none;
+    }
+  }
+
+  .links {
+    display: none;
+
+    @include breakpoint('sm') {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      transform: translateX(-50%);
+
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 2rem;
+    }
+  }
+
+  .actions {
+    margin-left: auto;
+    color: $color-text;
+  }
 
   a {
     position: relative;
@@ -40,7 +134,7 @@ nav {
     color: $color-text;
   }
 
-  a::after {
+  .links a::after {
     content: '';
     position: absolute;
     left: 50%;
@@ -58,19 +152,19 @@ nav {
     will-change: transform;
   }
 
-  a:hover,
-  a.active {
+  .links a:hover,
+  .links a.active {
     transform: scale(1.1);
     color: $color-accent;
   }
 
-  a:hover::after,
-  a.active::after {
+  .links a:hover::after,
+  .links a.active::after {
     transform: translateX(-50%) scaleX(1);
   }
 }
 
 main {
-  flex: 1;
+  min-height: calc(100% - $nav-height);
   padding-top: calc($nav-height + 1px); // compensa l'altezza della navbar fixed + il bordo
 }

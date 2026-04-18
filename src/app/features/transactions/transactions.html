@@ -1,1 +1,19 @@
 <p>transactions works!</p>
+
+@for (item of [].constructor(50); track $index) {
+  <div
+    style="
+      height: 100px;
+      background: #2a7b9b;
+      background: linear-gradient(
+        90deg,
+        rgba(42, 123, 155, 1) 0%,
+        rgba(42, 123, 155, 1) 50%,
+        rgba(87, 199, 133, 1) 50%,
+        rgba(237, 221, 83, 1) 100%
+      );
+      width: 100%;
+      margin-bottom: 1rem;
+    "
+  ></div>
+}
