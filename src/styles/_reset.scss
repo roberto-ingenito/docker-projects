@@ -9,9 +9,9 @@
 }
 
 body {
-  background: $color-surface;
-  color: $color-text;
-  font-family: $font-serif;
+  background: $bg-base;
+  color: $text-primary;
+  font-family: $font-display;
   height: 100dvh;
   overflow: hidden;
 }

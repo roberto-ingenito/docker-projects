@@ -1,39 +1,38 @@
-@use 'sass:color';
 @use 'variables' as *;
 
 :host {
   display: flex;
   height: 100%;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: $space-2;
   align-items: center;
   justify-content: center;
 
   h1 {
-    color: $color-accent;
+    color: $accent;
   }
 }
 
 header {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: $space-2;
   text-align: center;
 }
 
 .body {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: $space-8;
   max-width: 28rem;
   width: 100%;
-  padding: 1rem;
+  padding: $space-4;
 }
 
 form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: $space-6;
 }
 
 footer {
@@ -44,11 +43,11 @@ footer {
   a {
     font-weight: bold;
     text-decoration: none;
-    color: $color-accent;
+    color: $accent;
     transition: color $transition;
 
     &:hover {
-      color: color.adjust($color-accent, $lightness: 16%);
+      color: $accent-hover;
     }
   }
 }
@@ -56,5 +55,5 @@ footer {
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: $space-8;
 }

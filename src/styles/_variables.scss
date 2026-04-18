@@ -1,4 +1,5 @@
 @use 'sass:map';
+@use 'sass:color';
 
 // ─────────────────────────────────────────────────────────────
 // THEME SWITCH
@@ -8,7 +9,7 @@
 // ─────────────────────────────────────────────────────────────
 
 $theme: 'warm-cozy' !default;
-$mode: 'light' !default;
+$mode: 'dark' !default;
 
 // ─────────────────────────────────────────────────────────────
 // PALETTES
@@ -19,25 +20,33 @@ $palettes: (
   // 1. Warm & Cozy — toni caldi beige/sabbia, accent dorato muted
   'warm-cozy': (
       'dark': (
-        'bg': #0e0e10,
-        'surface': #1a1816,
+        'bg-base': #0e0e10,
+        'bg-subtle': #1a1816,
+        'bg-muted': #25221e,
         'border': #2a2724,
-        'border-hover': #4a443d,
+        'border-strong': #4a443d,
         'accent': #daae7a,
-        'text': #ede9e2,
-        'label': #948a7d,
-        'placeholder': #4a443d,
+        'text-on-accent': #1a1306,
+        'text-primary': #ede9e2,
+        'text-muted': #948a7d,
+        'text-placeholder': #4a443d,
+        'success': #6ec48b,
+        'warning': #e5b656,
         'error': #e35d5d,
       ),
       'light': (
-        'bg': #faf7f2,
-        'surface': #ffffff,
+        'bg-base': #faf7f2,
+        'bg-subtle': #ffffff,
+        'bg-muted': #f0ebe1,
         'border': #e8e2d8,
-        'border-hover': #b8a98f,
+        'border-strong': #b8a98f,
         'accent': #a87a3e,
-        'text': #2a2520,
-        'label': #7a7268,
-        'placeholder': #c9bfae,
+        'text-on-accent': #ffffff,
+        'text-primary': #2a2520,
+        'text-muted': #7a7268,
+        'text-placeholder': #c9bfae,
+        'success': #2f7a4f,
+        'warning': #b07b1e,
         'error': #c1272d,
       ),
     ),
@@ -45,25 +54,33 @@ $palettes: (
   // 2. Cool & Minimal — grigi freddi slate, accent sobrio
   'cool-minimal': (
       'dark': (
-        'bg': #0a0b0d,
-        'surface': #15171a,
+        'bg-base': #0a0b0d,
+        'bg-subtle': #15171a,
+        'bg-muted': #1f2227,
         'border': #25282d,
-        'border-hover': #404550,
+        'border-strong': #404550,
         'accent': #94a3b8,
-        'text': #e6e8eb,
-        'label': #7a8190,
-        'placeholder': #404550,
+        'text-on-accent': #0f172a,
+        'text-primary': #e6e8eb,
+        'text-muted': #7a8190,
+        'text-placeholder': #404550,
+        'success': #4ade80,
+        'warning': #facc15,
         'error': #f87171,
       ),
       'light': (
-        'bg': #f8fafc,
-        'surface': #ffffff,
+        'bg-base': #ffffff,
+        'bg-subtle': #f8fafc,
+        'bg-muted': #f1f5f9,
         'border': #e2e8f0,
-        'border-hover': #94a3b8,
+        'border-strong': #94a3b8,
         'accent': #475569,
-        'text': #0f172a,
-        'label': #64748b,
-        'placeholder': #cbd5e1,
+        'text-on-accent': #f8fafc,
+        'text-primary': #0f172a,
+        'text-muted': #64748b,
+        'text-placeholder': #cbd5e1,
+        'success': #16a34a,
+        'warning': #ca8a04,
         'error': #dc2626,
       ),
     ),
@@ -71,25 +88,33 @@ $palettes: (
   // 3. Mono Neutro — scala zinc pura, look editoriale
   'mono-neutro': (
       'dark': (
-        'bg': #09090b,
-        'surface': #18181b,
+        'bg-base': #09090b,
+        'bg-subtle': #18181b,
+        'bg-muted': #27272a,
         'border': #27272a,
-        'border-hover': #52525b,
+        'border-strong': #52525b,
         'accent': #d4d4d8,
-        'text': #fafafa,
-        'label': #71717a,
-        'placeholder': #3f3f46,
+        'text-on-accent': #18181b,
+        'text-primary': #fafafa,
+        'text-muted': #71717a,
+        'text-placeholder': #3f3f46,
+        'success': #4ade80,
+        'warning': #facc15,
         'error': #f87171,
       ),
       'light': (
-        'bg': #ffffff,
-        'surface': #fafafa,
+        'bg-base': #ffffff,
+        'bg-subtle': #fafafa,
+        'bg-muted': #f4f4f5,
         'border': #e4e4e7,
-        'border-hover': #a1a1aa,
+        'border-strong': #a1a1aa,
         'accent': #27272a,
-        'text': #18181b,
-        'label': #71717a,
-        'placeholder': #d4d4d8,
+        'text-on-accent': #fafafa,
+        'text-primary': #18181b,
+        'text-muted': #71717a,
+        'text-placeholder': #d4d4d8,
+        'success': #16a34a,
+        'warning': #ca8a04,
         'error': #dc2626,
       ),
     ),
@@ -97,25 +122,33 @@ $palettes: (
   // 4. Warm Muted Contemporaneo — taupe sofisticato, calore con saturazione bassa
   'warm-muted': (
       'dark': (
-        'bg': #100f0d,
-        'surface': #1c1a17,
+        'bg-base': #100f0d,
+        'bg-subtle': #1c1a17,
+        'bg-muted': #2a2620,
         'border': #2e2a25,
-        'border-hover': #5a5046,
+        'border-strong': #5a5046,
         'accent': #c4a47c,
-        'text': #f0ebe2,
-        'label': #8a7f72,
-        'placeholder': #4a443d,
+        'text-on-accent': #1a1306,
+        'text-primary': #f0ebe2,
+        'text-muted': #8a7f72,
+        'text-placeholder': #4a443d,
+        'success': #6ec48b,
+        'warning': #e5b656,
         'error': #e57373,
       ),
       'light': (
-        'bg': #f5f1eb,
-        'surface': #fdfbf7,
+        'bg-base': #f5f1eb,
+        'bg-subtle': #fdfbf7,
+        'bg-muted': #ece5d8,
         'border': #e0d8c9,
-        'border-hover': #a89880,
+        'border-strong': #a89880,
         'accent': #8b6f47,
-        'text': #2a241d,
-        'label': #786d5d,
-        'placeholder': #c9bfae,
+        'text-on-accent': #fdfbf7,
+        'text-primary': #2a241d,
+        'text-muted': #786d5d,
+        'text-placeholder': #c9bfae,
+        'success': #2f7a4f,
+        'warning': #a07314,
         'error': #b91c1c,
       ),
     )
@@ -127,26 +160,88 @@ $palettes: (
 
 $_active: map.get(map.get($palettes, $theme), $mode);
 
-$color-bg: map.get($_active, 'bg');
-$color-surface: map.get($_active, 'surface');
-$color-border: map.get($_active, 'border');
-$color-border-hover: map.get($_active, 'border-hover');
-$color-accent: map.get($_active, 'accent');
-$color-text: map.get($_active, 'text');
-$color-label: map.get($_active, 'label');
-$color-placeholder: map.get($_active, 'placeholder');
+// Surfaces
+$bg-base: map.get($_active, 'bg-base');
+$bg-subtle: map.get($_active, 'bg-subtle');
+$bg-muted: map.get($_active, 'bg-muted');
+
+// Borders
+$border: map.get($_active, 'border');
+$border-strong: map.get($_active, 'border-strong');
+
+// Accent
+$accent: map.get($_active, 'accent');
+$text-on-accent: map.get($_active, 'text-on-accent');
+$accent-hover: if(
+  $mode == 'dark',
+  color.adjust($accent, $lightness: 8%),
+  color.adjust($accent, $lightness: -10%)
+);
+$accent-subtle: rgba($accent, 0.08);
+
+// Text
+$text-primary: map.get($_active, 'text-primary');
+$text-muted: map.get($_active, 'text-muted');
+$text-placeholder: map.get($_active, 'text-placeholder');
+
+// Semantic
+$color-success: map.get($_active, 'success');
+$color-warning: map.get($_active, 'warning');
 $color-error: map.get($_active, 'error');
 
+// Interaction
+$focus-ring: rgba($accent, 0.4);
+$shadow-focus: 0 0 0 3px $focus-ring;
+$overlay: rgba(#000, 0.5);
+
 // ─────────────────────────────────────────────────────────────
-// DESIGN TOKENS (non legati al tema)
+// TYPOGRAPHY
 // ─────────────────────────────────────────────────────────────
 
-$font-serif: 'Lora', serif;
+$font-display: 'Lora', Georgia, serif;
+$font-ui: 'Inter', system-ui, sans-serif;
+
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-2xl: 1.5rem;
+$font-size-3xl: 1.875rem;
+
+// ─────────────────────────────────────────────────────────────
+// SPACING — 4px grid
+// ─────────────────────────────────────────────────────────────
+
+$space-1: 0.25rem; //  4px
+$space-2: 0.5rem; //  8px
+$space-3: 0.75rem; // 12px
+$space-4: 1rem; // 16px
+$space-6: 1.5rem; // 24px
+$space-8: 2rem; // 32px
+$space-12: 3rem; // 48px
+$space-16: 4rem; // 64px
+
+// ─────────────────────────────────────────────────────────────
+// RADIUS
+// ─────────────────────────────────────────────────────────────
 
 $radius-sm: 0.5rem;
 $radius-md: 1rem;
 $radius-lg: 2rem;
 
-$transition: 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+// ─────────────────────────────────────────────────────────────
+// Z-INDEX
+// ─────────────────────────────────────────────────────────────
 
+$z-dropdown: 100;
+$z-sticky: 200;
+$z-modal: 300;
+$z-toast: 400;
+
+// ─────────────────────────────────────────────────────────────
+// MOTION & LAYOUT
+// ─────────────────────────────────────────────────────────────
+
+$transition: 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 $nav-height: 4rem;

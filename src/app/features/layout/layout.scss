@@ -1,8 +1,8 @@
 @use 'variables' as *;
 @use 'breakpoints' as *;
 
-$padding: 0.25rem;
-$outer-radius: 1rem;
+$padding: $space-1;
+$outer-radius: $radius-md;
 $inner-radius: calc($outer-radius - $padding);
 
 :host {
@@ -17,7 +17,7 @@ mat-sidenav-container {
 
 mat-sidenav {
   width: 16rem;
-  background-color: $color-surface;
+  background-color: $bg-subtle;
   padding: $padding;
 
   border-top-right-radius: $outer-radius;
@@ -26,12 +26,12 @@ mat-sidenav {
   mat-nav-list {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: $space-1;
 
     padding: 0;
 
     a {
-      --mat-list-list-item-label-text-color: #{$color-text};
+      --mat-list-list-item-label-text-color: #{$text-primary};
 
       text-decoration: none;
 
@@ -42,8 +42,8 @@ mat-sidenav {
         color $transition;
 
       &.active {
-        --mat-list-list-item-label-text-color: #{$color-accent};
-        background-color: rgba($color-accent, 0.08);
+        --mat-list-list-item-label-text-color: #{$accent};
+        background-color: $accent-subtle;
       }
     }
   }
@@ -65,13 +65,13 @@ nav {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
-  background-color: rgba($color-surface, 0.5);
+  z-index: $z-sticky;
+  background-color: rgba($bg-subtle, 0.5);
   backdrop-filter: blur(1rem);
   -webkit-backdrop-filter: blur(1rem);
-  border-bottom: 1px solid $color-accent;
+  border-bottom: 1px solid $border-strong;
 
-  padding: 0 1rem;
+  padding: 0 $space-4;
 
   .nav-inner {
     position: relative;
@@ -82,11 +82,11 @@ nav {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 1rem;
+    gap: $space-4;
   }
 
   .menu-button {
-    color: $color-text;
+    color: $text-primary;
     flex-shrink: 0;
 
     @include breakpoint('sm') {
@@ -95,8 +95,8 @@ nav {
   }
 
   .page-title {
-    font-size: 1.125rem;
-    color: $color-text;
+    font-size: $font-size-lg;
+    color: $text-primary;
     flex: 1;
 
     @include breakpoint('sm') {
@@ -117,13 +117,13 @@ nav {
       display: flex;
       flex-direction: row;
       align-items: center;
-      gap: 2rem;
+      gap: $space-8;
     }
   }
 
   .actions {
     margin-left: auto;
-    color: $color-text;
+    color: $text-primary;
   }
 
   a {
@@ -131,7 +131,7 @@ nav {
     transition: all $transition;
     cursor: pointer;
     text-decoration: none;
-    color: $color-text;
+    color: $text-primary;
   }
 
   .links a::after {
@@ -141,7 +141,7 @@ nav {
     bottom: -0.25rem;
     width: 100%;
     height: 2px;
-    background: $color-accent;
+    background: $accent;
 
     transform: translateX(-50%) scaleX(0);
     transform-origin: center;
@@ -155,7 +155,7 @@ nav {
   .links a:hover,
   .links a.active {
     transform: scale(1.1);
-    color: $color-accent;
+    color: $accent;
   }
 
   .links a:hover::after,
