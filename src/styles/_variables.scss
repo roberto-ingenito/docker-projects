@@ -6,10 +6,10 @@
 // Cambia $theme per cambiare la palette dell'app.
 // Il mode (light/dark) viene invece scelto a runtime via `data-theme`
 // sull'elemento <html>, gestito da ThemeService.
-// $theme: 'warm-cozy' | 'cool-minimal' | 'mono-neutro' | 'warm-muted'
+// $theme: 'warm-cozy' | 'mono-neutro' | 'sage' | 'nordic' | 'lavender'
 // ─────────────────────────────────────────────────────────────
 
-$theme: 'warm-cozy' !default;
+$theme: 'lavender' !default;
 $default-mode: 'light' !default;
 
 // ─────────────────────────────────────────────────────────────
@@ -52,40 +52,6 @@ $palettes: (
       ),
     ),
 
-  // 2. Cool & Minimal — grigi freddi slate, accent sobrio
-  'cool-minimal': (
-      'dark': (
-        'bg-base': #0a0b0d,
-        'bg-subtle': #15171a,
-        'bg-muted': #1f2227,
-        'border': #25282d,
-        'border-strong': #404550,
-        'accent': #94a3b8,
-        'text-on-accent': #0f172a,
-        'text-primary': #e6e8eb,
-        'text-muted': #7a8190,
-        'text-placeholder': #404550,
-        'success': #4ade80,
-        'warning': #facc15,
-        'error': #f87171,
-      ),
-      'light': (
-        'bg-base': #ffffff,
-        'bg-subtle': #f8fafc,
-        'bg-muted': #f1f5f9,
-        'border': #e2e8f0,
-        'border-strong': #94a3b8,
-        'accent': #475569,
-        'text-on-accent': #f8fafc,
-        'text-primary': #0f172a,
-        'text-muted': #64748b,
-        'text-placeholder': #cbd5e1,
-        'success': #16a34a,
-        'warning': #ca8a04,
-        'error': #dc2626,
-      ),
-    ),
-
   // 3. Mono Neutro — scala zinc pura, look editoriale
   'mono-neutro': (
       'dark': (
@@ -120,37 +86,105 @@ $palettes: (
       ),
     ),
 
-  // 4. Warm Muted Contemporaneo — taupe sofisticato, calore con saturazione bassa
-  'warm-muted': (
+  // 5. Sage — verde salvia botanico, accent organico muted
+  'sage': (
       'dark': (
-        'bg-base': #100f0d,
-        'bg-subtle': #1c1a17,
-        'bg-muted': #2a2620,
-        'border': #2e2a25,
-        'border-strong': #5a5046,
-        'accent': #c4a47c,
-        'text-on-accent': #1a1306,
-        'text-primary': #f0ebe2,
-        'text-muted': #8a7f72,
-        'text-placeholder': #4a443d,
+        'bg-base': #0d0f0d,
+        'bg-subtle': #161916,
+        'bg-muted': #1f2420,
+        'border': #232826,
+        'border-strong': #404843,
+        'accent': #a3b5a0,
+        'text-on-accent': #0d1410,
+        'text-primary': #e8ece6,
+        'text-muted': #8a948a,
+        'text-placeholder': #404843,
         'success': #6ec48b,
         'warning': #e5b656,
         'error': #e57373,
       ),
       'light': (
-        'bg-base': #f5f1eb,
-        'bg-subtle': #fdfbf7,
-        'bg-muted': #ece5d8,
-        'border': #e0d8c9,
-        'border-strong': #a89880,
-        'accent': #8b6f47,
-        'text-on-accent': #fdfbf7,
-        'text-primary': #2a241d,
-        'text-muted': #786d5d,
-        'text-placeholder': #c9bfae,
+        'bg-base': #f7f8f4,
+        'bg-subtle': #ffffff,
+        'bg-muted': #ecefe6,
+        'border': #e0e3da,
+        'border-strong': #9ba996,
+        'accent': #5a7058,
+        'text-on-accent': #ffffff,
+        'text-primary': #1f2620,
+        'text-muted': #6b766a,
+        'text-placeholder': #c5ccba,
         'success': #2f7a4f,
-        'warning': #a07314,
-        'error': #b91c1c,
+        'warning': #b07b1e,
+        'error': #c1272d,
+      ),
+    ),
+
+  // 6. Nordic — blu-grigio freddo scandinavo, accent ghiaccio
+  'nordic': (
+      'dark': (
+        'bg-base': #0a0d11,
+        'bg-subtle': #131820,
+        'bg-muted': #1c2330,
+        'border': #232a36,
+        'border-strong': #3d4858,
+        'accent': #88a4c4,
+        'text-on-accent': #0a131e,
+        'text-primary': #e4e9f0,
+        'text-muted': #7a8696,
+        'text-placeholder': #3d4858,
+        'success': #6ec48b,
+        'warning': #e5b656,
+        'error': #e57373,
+      ),
+      'light': (
+        'bg-base': #fbfcfd,
+        'bg-subtle': #ffffff,
+        'bg-muted': #eef2f7,
+        'border': #dde3eb,
+        'border-strong': #8a98ad,
+        'accent': #3d5a7a,
+        'text-on-accent': #ffffff,
+        'text-primary': #1a2230,
+        'text-muted': #5e6b80,
+        'text-placeholder': #c0c9d6,
+        'success': #2f7a4f,
+        'warning': #b07b1e,
+        'error': #c1272d,
+      ),
+    ),
+
+  // 8. Lavender — contemplativo, accent viola muted
+  'lavender': (
+      'dark': (
+        'bg-base': #0e0d11,
+        'bg-subtle': #18171c,
+        'bg-muted': #232028,
+        'border': #28252e,
+        'border-strong': #4a4456,
+        'accent': #b0a4cc,
+        'text-on-accent': #15101e,
+        'text-primary': #ebe8f0,
+        'text-muted': #8a8496,
+        'text-placeholder': #4a4456,
+        'success': #6ec48b,
+        'warning': #e5b656,
+        'error': #e57373,
+      ),
+      'light': (
+        'bg-base': #faf8fc,
+        'bg-subtle': #ffffff,
+        'bg-muted': #efebf5,
+        'border': #e4dfee,
+        'border-strong': #a298b8,
+        'accent': #6a5d8a,
+        'text-on-accent': #ffffff,
+        'text-primary': #221c2a,
+        'text-muted': #6e6580,
+        'text-placeholder': #c9c1d6,
+        'success': #2f7a4f,
+        'warning': #b07b1e,
+        'error': #c1272d,
       ),
     )
 );
