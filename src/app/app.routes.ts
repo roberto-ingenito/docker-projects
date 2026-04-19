@@ -27,14 +27,17 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         component: Dashboard,
+        data: { title: 'Dashboard' },
       },
       {
         path: 'categories',
         component: Categories,
+        data: { title: 'Categorie' },
       },
       {
         path: 'transactions',
         component: Transactions,
+        data: { title: 'Transazioni' },
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],

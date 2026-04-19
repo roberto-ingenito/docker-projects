@@ -1,6 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import {
+  ActivatedRoute,
+  NavigationEnd,
+  Router,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet,
+} from '@angular/router';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -28,6 +35,7 @@ import { AuthStore } from '../../core/services/auth.store';
 })
 export class Layout {
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private auth = inject(AuthStore);
   protected themeService = inject(ThemeService);
 
@@ -39,21 +47,16 @@ export class Layout {
 
   isDark = computed(() => this.themeService.theme() === 'dark');
 
-  private currentUrl = toSignal(
+  private activeChild = toSignal(
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-      map((e) => e.urlAfterRedirects),
+      map(() => this.route.firstChild?.snapshot),
     ),
-    { initialValue: this.router.url },
+    { initialValue: this.route.firstChild?.snapshot },
   );
 
-  protected currentSegment = computed(
-    () => this.currentUrl().split('?')[0].split('/').filter(Boolean)[0] ?? '',
-  );
-
-  pageTitle = computed(
-    () => this.navItems.find((e) => e.route === this.currentSegment())?.label ?? '',
-  );
+  protected pageTitle = computed(() => this.activeChild()?.data['title'] ?? '');
+  private currentSegment = computed(() => this.activeChild()?.url[0]?.path ?? '');
 
   toggleTheme() {
     this.themeService.toggle();
