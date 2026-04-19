@@ -1,45 +1,50 @@
 <mat-sidenav-container>
   <mat-sidenav #sidenav mode="over" autoFocus="dialog">
     <mat-nav-list>
-      <a mat-list-item routerLink="dashboard" routerLinkActive="active" (click)="sidenav.close()">
-        Dashboard
-      </a>
-      <a mat-list-item routerLink="categories" routerLinkActive="active" (click)="sidenav.close()">
-        Categorie
-      </a>
-      <a
-        mat-list-item
-        routerLink="transactions"
-        routerLinkActive="active"
-        (click)="sidenav.close()"
-      >
-        Transazioni
-      </a>
+      @for (item of navItems; track item.route) {
+        <a
+          mat-list-item
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          (click)="sidenav.close()"
+        >
+          {{ item.label }}
+        </a>
+      }
     </mat-nav-list>
   </mat-sidenav>
 
   <mat-sidenav-content>
     <nav>
       <div class="nav-inner">
-        <button
-          mat-icon-button
-          type="button"
-          class="menu-button"
-          aria-label="Apri menu"
-          (click)="sidenav.toggle()"
-        >
+        <button mat-icon-button type="button" class="menu-button" (click)="sidenav.toggle()">
           <mat-icon>menu</mat-icon>
         </button>
 
         <span class="page-title">{{ pageTitle() }}</span>
 
         <div class="links">
-          <a routerLink="dashboard" routerLinkActive="active">Dashboard</a>
-          <a routerLink="categories" routerLinkActive="active">Categorie</a>
-          <a routerLink="transactions" routerLinkActive="active">Transazioni</a>
+          @for (item of navItems; track item.route) {
+            <a [routerLink]="item.route" routerLinkActive="active">
+              {{ item.label }}
+            </a>
+          }
         </div>
 
-        <div class="actions">TODO</div>
+        <div class="actions">
+          <button
+            mat-icon-button
+            type="button"
+            [matTooltip]="isDark() ? 'Tema chiaro' : 'Tema scuro'"
+            (click)="toggleTheme()"
+          >
+            <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+          </button>
+
+          <button mat-icon-button type="button" matTooltip="Logout" (click)="logout()">
+            <mat-icon>logout</mat-icon>
+          </button>
+        </div>
       </div>
     </nav>
 

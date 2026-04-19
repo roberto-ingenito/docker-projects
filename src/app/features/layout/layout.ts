@@ -1,17 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, inject, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { filter, map } from 'rxjs';
-
-const PAGE_TITLES: Record<string, string> = {
-  dashboard: 'Dashboard',
-  categories: 'Categorie',
-  transactions: 'Transazioni',
-};
+import { ThemeService } from '../../core/services/theme.service';
+import { AuthStore } from '../../core/services/auth.store';
 
 @Component({
   selector: 'app-layout',
@@ -23,6 +20,7 @@ const PAGE_TITLES: Record<string, string> = {
     MatListModule,
     MatIconButton,
     MatIcon,
+    MatTooltipModule,
   ],
   templateUrl: './layout.html',
   styleUrl: './layout.scss',
@@ -30,6 +28,16 @@ const PAGE_TITLES: Record<string, string> = {
 })
 export class Layout {
   private router = inject(Router);
+  private auth = inject(AuthStore);
+  protected themeService = inject(ThemeService);
+
+  protected readonly navItems = [
+    { route: 'dashboard', label: 'Dashboard' },
+    { route: 'categories', label: 'Categorie' },
+    { route: 'transactions', label: 'Transazioni' },
+  ];
+
+  isDark = computed(() => this.themeService.theme() === 'dark');
 
   private currentUrl = toSignal(
     this.router.events.pipe(
@@ -39,8 +47,27 @@ export class Layout {
     { initialValue: this.router.url },
   );
 
-  pageTitle = computed(() => {
-    const segment = this.currentUrl().split('?')[0].split('/').filter(Boolean)[0] ?? '';
-    return PAGE_TITLES[segment] ?? '';
-  });
+  protected currentSegment = computed(
+    () => this.currentUrl().split('?')[0].split('/').filter(Boolean)[0] ?? '',
+  );
+
+  pageTitle = computed(
+    () => this.navItems.find((e) => e.route === this.currentSegment())?.label ?? '',
+  );
+
+  toggleTheme() {
+    this.themeService.toggle();
+  }
+
+  navigateAndClose(route: string, sidenav: MatSidenav) {
+    sidenav.close();
+    if (this.currentSegment() !== route) {
+      this.router.navigate([route]);
+    }
+  }
+
+  logout() {
+    this.auth.logout();
+    this.router.navigate(['/login']);
+  }
 }

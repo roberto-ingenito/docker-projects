@@ -60,21 +60,31 @@ mat-sidenav-content {
 }
 
 nav {
-  height: $nav-height;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
+
+  display: flex;
+  justify-content: center;
+
+  height: $nav-height;
   z-index: $z-sticky;
-  background-color: rgba($bg-subtle, 0.5);
+
+  background-color: $nav-bg;
   backdrop-filter: blur(1rem);
   -webkit-backdrop-filter: blur(1rem);
+
   border-bottom: 1px solid $border-strong;
+
+  display: flex;
+  justify-content: center;
 
   padding: 0 $space-4;
 
   .nav-inner {
     position: relative;
+
     height: 100%;
     width: 100%;
     max-width: 80rem;
@@ -123,7 +133,14 @@ nav {
 
   .actions {
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: $space-1;
     color: $text-primary;
+
+    button {
+      color: $text-primary;
+    }
   }
 
   a {

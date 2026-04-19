@@ -3,13 +3,14 @@
 
 // ─────────────────────────────────────────────────────────────
 // THEME SWITCH
-// Cambia $theme e $mode per cambiare l'intera palette dell'app.
+// Cambia $theme per cambiare la palette dell'app.
+// Il mode (light/dark) viene invece scelto a runtime via `data-theme`
+// sull'elemento <html>, gestito da ThemeService.
 // $theme: 'warm-cozy' | 'cool-minimal' | 'mono-neutro' | 'warm-muted'
-// $mode:  'light' | 'dark'
 // ─────────────────────────────────────────────────────────────
 
 $theme: 'warm-cozy' !default;
-$mode: 'dark' !default;
+$default-mode: 'light' !default;
 
 // ─────────────────────────────────────────────────────────────
 // PALETTES
@@ -158,41 +159,91 @@ $palettes: (
 // RESOLVE ACTIVE PALETTE
 // ─────────────────────────────────────────────────────────────
 
-$_active: map.get(map.get($palettes, $theme), $mode);
+// ─────────────────────────────────────────────────────────────
+// EMIT CSS CUSTOM PROPERTIES PER MODE
+// Le $ Sass qui sotto puntano a var(--*): il mode cambia a runtime
+// switchando l'attributo `data-theme` su <html>.
+// ─────────────────────────────────────────────────────────────
+
+@mixin _emit-palette($mode) {
+  $p: map.get(map.get($palettes, $theme), $mode);
+  $accent-value: map.get($p, 'accent');
+  $accent-hover-value: if(
+    $mode == 'dark',
+    color.adjust($accent-value, $lightness: 8%),
+    color.adjust($accent-value, $lightness: -10%)
+  );
+
+  --bg-base: #{map.get($p, 'bg-base')};
+  --bg-subtle: #{map.get($p, 'bg-subtle')};
+  --bg-muted: #{map.get($p, 'bg-muted')};
+  --nav-bg: #{rgba(map.get($p, 'bg-subtle'), 0.5)};
+
+  --border: #{map.get($p, 'border')};
+  --border-strong: #{map.get($p, 'border-strong')};
+
+  --accent: #{$accent-value};
+  --accent-hover: #{$accent-hover-value};
+  --accent-subtle: #{rgba($accent-value, 0.08)};
+  --text-on-accent: #{map.get($p, 'text-on-accent')};
+
+  --text-primary: #{map.get($p, 'text-primary')};
+  --text-muted: #{map.get($p, 'text-muted')};
+  --text-placeholder: #{map.get($p, 'text-placeholder')};
+
+  --color-success: #{map.get($p, 'success')};
+  --color-warning: #{map.get($p, 'warning')};
+  --color-error: #{map.get($p, 'error')};
+
+  --focus-ring: #{rgba($accent-value, 0.4)};
+  --shadow-focus: 0 0 0 3px #{rgba($accent-value, 0.4)};
+
+  color-scheme: #{$mode};
+}
+
+:root {
+  @include _emit-palette($default-mode);
+  --overlay: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme='light'] {
+  @include _emit-palette('light');
+}
+
+[data-theme='dark'] {
+  @include _emit-palette('dark');
+}
 
 // Surfaces
-$bg-base: map.get($_active, 'bg-base');
-$bg-subtle: map.get($_active, 'bg-subtle');
-$bg-muted: map.get($_active, 'bg-muted');
+$bg-base: var(--bg-base);
+$bg-subtle: var(--bg-subtle);
+$bg-muted: var(--bg-muted);
+$nav-bg: var(--nav-bg);
 
 // Borders
-$border: map.get($_active, 'border');
-$border-strong: map.get($_active, 'border-strong');
+$border: var(--border);
+$border-strong: var(--border-strong);
 
 // Accent
-$accent: map.get($_active, 'accent');
-$text-on-accent: map.get($_active, 'text-on-accent');
-$accent-hover: if(
-  $mode == 'dark',
-  color.adjust($accent, $lightness: 8%),
-  color.adjust($accent, $lightness: -10%)
-);
-$accent-subtle: rgba($accent, 0.08);
+$accent: var(--accent);
+$accent-hover: var(--accent-hover);
+$accent-subtle: var(--accent-subtle);
+$text-on-accent: var(--text-on-accent);
 
 // Text
-$text-primary: map.get($_active, 'text-primary');
-$text-muted: map.get($_active, 'text-muted');
-$text-placeholder: map.get($_active, 'text-placeholder');
+$text-primary: var(--text-primary);
+$text-muted: var(--text-muted);
+$text-placeholder: var(--text-placeholder);
 
 // Semantic
-$color-success: map.get($_active, 'success');
-$color-warning: map.get($_active, 'warning');
-$color-error: map.get($_active, 'error');
+$color-success: var(--color-success);
+$color-warning: var(--color-warning);
+$color-error: var(--color-error);
 
 // Interaction
-$focus-ring: rgba($accent, 0.4);
-$shadow-focus: 0 0 0 3px $focus-ring;
-$overlay: rgba(#000, 0.5);
+$focus-ring: var(--focus-ring);
+$shadow-focus: var(--shadow-focus);
+$overlay: var(--overlay);
 
 // ─────────────────────────────────────────────────────────────
 // TYPOGRAPHY
