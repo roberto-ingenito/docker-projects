@@ -39,7 +39,7 @@ export class AuthStore {
   }
 
   logout() {
-    localStorage.removeItem('auth_state');
+    this.deleteSavedState();
     this.state.set(null);
   }
 

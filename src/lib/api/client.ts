@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosError } from 'axios';
 import { ApiError } from '../types/api';
 import { UserLoginResponseDto } from '../types/user';
 import { inject, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthStore } from '../../app/core/services/auth.store';
 import { environment } from '../../environments/environment';
 
@@ -12,6 +13,7 @@ export class ApiClient {
   private failedQueue: any[] = [];
 
   private authStore = inject(AuthStore);
+  private router = inject(Router);
 
   constructor() {
     this.client = axios.create({
@@ -91,8 +93,8 @@ export class ApiClient {
           } catch (refreshError) {
             this.processQueue(refreshError, null);
 
-            // Se il refresh fallisce, pulisci tutto e reindirizza al login (indirettamente tramite stato)
-            this.authStore.deleteSavedState();
+            this.authStore.logout();
+            this.router.navigate(['/login']);
 
             return Promise.reject(refreshError);
           } finally {
