@@ -80,7 +80,7 @@ nav {
   display: flex;
   justify-content: center;
 
-  padding: 0 $space-4;
+  padding: 0 $layout-padding-x;
 
   .nav-inner {
     position: relative;
@@ -195,5 +195,5 @@ main {
   min-height: calc(100% - $nav-height);
   max-width: 82rem;
 
-  padding: calc($nav-height + 1rem) 1rem 1rem 1rem;
+  padding: calc($nav-height + 1rem) $layout-padding-x $layout-padding-x $layout-padding-x;
 }

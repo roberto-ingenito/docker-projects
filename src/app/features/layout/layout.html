@@ -20,7 +20,7 @@
         <p class="cashly-label">Cashly</p>
 
         <button mat-icon-button type="button" class="menu-button" (click)="sidenav.toggle()">
-          <mat-icon>menu</mat-icon>
+          <app-icon>menu</app-icon>
         </button>
 
         <span class="page-title">{{ pageTitle() }}</span>
@@ -40,11 +40,11 @@
             [matTooltip]="isDark() ? 'Tema chiaro' : 'Tema scuro'"
             (click)="toggleTheme()"
           >
-            <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+            <app-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</app-icon>
           </button>
 
           <button mat-icon-button type="button" matTooltip="Logout" (click)="logout()">
-            <mat-icon>logout</mat-icon>
+            <app-icon>move_item</app-icon>
           </button>
         </div>
       </div>

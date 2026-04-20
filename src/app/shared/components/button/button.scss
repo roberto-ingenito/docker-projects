@@ -1,48 +1,62 @@
 @use 'variables' as *;
 
 .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    font-family: $font-display;
-    font-weight: 400;
-    font-size: $font-size-base;
-    letter-spacing: 0.03em;
-    padding: 0.875rem $space-8;
-    border-radius: $radius-sm;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all $transition;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  width: 100%;
+  font-family: $font-display;
+  font-weight: 400;
+  font-size: $font-size-base;
+  letter-spacing: 0.03em;
+  padding: 0.875rem $space-8;
+  border-radius: $radius-sm;
+  border: 1px solid transparent;
+  box-shadow: none;
+  cursor: pointer;
+  transition: all $transition;
 
-    &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &--primary {
+    color: $text-on-accent;
+    background: $accent;
+
+    &:hover:not(:disabled) {
+      background: $accent-hover;
+      scale: 1.03;
     }
 
-    &--primary {
-        color: $text-on-accent;
-        background: $accent;
-        border-color: $accent;
+    &:active:not(:disabled) {
+      scale: 0.97;
+    }
+  }
 
-        &:hover:not(:disabled) {
-            background: $accent-hover;
-            border-color: $accent-hover;
-            scale: 1.02;
-        }
+  &--secondary {
+    color: $text-primary;
+    background: $bg-muted;
 
-        &:active:not(:disabled) {
-            scale: 0.98;
-        }
+    &:hover:not(:disabled) {
+      background: $bg-muted;
+      scale: 1.03;
     }
 
-    &--secondary {
-        color: $text-primary;
-        background: transparent;
-        border-color: $border;
-
-        &:hover:not(:disabled) {
-            border-color: $border-strong;
-        }
+    &:active:not(:disabled) {
+      scale: 0.97;
     }
+  }
+
+  &--outlined {
+    color: $text-primary;
+    background: transparent;
+    border-color: $border;
+
+    &:hover:not(:disabled) {
+      border-color: $border-strong;
+    }
+  }
 }

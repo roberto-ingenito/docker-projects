@@ -4,5 +4,8 @@
   [class]="'btn btn--' + variant()"
   (click)="clicked.emit()"
 >
+  @if (icon(); as iconName) {
+    <app-icon>{{ iconName }}</app-icon>
+  }
   <ng-content />
 </button>

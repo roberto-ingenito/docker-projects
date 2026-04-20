@@ -16,7 +16,6 @@ import {
   RouterOutlet,
 } from '@angular/router';
 import { MatIconButton } from '@angular/material/button';
-import { MatIcon } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -26,6 +25,7 @@ import { ThemeService } from '../../core/services/theme.service';
 import { AuthStore } from '../../core/services/auth.store';
 import { CategoriesStore } from '../../core/services/categories.store';
 import { TransactionsStore } from '../../core/services/transactions.store';
+import { Icon } from '../../shared/components/icon/icon';
 
 @Component({
   selector: 'app-layout',
@@ -36,9 +36,9 @@ import { TransactionsStore } from '../../core/services/transactions.store';
     MatSidenavModule,
     MatListModule,
     MatIconButton,
-    MatIcon,
     MatTooltipModule,
     MatProgressSpinner,
+    Icon,
   ],
   templateUrl: './layout.html',
   styleUrl: './layout.scss',
