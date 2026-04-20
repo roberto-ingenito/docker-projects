@@ -26,16 +26,12 @@ export class AuthStore {
 
   async signup(dto: UserCreateDto) {
     const responseDto = await auth.signup(dto);
-    const newState: AuthState = responseDto;
-    localStorage.setItem('auth_state', JSON.stringify(newState));
-    this.state.set(newState);
+    this.setState(responseDto);
   }
 
   async login(dto: UserLoginDto) {
     const responseDto = await auth.login(dto);
-    const newState: AuthState = responseDto;
-    localStorage.setItem('auth_state', JSON.stringify(newState));
-    this.state.set(newState);
+    this.setState(responseDto);
   }
 
   logout() {
@@ -43,40 +39,25 @@ export class AuthStore {
     this.state.set(null);
   }
 
-  private getSavedState() {
-    const userData = localStorage.getItem('auth_state');
-
-    if (userData) {
-      return JSON.parse(userData) as AuthState;
-    }
-
-    return null;
-  }
-
-  getJwtToken = () => this.getSavedState()?.token;
-  getRefreshToken = () => this.getSavedState()?.refreshToken;
+  getJwtToken = () => this.state()?.token;
+  getRefreshToken = () => this.state()?.refreshToken;
 
   saveJwtToken(newToken: string) {
     const currentState = this.state();
     if (!currentState) return;
 
-    const newState: AuthState = {
-      ...currentState,
-      token: newToken,
-    };
-
-    this.state.set(newState);
+    this.setState({ ...currentState, token: newToken });
   }
 
   saveRefreshToken(newToken: string) {
     const currentState = this.state();
     if (!currentState) return;
 
-    const newState: AuthState = {
-      ...currentState,
-      refreshToken: newToken,
-    };
+    this.setState({ ...currentState, refreshToken: newToken });
+  }
 
+  private setState(newState: AuthState) {
+    localStorage.setItem('auth_state', JSON.stringify(newState));
     this.state.set(newState);
   }
 

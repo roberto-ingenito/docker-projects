@@ -5,6 +5,7 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthStore } from '../../app/core/services/auth.store';
 import { environment } from '../../environments/environment';
+import * as authApi from '../api/auth';
 
 @Injectable({ providedIn: 'root' })
 export class ApiClient {
@@ -71,15 +72,9 @@ export class ApiClient {
               throw new Error('No refresh token available');
             }
 
-            // Chiamata diretta ad axios per evitare l'interceptor infinito
-            const response = await axios.post<UserLoginResponseDto>(
-              `${environment.apiUrl}/Users/refresh`,
-              {
-                refreshToken: refreshToken,
-              },
-            );
-
-            const { token: newToken, refreshToken: newRefreshToken } = response.data;
+            // Chiamata per ottenere il nuovo refresh token
+            const response = await authApi.refreshToken(refreshToken);
+            const { token: newToken, refreshToken: newRefreshToken } = response;
 
             // Salva i nuovi token nei cookie
             this.authStore.saveJwtToken(newToken);
