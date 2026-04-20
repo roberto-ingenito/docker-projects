@@ -190,6 +190,10 @@ nav {
 }
 
 main {
+  margin: 0 auto;
+
   min-height: calc(100% - $nav-height);
-  padding-top: calc($nav-height + 1px); // compensa l'altezza della navbar fixed + il bordo
+  max-width: 82rem;
+
+  padding: calc($nav-height + 1rem) 1rem 1rem 1rem;
 }
