@@ -51,7 +51,11 @@
     </nav>
 
     <main>
-      <router-outlet />
+      @if (isLoading()) {
+        <mat-spinner diameter="50" />
+      } @else {
+        <router-outlet />
+      }
     </main>
   </mat-sidenav-content>
 </mat-sidenav-container>

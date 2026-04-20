@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   ActivatedRoute,
@@ -13,6 +20,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { filter, map } from 'rxjs';
 import { ThemeService } from '../../core/services/theme.service';
 import { AuthStore } from '../../core/services/auth.store';
@@ -28,12 +36,13 @@ import { AuthStore } from '../../core/services/auth.store';
     MatIconButton,
     MatIcon,
     MatTooltipModule,
+    MatProgressSpinner,
   ],
   templateUrl: './layout.html',
   styleUrl: './layout.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Layout {
+export class Layout implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private auth = inject(AuthStore);
@@ -57,6 +66,13 @@ export class Layout {
 
   protected pageTitle = computed(() => this.activeChild()?.data['title'] ?? '');
   private currentSegment = computed(() => this.activeChild()?.url[0]?.path ?? '');
+
+  isLoading = signal(true);
+
+  ngOnInit(): void {
+    // TODO: inserire la chiamata API per il caricamento dei dati iniziale
+    this.isLoading.set(false);
+  }
 
   toggleTheme() {
     this.themeService.toggle();
