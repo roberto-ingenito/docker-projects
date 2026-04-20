@@ -24,6 +24,8 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { filter, map } from 'rxjs';
 import { ThemeService } from '../../core/services/theme.service';
 import { AuthStore } from '../../core/services/auth.store';
+import { CategoriesStore } from '../../core/services/categories.store';
+import { TransactionsStore } from '../../core/services/transactions.store';
 
 @Component({
   selector: 'app-layout',
@@ -46,6 +48,8 @@ export class Layout implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private auth = inject(AuthStore);
+  private categoriesStore = inject(CategoriesStore);
+  private transactionsStore = inject(TransactionsStore);
   protected themeService = inject(ThemeService);
 
   protected readonly navItems = [
@@ -69,8 +73,12 @@ export class Layout implements OnInit {
 
   isLoading = signal(true);
 
-  ngOnInit(): void {
-    // TODO: inserire la chiamata API per il caricamento dei dati iniziale
+  async ngOnInit(): Promise<void> {
+    await Promise.all([
+      this.categoriesStore.init(),
+      this.transactionsStore.init(), //
+    ]);
+
     this.isLoading.set(false);
   }
 
