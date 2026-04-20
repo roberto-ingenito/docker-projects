@@ -30,4 +30,9 @@ html {
 
 .material-symbols-rounded {
   font-family: 'Material Symbols Rounded Variable';
+  visibility: hidden;
+}
+
+.icons-ready .material-symbols-rounded {
+  visibility: visible;
 }

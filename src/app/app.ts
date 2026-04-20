@@ -42,6 +42,18 @@ export class App implements OnInit {
 
   ngOnInit() {
     this.theme.init();
+    this.markIconsReadyWhenFontLoaded();
+  }
+
+  private markIconsReadyWhenFontLoaded(): void {
+    const fonts = (document as Document & { fonts?: FontFaceSet }).fonts;
+    if (!fonts) {
+      document.documentElement.classList.add('icons-ready');
+      return;
+    }
+    fonts.load("24px 'Material Symbols Rounded Variable'").finally(() => {
+      document.documentElement.classList.add('icons-ready');
+    });
   }
 
   private removeNoTransitions(): void {
