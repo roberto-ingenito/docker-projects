@@ -1,9 +1,9 @@
 @use 'variables' as *;
 @use 'breakpoints' as *;
 
-$padding: $space-1;
-$outer-radius: $radius-md;
-$inner-radius: calc($outer-radius - $padding);
+$sidenav-padding: $space-1;
+$sidenav-outer-radius: $radius-md;
+$sidenav-inner-radius: calc($sidenav-outer-radius - $sidenav-padding);
 
 :host {
   display: block;
@@ -18,10 +18,10 @@ mat-sidenav-container {
 mat-sidenav {
   width: 16rem;
   background-color: $bg-subtle;
-  padding: $padding;
+  padding: $sidenav-padding;
 
-  border-top-right-radius: $outer-radius;
-  border-bottom-right-radius: $outer-radius;
+  border-top-right-radius: $sidenav-outer-radius;
+  border-bottom-right-radius: $sidenav-outer-radius;
 
   mat-nav-list {
     display: flex;
@@ -35,7 +35,7 @@ mat-sidenav {
 
       text-decoration: none;
 
-      border-radius: $inner-radius;
+      border-radius: $sidenav-inner-radius;
 
       transition:
         background-color $transition,
