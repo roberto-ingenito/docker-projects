@@ -1,0 +1,51 @@
+@use 'variables' as *;
+@use 'breakpoints' as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+header {
+  display: flex;
+  gap: 1rem;
+
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: start;
+
+  @include breakpoint('md') {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .title {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+  }
+
+  .actions {
+    display: flex;
+    width: 100%;
+    gap: $space-2;
+
+    @include breakpoint('md') {
+      width: auto;
+    }
+
+    & > *:nth-child(1) {
+      flex: 1;
+    }
+
+    & > *:nth-child(2) {
+      flex: 2;
+
+      @include breakpoint('md') {
+        flex: initial;
+      }
+    }
+  }
+}
