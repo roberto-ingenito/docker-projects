@@ -10,8 +10,12 @@ import { Icon } from '../icon/icon';
 })
 export class Button {
   type = input<'button' | 'submit' | 'reset'>('button');
-  variant = input<'primary' | 'secondary' | 'outlined'>('primary');
+  variant = input<'primary' | 'secondary' | 'outlined' | 'danger'>('primary');
   icon = input<string>();
+  iconSize = input<number>(20);
+  iconOnly = input(false);
+  size = input<number>(32);
+  padding = input<string>();
   disabled = input(false);
   clicked = output<void>();
 }

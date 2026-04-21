@@ -16,8 +16,10 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 export class Icon {
   size = input<number>(24);
   filled = input<boolean>(true);
+  weight = input<100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900>(400);
 
   protected variationSettings = computed(
-    () => `'FILL' ${this.filled() ? 1 : 0}, 'wght' 400, 'GRAD' 0, 'opsz' ${this.size()}`,
+    () =>
+      `'FILL' ${this.filled() ? 1 : 0}, 'wght'  ${this.weight()}, 'GRAD' 0, 'opsz' ${this.size()}`,
   );
 }

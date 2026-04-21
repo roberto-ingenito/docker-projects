@@ -1,0 +1,39 @@
+<div class="card">
+  <div>
+    <div [class]="'arrow arrow--' + (isIncome() ? 'income' : 'expense')">
+      <app-icon [weight]="600">{{ isIncome() ? 'north_east' : 'south_east' }}</app-icon>
+    </div>
+    <div style="flex: 1; min-width: 0">
+      <p>
+        {{ transaction().description || (isIncome() ? 'Entrata' : 'Uscita') }}
+      </p>
+      <div>
+        <p>{{ transaction().categoryId }}</p>
+      </div>
+      <div>
+        <p>{{ transaction().transactionDate }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="amount-and-type">
+    <p [class]="'amount amount--' + (isIncome() ? 'income' : 'expense')">
+      {{
+        (isIncome() ? '+' : '-') +
+          transaction().amount.toLocaleString('it-IT', {
+            style: 'currency',
+            currency: 'EUR',
+          })
+      }}
+    </p>
+
+    <div [class]="'type-chip type-chip--' + (isIncome() ? 'income' : 'expense')">
+      {{ isIncome() ? 'Entrata' : 'Uscita' }}
+    </div>
+  </div>
+
+  <div>
+    <app-button variant="primary" icon="edit" [iconOnly]="true" />
+    <app-button variant="secondary" icon="delete" [iconOnly]="true" />
+  </div>
+</div>

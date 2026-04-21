@@ -61,4 +61,22 @@
       scale: 0.97;
     }
   }
+
+  &--danger {
+    background: rgba($color: red, $alpha: 0.25);
+    color: color-mix(in srgb, red 75%, white 15%);
+
+    &:hover:not(:disabled) {
+      scale: 1.03;
+    }
+
+    &:active:not(:disabled) {
+      scale: 0.97;
+    }
+  }
+
+  &--icon {
+    width: auto;
+    flex-shrink: 0;
+  }
 }

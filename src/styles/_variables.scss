@@ -5,7 +5,7 @@
 // Cambia $theme per cambiare la palette dell'app.
 // Il mode (light/dark) viene scelto a runtime via `data-theme`
 // sull'elemento <html>, gestito da ThemeService.
-// $theme: 'warm-cozy' | 'mono-neutro' | 'sage' | 'nordic' | 'lavender' | 'material'
+// $theme: 'warm-cozy' | 'mono-neutro' | 'sage' | 'lavender' | 'material'
 // ─────────────────────────────────────────────────────────────
 
 $theme: 'material' !default;
@@ -37,6 +37,8 @@ $palettes: (
         'on-error': rgb(255 255 255),
         'error-container': rgb(255 218 214),
         'on-error-container': rgb(65 0 2),
+        'success': rgb(80 112 64),
+        'danger': rgb(193 39 45),
         'background': rgb(250 247 242),
         'on-background': rgb(42 37 32),
         'surface': rgb(250 247 242),
@@ -73,6 +75,8 @@ $palettes: (
         'on-error': rgb(65 0 2),
         'error-container': rgb(147 0 10),
         'on-error-container': rgb(255 218 214),
+        'success': rgb(160 196 140),
+        'danger': rgb(227 93 93),
         'background': rgb(14 14 16),
         'on-background': rgb(237 233 226),
         'surface': rgb(14 14 16),
@@ -113,6 +117,8 @@ $palettes: (
         'on-error': rgb(255 255 255),
         'error-container': rgb(254 226 226),
         'on-error-container': rgb(69 10 10),
+        'success': rgb(22 163 74),
+        'danger': rgb(220 38 38),
         'background': rgb(255 255 255),
         'on-background': rgb(24 24 27),
         'surface': rgb(255 255 255),
@@ -149,6 +155,8 @@ $palettes: (
         'on-error': rgb(69 10 10),
         'error-container': rgb(127 29 29),
         'on-error-container': rgb(254 226 226),
+        'success': rgb(74 222 128),
+        'danger': rgb(248 113 113),
         'background': rgb(9 9 11),
         'on-background': rgb(250 250 250),
         'surface': rgb(9 9 11),
@@ -189,6 +197,8 @@ $palettes: (
         'on-error': rgb(255 255 255),
         'error-container': rgb(255 218 214),
         'on-error-container': rgb(65 0 2),
+        'success': rgb(46 120 70),
+        'danger': rgb(193 39 45),
         'background': rgb(247 248 244),
         'on-background': rgb(31 38 32),
         'surface': rgb(247 248 244),
@@ -225,6 +235,8 @@ $palettes: (
         'on-error': rgb(65 0 2),
         'error-container': rgb(147 0 10),
         'on-error-container': rgb(255 218 214),
+        'success': rgb(134 196 158),
+        'danger': rgb(229 115 115),
         'background': rgb(13 15 13),
         'on-background': rgb(232 236 230),
         'surface': rgb(13 15 13),
@@ -243,82 +255,6 @@ $palettes: (
         'surface-container': rgb(31 36 32),
         'surface-container-high': rgb(41 46 42),
         'surface-container-highest': rgb(52 58 52),
-      ),
-    ),
-
-  // 4. Nordic — blu-grigio freddo scandinavo, accent ghiaccio
-  'nordic': (
-      'light': (
-        'primary': rgb(61 90 122),
-        'on-primary': rgb(255 255 255),
-        'primary-container': rgb(210 222 235),
-        'on-primary-container': rgb(26 34 48),
-        'secondary': rgb(90 107 128),
-        'on-secondary': rgb(255 255 255),
-        'secondary-container': rgb(222 230 240),
-        'on-secondary-container': rgb(26 34 48),
-        'tertiary': rgb(77 122 138),
-        'on-tertiary': rgb(255 255 255),
-        'tertiary-container': rgb(210 230 236),
-        'on-tertiary-container': rgb(22 44 52),
-        'error': rgb(193 39 45),
-        'on-error': rgb(255 255 255),
-        'error-container': rgb(255 218 214),
-        'on-error-container': rgb(65 0 2),
-        'background': rgb(251 252 253),
-        'on-background': rgb(26 34 48),
-        'surface': rgb(251 252 253),
-        'on-surface': rgb(26 34 48),
-        'surface-variant': rgb(238 242 247),
-        'on-surface-variant': rgb(94 107 128),
-        'outline': rgb(138 152 173),
-        'outline-variant': rgb(221 227 235),
-        'inverse-surface': rgb(26 34 48),
-        'inverse-on-surface': rgb(251 252 253),
-        'inverse-primary': rgb(136 164 196),
-        'surface-dim': rgb(220 226 232),
-        'surface-bright': rgb(253 254 255),
-        'surface-container-lowest': rgb(255 255 255),
-        'surface-container-low': rgb(244 247 251),
-        'surface-container': rgb(238 242 247),
-        'surface-container-high': rgb(232 237 243),
-        'surface-container-highest': rgb(224 230 238),
-      ),
-      'dark': (
-        'primary': rgb(136 164 196),
-        'on-primary': rgb(10 19 30),
-        'primary-container': rgb(42 62 90),
-        'on-primary-container': rgb(210 222 235),
-        'secondary': rgb(170 184 208),
-        'on-secondary': rgb(26 34 48),
-        'secondary-container': rgb(56 68 88),
-        'on-secondary-container': rgb(222 230 240),
-        'tertiary': rgb(146 180 192),
-        'on-tertiary': rgb(10 30 38),
-        'tertiary-container': rgb(46 86 98),
-        'on-tertiary-container': rgb(210 230 236),
-        'error': rgb(229 115 115),
-        'on-error': rgb(65 0 2),
-        'error-container': rgb(147 0 10),
-        'on-error-container': rgb(255 218 214),
-        'background': rgb(10 13 17),
-        'on-background': rgb(228 233 240),
-        'surface': rgb(10 13 17),
-        'on-surface': rgb(228 233 240),
-        'surface-variant': rgb(28 35 48),
-        'on-surface-variant': rgb(122 134 150),
-        'outline': rgb(61 72 88),
-        'outline-variant': rgb(35 42 54),
-        'inverse-surface': rgb(228 233 240),
-        'inverse-on-surface': rgb(26 34 48),
-        'inverse-primary': rgb(61 90 122),
-        'surface-dim': rgb(10 13 17),
-        'surface-bright': rgb(48 54 64),
-        'surface-container-lowest': rgb(6 8 11),
-        'surface-container-low': rgb(19 24 32),
-        'surface-container': rgb(28 35 48),
-        'surface-container-high': rgb(38 46 62),
-        'surface-container-highest': rgb(48 58 76),
       ),
     ),
 
@@ -341,6 +277,8 @@ $palettes: (
         'on-error': rgb(255 255 255),
         'error-container': rgb(255 218 214),
         'on-error-container': rgb(65 0 2),
+        'success': rgb(70 110 80),
+        'danger': rgb(193 39 45),
         'background': rgb(250 248 252),
         'on-background': rgb(34 28 42),
         'surface': rgb(250 248 252),
@@ -377,6 +315,8 @@ $palettes: (
         'on-error': rgb(65 0 2),
         'error-container': rgb(147 0 10),
         'on-error-container': rgb(255 218 214),
+        'success': rgb(150 196 160),
+        'danger': rgb(229 115 115),
         'background': rgb(14 13 17),
         'on-background': rgb(235 232 240),
         'surface': rgb(14 13 17),
@@ -416,8 +356,10 @@ $palettes: (
         'on-tertiary-container': rgb(87 62 92),
         'error': rgb(186 26 26),
         'on-error': rgb(255 255 255),
-        'error-container': rgb(255 218 214),
+        'error-container': rgb(255, 185, 178),
         'on-error-container': rgb(147 0 10),
+        'success': rgb(52 168 83),
+        'danger': rgb(186 26 26),
         'background': rgb(249 249 255),
         'on-background': rgb(25 28 32),
         'surface': rgb(249 249 255),
@@ -467,6 +409,8 @@ $palettes: (
         'on-error': rgb(105 0 5),
         'error-container': rgb(147 0 10),
         'on-error-container': rgb(255 218 214),
+        'success': rgb(129 201 149),
+        'danger': rgb(255 180 171),
         'background': rgb(17 19 24),
         'on-background': rgb(226 226 233),
         'surface': rgb(17 19 24),
@@ -553,6 +497,8 @@ $palettes: (
   $surface-container: map.get($p, 'surface-container');
   $surface-container-high: map.get($p, 'surface-container-high');
   $surface-container-highest: map.get($p, 'surface-container-highest');
+  $success: map.get($p, 'success');
+  $danger: map.get($p, 'danger');
 
   $surface-tint: _get($p, 'surface-tint', $primary);
   $primary-fixed: _get($p, 'primary-fixed', $primary-container);
@@ -586,6 +532,8 @@ $palettes: (
   --md-sys-color-on-error: #{$on-error};
   --md-sys-color-error-container: #{$error-container};
   --md-sys-color-on-error-container: #{$on-error-container};
+  --md-sys-color-success: #{$success};
+  --md-sys-color-danger: #{$danger};
   --md-sys-color-background: #{$background};
   --md-sys-color-on-background: #{$on-background};
   --md-sys-color-surface: #{$surface};
@@ -624,14 +572,17 @@ $palettes: (
 
 :root {
   @include _emit-palette($default-mode);
+  --mix-color: black;
 }
 
 [data-theme='light'] {
   @include _emit-palette('light');
+  --mix-color: black;
 }
 
 [data-theme='dark'] {
   @include _emit-palette('dark');
+  --mix-color: white;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -675,6 +626,10 @@ $error: var(--md-sys-color-error);
 $on-error: var(--md-sys-color-on-error);
 $error-container: var(--md-sys-color-error-container);
 $on-error-container: var(--md-sys-color-on-error-container);
+
+// Semantic status
+$success: var(--md-sys-color-success);
+$danger: var(--md-sys-color-danger);
 
 // Background & Surface
 $background: var(--md-sys-color-background);

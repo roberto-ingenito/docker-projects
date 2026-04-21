@@ -1,11 +1,15 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Button } from '../../shared/components/button/button';
+import { TransactionsStore } from '../../core/services/transactions.store';
+import { TransactionCard } from './components/transaction-card/transaction-card';
 
 @Component({
   selector: 'app-transactions',
-  imports: [Button],
+  imports: [Button, TransactionCard],
   templateUrl: './transactions.html',
   styleUrl: './transactions.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Transactions {}
+export class Transactions {
+  transactionsStore = inject(TransactionsStore);
+}

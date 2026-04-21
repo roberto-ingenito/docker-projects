@@ -10,4 +10,10 @@
   </div>
 </header>
 
-<main>TODO</main>
+<main>
+  <div class="transaction-list">
+    @for (item of transactionsStore.state(); track $index) {
+      <app-transaction-card [transaction]="item" />
+    }
+  </div>
+</main>

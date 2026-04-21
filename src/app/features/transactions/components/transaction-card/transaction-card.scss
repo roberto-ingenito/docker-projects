@@ -1,0 +1,94 @@
+@use 'variables' as *;
+
+.card {
+  background-color: $secondary-container;
+  width: auto;
+  // border: 1px solid $outline;
+  border-radius: $radius-md;
+
+  display: flex;
+  flex-direction: row;
+  gap: $space-3;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 1rem;
+
+  & > *:nth-child(1) {
+    display: flex;
+    flex-direction: row;
+    gap: $space-3;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+  }
+
+  & > *:nth-child(3) {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+  }
+}
+
+.amount-and-type {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: end;
+  gap: $space-2;
+
+  .amount {
+    font-weight: bold !important;
+    font-size: $font-size-xl;
+
+    &--expense {
+      color: $error;
+    }
+
+    &--income {
+      color: $success;
+    }
+  }
+
+  .type-chip {
+    padding: $space-1 $space-2;
+
+    font-weight: bold;
+    letter-spacing: 0.7px;
+    white-space: nowrap;
+
+    font-size: $font-size-xs;
+
+    border-radius: $radius-lg;
+
+    &--expense {
+      background-color: color-mix(in srgb, #{$error}, transparent 75%);
+      color: color-mix(in srgb, #{$error}, var(--mix-color) 25%);
+    }
+
+    &--income {
+      background-color: color-mix(in srgb, #{$success}, transparent 75%);
+      color: color-mix(in srgb, #{$success}, var(--mix-color) 25%);
+    }
+  }
+}
+
+.arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 3rem;
+  height: 3rem;
+  border-radius: 3rem;
+
+  &--expense {
+    background-color: color-mix(in srgb, red, transparent 65%);
+    color: color-mix(in srgb, red, var(--mix-color) 40%);
+  }
+
+  &--income {
+    background-color: color-mix(in srgb, #{$success}, transparent 75%);
+    color: color-mix(in srgb, #{$success}, var(--mix-color) 40%);
+  }
+}
