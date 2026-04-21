@@ -1,49 +1,48 @@
 @use 'variables' as *;
 
 @mixin input-base {
-    width: 100%;
-    background: transparent;
-    border: 1px solid $border;
-    border-radius: $radius-sm;
-    padding: $space-3;
-    font-family: $font-display;
-    font-weight: 300;
-    color: $text-primary;
-    outline: none;
-    transition: all $transition;
+  width: 100%;
+  background: transparent;
+  border: 1px solid $outline;
+  border-radius: $radius-sm;
+  padding: $space-3;
+  font-family: $font-display;
+  font-weight: 300;
+  color: $on-surface;
+  outline: none;
+  transition: all $transition;
 
-    &::placeholder {
-        color: $text-placeholder;
-        font-style: italic;
-    }
+  &::placeholder {
+    color: color-mix(in srgb, #{$on-surface} 50%, transparent);
+    font-style: italic;
+  }
 
-    &:hover {
-        border-color: $border-strong;
-    }
+  &:hover {
+    border-color: $primary;
+  }
 
-    &:focus {
-        border-color: $accent;
-        box-shadow: inset 0 0 0 1px $accent;
-    }
+  &:focus {
+    border-color: $primary;
+    box-shadow: inset 0 0 0 1px $primary;
+  }
 
-    &[aria-invalid='true'] {
-        border-color: $color-error;
-        box-shadow: inset 0 0 0 1px $color-error;
-    }
+  &[aria-invalid='true'] {
+    border-color: $error;
+    box-shadow: inset 0 0 0 1px $error;
+  }
 }
 
 @mixin input-group-base {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 
-    label {
-        font-weight: 300;
-        color: $text-muted;
-        margin-bottom: $space-2;
-        transition: color $transition;
-    }
+  label {
+    font-weight: 300;
+    margin-bottom: $space-2;
+    transition: color $transition;
+  }
 
-    &:focus-within label {
-        color: $accent;
-    }
+  &:focus-within label {
+    color: $primary;
+  }
 }

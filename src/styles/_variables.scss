@@ -1,243 +1,629 @@
 @use 'sass:map';
-@use 'sass:color';
 
 // ─────────────────────────────────────────────────────────────
 // THEME SWITCH
 // Cambia $theme per cambiare la palette dell'app.
-// Il mode (light/dark) viene invece scelto a runtime via `data-theme`
+// Il mode (light/dark) viene scelto a runtime via `data-theme`
 // sull'elemento <html>, gestito da ThemeService.
-// $theme: 'warm-cozy' | 'mono-neutro' | 'sage' | 'nordic' | 'lavender'
+// $theme: 'warm-cozy' | 'mono-neutro' | 'sage' | 'nordic' | 'lavender' | 'material'
 // ─────────────────────────────────────────────────────────────
 
-$theme: 'lavender' !default;
+$theme: 'material' !default;
 $default-mode: 'light' !default;
 
 // ─────────────────────────────────────────────────────────────
-// PALETTES
+// PALETTES (Material Design 3 style)
 // Ogni palette definisce light + dark con contrasto bilanciato (WCAG AA).
+// Le variabili seguono la naming convention di Material (--md-sys-color-*).
 // ─────────────────────────────────────────────────────────────
 
 $palettes: (
   // 1. Warm & Cozy — toni caldi beige/sabbia, accent dorato muted
   'warm-cozy': (
-      'dark': (
-        'bg-base': #0e0e10,
-        'bg-subtle': #1a1816,
-        'bg-muted': #25221e,
-        'border': #2a2724,
-        'border-strong': #4a443d,
-        'accent': #daae7a,
-        'text-on-accent': #1a1306,
-        'text-primary': #ede9e2,
-        'text-muted': #948a7d,
-        'text-placeholder': #4a443d,
-        'success': #6ec48b,
-        'warning': #e5b656,
-        'error': #e35d5d,
-      ),
       'light': (
-        'bg-base': #faf7f2,
-        'bg-subtle': #ffffff,
-        'bg-muted': #f0ebe1,
-        'border': #e8e2d8,
-        'border-strong': #b8a98f,
-        'accent': #a87a3e,
-        'text-on-accent': #ffffff,
-        'text-primary': #2a2520,
-        'text-muted': #7a7268,
-        'text-placeholder': #c9bfae,
-        'success': #2f7a4f,
-        'warning': #b07b1e,
-        'error': #c1272d,
+        'primary': rgb(120 88 40),
+        'on-primary': rgb(255 255 255),
+        'primary-container': rgb(243 220 190),
+        'on-primary-container': rgb(74 55 18),
+        'secondary': rgb(122 96 64),
+        'on-secondary': rgb(255 255 255),
+        'secondary-container': rgb(232 212 184),
+        'on-secondary-container': rgb(62 44 20),
+        'tertiary': rgb(156 93 62),
+        'on-tertiary': rgb(255 255 255),
+        'tertiary-container': rgb(241 212 185),
+        'on-tertiary-container': rgb(80 48 29),
+        'error': rgb(193 39 45),
+        'on-error': rgb(255 255 255),
+        'error-container': rgb(255 218 214),
+        'on-error-container': rgb(65 0 2),
+        'background': rgb(250 247 242),
+        'on-background': rgb(42 37 32),
+        'surface': rgb(250 247 242),
+        'on-surface': rgb(42 37 32),
+        'surface-variant': rgb(240 235 225),
+        'on-surface-variant': rgb(122 114 104),
+        'outline': rgb(184 169 143),
+        'outline-variant': rgb(232 226 216),
+        'inverse-surface': rgb(42 37 32),
+        'inverse-on-surface': rgb(250 247 242),
+        'inverse-primary': rgb(218 174 122),
+        'surface-dim': rgb(235 229 219),
+        'surface-bright': rgb(255 253 248),
+        'surface-container-lowest': rgb(255 255 255),
+        'surface-container-low': rgb(245 240 230),
+        'surface-container': rgb(240 235 225),
+        'surface-container-high': rgb(234 228 216),
+        'surface-container-highest': rgb(228 222 206),
+      ),
+      'dark': (
+        'primary': rgb(218 174 122),
+        'on-primary': rgb(26 19 6),
+        'primary-container': rgb(92 65 26),
+        'on-primary-container': rgb(243 220 190),
+        'secondary': rgb(203 184 150),
+        'on-secondary': rgb(42 32 18),
+        'secondary-container': rgb(94 69 40),
+        'on-secondary-container': rgb(232 212 184),
+        'tertiary': rgb(214 176 150),
+        'on-tertiary': rgb(46 26 14),
+        'tertiary-container': rgb(122 79 52),
+        'on-tertiary-container': rgb(241 212 185),
+        'error': rgb(227 93 93),
+        'on-error': rgb(65 0 2),
+        'error-container': rgb(147 0 10),
+        'on-error-container': rgb(255 218 214),
+        'background': rgb(14 14 16),
+        'on-background': rgb(237 233 226),
+        'surface': rgb(14 14 16),
+        'on-surface': rgb(237 233 226),
+        'surface-variant': rgb(37 34 30),
+        'on-surface-variant': rgb(148 138 125),
+        'outline': rgb(74 68 61),
+        'outline-variant': rgb(42 39 36),
+        'inverse-surface': rgb(237 233 226),
+        'inverse-on-surface': rgb(42 37 32),
+        'inverse-primary': rgb(120 88 40),
+        'surface-dim': rgb(14 14 16),
+        'surface-bright': rgb(54 51 46),
+        'surface-container-lowest': rgb(9 9 10),
+        'surface-container-low': rgb(26 24 22),
+        'surface-container': rgb(37 34 30),
+        'surface-container-high': rgb(48 44 39),
+        'surface-container-highest': rgb(60 55 48),
       ),
     ),
 
-  // 3. Mono Neutro — scala zinc pura, look editoriale
+  // 2. Mono Neutro — scala zinc pura, look editoriale
   'mono-neutro': (
-      'dark': (
-        'bg-base': #09090b,
-        'bg-subtle': #18181b,
-        'bg-muted': #27272a,
-        'border': #27272a,
-        'border-strong': #52525b,
-        'accent': #d4d4d8,
-        'text-on-accent': #18181b,
-        'text-primary': #fafafa,
-        'text-muted': #71717a,
-        'text-placeholder': #3f3f46,
-        'success': #4ade80,
-        'warning': #facc15,
-        'error': #f87171,
-      ),
       'light': (
-        'bg-base': #ffffff,
-        'bg-subtle': #fafafa,
-        'bg-muted': #f4f4f5,
-        'border': #e4e4e7,
-        'border-strong': #a1a1aa,
-        'accent': #27272a,
-        'text-on-accent': #fafafa,
-        'text-primary': #18181b,
-        'text-muted': #71717a,
-        'text-placeholder': #d4d4d8,
-        'success': #16a34a,
-        'warning': #ca8a04,
-        'error': #dc2626,
+        'primary': rgb(39 39 42),
+        'on-primary': rgb(250 250 250),
+        'primary-container': rgb(212 212 216),
+        'on-primary-container': rgb(24 24 27),
+        'secondary': rgb(82 82 91),
+        'on-secondary': rgb(255 255 255),
+        'secondary-container': rgb(228 228 231),
+        'on-secondary-container': rgb(24 24 27),
+        'tertiary': rgb(113 113 122),
+        'on-tertiary': rgb(255 255 255),
+        'tertiary-container': rgb(228 228 231),
+        'on-tertiary-container': rgb(24 24 27),
+        'error': rgb(220 38 38),
+        'on-error': rgb(255 255 255),
+        'error-container': rgb(254 226 226),
+        'on-error-container': rgb(69 10 10),
+        'background': rgb(255 255 255),
+        'on-background': rgb(24 24 27),
+        'surface': rgb(255 255 255),
+        'on-surface': rgb(24 24 27),
+        'surface-variant': rgb(244 244 245),
+        'on-surface-variant': rgb(113 113 122),
+        'outline': rgb(161 161 170),
+        'outline-variant': rgb(228 228 231),
+        'inverse-surface': rgb(24 24 27),
+        'inverse-on-surface': rgb(250 250 250),
+        'inverse-primary': rgb(212 212 216),
+        'surface-dim': rgb(228 228 231),
+        'surface-bright': rgb(255 255 255),
+        'surface-container-lowest': rgb(255 255 255),
+        'surface-container-low': rgb(250 250 250),
+        'surface-container': rgb(244 244 245),
+        'surface-container-high': rgb(237 237 239),
+        'surface-container-highest': rgb(228 228 231),
+      ),
+      'dark': (
+        'primary': rgb(212 212 216),
+        'on-primary': rgb(24 24 27),
+        'primary-container': rgb(63 63 70),
+        'on-primary-container': rgb(250 250 250),
+        'secondary': rgb(161 161 170),
+        'on-secondary': rgb(24 24 27),
+        'secondary-container': rgb(63 63 70),
+        'on-secondary-container': rgb(244 244 245),
+        'tertiary': rgb(113 113 122),
+        'on-tertiary': rgb(24 24 27),
+        'tertiary-container': rgb(63 63 70),
+        'on-tertiary-container': rgb(244 244 245),
+        'error': rgb(248 113 113),
+        'on-error': rgb(69 10 10),
+        'error-container': rgb(127 29 29),
+        'on-error-container': rgb(254 226 226),
+        'background': rgb(9 9 11),
+        'on-background': rgb(250 250 250),
+        'surface': rgb(9 9 11),
+        'on-surface': rgb(250 250 250),
+        'surface-variant': rgb(39 39 42),
+        'on-surface-variant': rgb(113 113 122),
+        'outline': rgb(82 82 91),
+        'outline-variant': rgb(39 39 42),
+        'inverse-surface': rgb(250 250 250),
+        'inverse-on-surface': rgb(24 24 27),
+        'inverse-primary': rgb(39 39 42),
+        'surface-dim': rgb(9 9 11),
+        'surface-bright': rgb(52 52 56),
+        'surface-container-lowest': rgb(4 4 5),
+        'surface-container-low': rgb(24 24 27),
+        'surface-container': rgb(39 39 42),
+        'surface-container-high': rgb(49 49 53),
+        'surface-container-highest': rgb(63 63 70),
       ),
     ),
 
-  // 5. Sage — verde salvia botanico, accent organico muted
+  // 3. Sage — verde salvia botanico, accent organico muted
   'sage': (
-      'dark': (
-        'bg-base': #0d0f0d,
-        'bg-subtle': #161916,
-        'bg-muted': #1f2420,
-        'border': #232826,
-        'border-strong': #404843,
-        'accent': #a3b5a0,
-        'text-on-accent': #0d1410,
-        'text-primary': #e8ece6,
-        'text-muted': #8a948a,
-        'text-placeholder': #404843,
-        'success': #6ec48b,
-        'warning': #e5b656,
-        'error': #e57373,
-      ),
       'light': (
-        'bg-base': #f7f8f4,
-        'bg-subtle': #ffffff,
-        'bg-muted': #ecefe6,
-        'border': #e0e3da,
-        'border-strong': #9ba996,
-        'accent': #5a7058,
-        'text-on-accent': #ffffff,
-        'text-primary': #1f2620,
-        'text-muted': #6b766a,
-        'text-placeholder': #c5ccba,
-        'success': #2f7a4f,
-        'warning': #b07b1e,
-        'error': #c1272d,
+        'primary': rgb(90 112 88),
+        'on-primary': rgb(255 255 255),
+        'primary-container': rgb(212 225 208),
+        'on-primary-container': rgb(31 38 32),
+        'secondary': rgb(107 122 74),
+        'on-secondary': rgb(255 255 255),
+        'secondary-container': rgb(220 230 190),
+        'on-secondary-container': rgb(36 44 18),
+        'tertiary': rgb(138 122 90),
+        'on-tertiary': rgb(255 255 255),
+        'tertiary-container': rgb(232 222 196),
+        'on-tertiary-container': rgb(50 40 14),
+        'error': rgb(193 39 45),
+        'on-error': rgb(255 255 255),
+        'error-container': rgb(255 218 214),
+        'on-error-container': rgb(65 0 2),
+        'background': rgb(247 248 244),
+        'on-background': rgb(31 38 32),
+        'surface': rgb(247 248 244),
+        'on-surface': rgb(31 38 32),
+        'surface-variant': rgb(236 239 230),
+        'on-surface-variant': rgb(107 118 106),
+        'outline': rgb(155 169 150),
+        'outline-variant': rgb(224 227 218),
+        'inverse-surface': rgb(31 38 32),
+        'inverse-on-surface': rgb(247 248 244),
+        'inverse-primary': rgb(163 181 160),
+        'surface-dim': rgb(223 226 217),
+        'surface-bright': rgb(250 252 247),
+        'surface-container-lowest': rgb(255 255 255),
+        'surface-container-low': rgb(241 244 237),
+        'surface-container': rgb(236 239 230),
+        'surface-container-high': rgb(230 234 222),
+        'surface-container-highest': rgb(222 226 213),
+      ),
+      'dark': (
+        'primary': rgb(163 181 160),
+        'on-primary': rgb(13 20 16),
+        'primary-container': rgb(50 62 48),
+        'on-primary-container': rgb(212 225 208),
+        'secondary': rgb(190 202 157),
+        'on-secondary': rgb(36 44 18),
+        'secondary-container': rgb(80 92 52),
+        'on-secondary-container': rgb(220 230 190),
+        'tertiary': rgb(202 190 160),
+        'on-tertiary': rgb(50 40 14),
+        'tertiary-container': rgb(100 88 58),
+        'on-tertiary-container': rgb(232 222 196),
+        'error': rgb(229 115 115),
+        'on-error': rgb(65 0 2),
+        'error-container': rgb(147 0 10),
+        'on-error-container': rgb(255 218 214),
+        'background': rgb(13 15 13),
+        'on-background': rgb(232 236 230),
+        'surface': rgb(13 15 13),
+        'on-surface': rgb(232 236 230),
+        'surface-variant': rgb(31 36 32),
+        'on-surface-variant': rgb(138 148 138),
+        'outline': rgb(64 72 67),
+        'outline-variant': rgb(35 40 38),
+        'inverse-surface': rgb(232 236 230),
+        'inverse-on-surface': rgb(31 38 32),
+        'inverse-primary': rgb(90 112 88),
+        'surface-dim': rgb(13 15 13),
+        'surface-bright': rgb(50 54 48),
+        'surface-container-lowest': rgb(8 10 8),
+        'surface-container-low': rgb(22 25 22),
+        'surface-container': rgb(31 36 32),
+        'surface-container-high': rgb(41 46 42),
+        'surface-container-highest': rgb(52 58 52),
       ),
     ),
 
-  // 6. Nordic — blu-grigio freddo scandinavo, accent ghiaccio
+  // 4. Nordic — blu-grigio freddo scandinavo, accent ghiaccio
   'nordic': (
-      'dark': (
-        'bg-base': #0a0d11,
-        'bg-subtle': #131820,
-        'bg-muted': #1c2330,
-        'border': #232a36,
-        'border-strong': #3d4858,
-        'accent': #88a4c4,
-        'text-on-accent': #0a131e,
-        'text-primary': #e4e9f0,
-        'text-muted': #7a8696,
-        'text-placeholder': #3d4858,
-        'success': #6ec48b,
-        'warning': #e5b656,
-        'error': #e57373,
-      ),
       'light': (
-        'bg-base': #fbfcfd,
-        'bg-subtle': #ffffff,
-        'bg-muted': #eef2f7,
-        'border': #dde3eb,
-        'border-strong': #8a98ad,
-        'accent': #3d5a7a,
-        'text-on-accent': #ffffff,
-        'text-primary': #1a2230,
-        'text-muted': #5e6b80,
-        'text-placeholder': #c0c9d6,
-        'success': #2f7a4f,
-        'warning': #b07b1e,
-        'error': #c1272d,
+        'primary': rgb(61 90 122),
+        'on-primary': rgb(255 255 255),
+        'primary-container': rgb(210 222 235),
+        'on-primary-container': rgb(26 34 48),
+        'secondary': rgb(90 107 128),
+        'on-secondary': rgb(255 255 255),
+        'secondary-container': rgb(222 230 240),
+        'on-secondary-container': rgb(26 34 48),
+        'tertiary': rgb(77 122 138),
+        'on-tertiary': rgb(255 255 255),
+        'tertiary-container': rgb(210 230 236),
+        'on-tertiary-container': rgb(22 44 52),
+        'error': rgb(193 39 45),
+        'on-error': rgb(255 255 255),
+        'error-container': rgb(255 218 214),
+        'on-error-container': rgb(65 0 2),
+        'background': rgb(251 252 253),
+        'on-background': rgb(26 34 48),
+        'surface': rgb(251 252 253),
+        'on-surface': rgb(26 34 48),
+        'surface-variant': rgb(238 242 247),
+        'on-surface-variant': rgb(94 107 128),
+        'outline': rgb(138 152 173),
+        'outline-variant': rgb(221 227 235),
+        'inverse-surface': rgb(26 34 48),
+        'inverse-on-surface': rgb(251 252 253),
+        'inverse-primary': rgb(136 164 196),
+        'surface-dim': rgb(220 226 232),
+        'surface-bright': rgb(253 254 255),
+        'surface-container-lowest': rgb(255 255 255),
+        'surface-container-low': rgb(244 247 251),
+        'surface-container': rgb(238 242 247),
+        'surface-container-high': rgb(232 237 243),
+        'surface-container-highest': rgb(224 230 238),
+      ),
+      'dark': (
+        'primary': rgb(136 164 196),
+        'on-primary': rgb(10 19 30),
+        'primary-container': rgb(42 62 90),
+        'on-primary-container': rgb(210 222 235),
+        'secondary': rgb(170 184 208),
+        'on-secondary': rgb(26 34 48),
+        'secondary-container': rgb(56 68 88),
+        'on-secondary-container': rgb(222 230 240),
+        'tertiary': rgb(146 180 192),
+        'on-tertiary': rgb(10 30 38),
+        'tertiary-container': rgb(46 86 98),
+        'on-tertiary-container': rgb(210 230 236),
+        'error': rgb(229 115 115),
+        'on-error': rgb(65 0 2),
+        'error-container': rgb(147 0 10),
+        'on-error-container': rgb(255 218 214),
+        'background': rgb(10 13 17),
+        'on-background': rgb(228 233 240),
+        'surface': rgb(10 13 17),
+        'on-surface': rgb(228 233 240),
+        'surface-variant': rgb(28 35 48),
+        'on-surface-variant': rgb(122 134 150),
+        'outline': rgb(61 72 88),
+        'outline-variant': rgb(35 42 54),
+        'inverse-surface': rgb(228 233 240),
+        'inverse-on-surface': rgb(26 34 48),
+        'inverse-primary': rgb(61 90 122),
+        'surface-dim': rgb(10 13 17),
+        'surface-bright': rgb(48 54 64),
+        'surface-container-lowest': rgb(6 8 11),
+        'surface-container-low': rgb(19 24 32),
+        'surface-container': rgb(28 35 48),
+        'surface-container-high': rgb(38 46 62),
+        'surface-container-highest': rgb(48 58 76),
       ),
     ),
 
-  // 8. Lavender — contemplativo, accent viola muted
+  // 5. Lavender — contemplativo, accent viola muted
   'lavender': (
-      'dark': (
-        'bg-base': #0e0d11,
-        'bg-subtle': #18171c,
-        'bg-muted': #232028,
-        'border': #28252e,
-        'border-strong': #4a4456,
-        'accent': #b0a4cc,
-        'text-on-accent': #15101e,
-        'text-primary': #ebe8f0,
-        'text-muted': #8a8496,
-        'text-placeholder': #4a4456,
-        'success': #6ec48b,
-        'warning': #e5b656,
-        'error': #e57373,
-      ),
       'light': (
-        'bg-base': #faf8fc,
-        'bg-subtle': #ffffff,
-        'bg-muted': #efebf5,
-        'border': #e4dfee,
-        'border-strong': #a298b8,
-        'accent': #6a5d8a,
-        'text-on-accent': #ffffff,
-        'text-primary': #221c2a,
-        'text-muted': #6e6580,
-        'text-placeholder': #c9c1d6,
-        'success': #2f7a4f,
-        'warning': #b07b1e,
-        'error': #c1272d,
+        'primary': rgb(106 93 138),
+        'on-primary': rgb(255 255 255),
+        'primary-container': rgb(228 220 238),
+        'on-primary-container': rgb(34 28 42),
+        'secondary': rgb(122 90 128),
+        'on-secondary': rgb(255 255 255),
+        'secondary-container': rgb(235 220 240),
+        'on-secondary-container': rgb(42 28 46),
+        'tertiary': rgb(138 90 110),
+        'on-tertiary': rgb(255 255 255),
+        'tertiary-container': rgb(240 220 228),
+        'on-tertiary-container': rgb(46 28 38),
+        'error': rgb(193 39 45),
+        'on-error': rgb(255 255 255),
+        'error-container': rgb(255 218 214),
+        'on-error-container': rgb(65 0 2),
+        'background': rgb(250 248 252),
+        'on-background': rgb(34 28 42),
+        'surface': rgb(250 248 252),
+        'on-surface': rgb(34 28 42),
+        'surface-variant': rgb(239 235 245),
+        'on-surface-variant': rgb(110 101 128),
+        'outline': rgb(162 152 184),
+        'outline-variant': rgb(228 223 238),
+        'inverse-surface': rgb(34 28 42),
+        'inverse-on-surface': rgb(250 248 252),
+        'inverse-primary': rgb(176 164 204),
+        'surface-dim': rgb(223 218 230),
+        'surface-bright': rgb(253 251 255),
+        'surface-container-lowest': rgb(255 255 255),
+        'surface-container-low': rgb(245 240 250),
+        'surface-container': rgb(239 235 245),
+        'surface-container-high': rgb(232 226 240),
+        'surface-container-highest': rgb(222 216 233),
+      ),
+      'dark': (
+        'primary': rgb(176 164 204),
+        'on-primary': rgb(21 16 30),
+        'primary-container': rgb(60 50 82),
+        'on-primary-container': rgb(228 220 238),
+        'secondary': rgb(196 170 204),
+        'on-secondary': rgb(42 28 46),
+        'secondary-container': rgb(74 54 80),
+        'on-secondary-container': rgb(235 220 240),
+        'tertiary': rgb(204 170 184),
+        'on-tertiary': rgb(46 28 38),
+        'tertiary-container': rgb(82 54 68),
+        'on-tertiary-container': rgb(240 220 228),
+        'error': rgb(229 115 115),
+        'on-error': rgb(65 0 2),
+        'error-container': rgb(147 0 10),
+        'on-error-container': rgb(255 218 214),
+        'background': rgb(14 13 17),
+        'on-background': rgb(235 232 240),
+        'surface': rgb(14 13 17),
+        'on-surface': rgb(235 232 240),
+        'surface-variant': rgb(35 32 40),
+        'on-surface-variant': rgb(138 132 150),
+        'outline': rgb(74 68 86),
+        'outline-variant': rgb(40 37 46),
+        'inverse-surface': rgb(235 232 240),
+        'inverse-on-surface': rgb(34 28 42),
+        'inverse-primary': rgb(106 93 138),
+        'surface-dim': rgb(14 13 17),
+        'surface-bright': rgb(54 50 60),
+        'surface-container-lowest': rgb(10 9 13),
+        'surface-container-low': rgb(24 23 28),
+        'surface-container': rgb(35 32 40),
+        'surface-container-high': rgb(46 42 52),
+        'surface-container-highest': rgb(58 54 66),
+      ),
+    ),
+
+  // 6. Material — palette Material Design 3 medium-contrast (blu)
+  'material': (
+      'light': (
+        'primary': rgb(65 95 145),
+        'surface-tint': rgb(65 95 145),
+        'on-primary': rgb(255 255 255),
+        'primary-container': rgb(214 227 255),
+        'on-primary-container': rgb(40 71 119),
+        'secondary': rgb(86 95 113),
+        'on-secondary': rgb(255 255 255),
+        'secondary-container': rgb(218 226 249),
+        'on-secondary-container': rgb(62 71 89),
+        'tertiary': rgb(112 85 117),
+        'on-tertiary': rgb(255 255 255),
+        'tertiary-container': rgb(250 216 253),
+        'on-tertiary-container': rgb(87 62 92),
+        'error': rgb(186 26 26),
+        'on-error': rgb(255 255 255),
+        'error-container': rgb(255 218 214),
+        'on-error-container': rgb(147 0 10),
+        'background': rgb(249 249 255),
+        'on-background': rgb(25 28 32),
+        'surface': rgb(249 249 255),
+        'on-surface': rgb(25 28 32),
+        'surface-variant': rgb(224 226 236),
+        'on-surface-variant': rgb(68 71 78),
+        'outline': rgb(116 119 127),
+        'outline-variant': rgb(196 198 208),
+        'inverse-surface': rgb(46 48 54),
+        'inverse-on-surface': rgb(240 240 247),
+        'inverse-primary': rgb(170 199 255),
+        'primary-fixed': rgb(214 227 255),
+        'on-primary-fixed': rgb(0 27 62),
+        'primary-fixed-dim': rgb(170 199 255),
+        'on-primary-fixed-variant': rgb(40 71 119),
+        'secondary-fixed': rgb(218 226 249),
+        'on-secondary-fixed': rgb(19 28 43),
+        'secondary-fixed-dim': rgb(190 198 220),
+        'on-secondary-fixed-variant': rgb(62 71 89),
+        'tertiary-fixed': rgb(250 216 253),
+        'on-tertiary-fixed': rgb(40 19 46),
+        'tertiary-fixed-dim': rgb(221 188 224),
+        'on-tertiary-fixed-variant': rgb(87 62 92),
+        'surface-dim': rgb(217 217 224),
+        'surface-bright': rgb(249 249 255),
+        'surface-container-lowest': rgb(255 255 255),
+        'surface-container-low': rgb(243 243 250),
+        'surface-container': rgb(237 237 244),
+        'surface-container-high': rgb(231 232 238),
+        'surface-container-highest': rgb(226 226 233),
+      ),
+      'dark': (
+        'primary': rgb(170 199 255),
+        'surface-tint': rgb(170 199 255),
+        'on-primary': rgb(10 48 95),
+        'primary-container': rgb(40 71 119),
+        'on-primary-container': rgb(214 227 255),
+        'secondary': rgb(190 198 220),
+        'on-secondary': rgb(40 49 65),
+        'secondary-container': rgb(62 71 89),
+        'on-secondary-container': rgb(218 226 249),
+        'tertiary': rgb(221 188 224),
+        'on-tertiary': rgb(63 40 68),
+        'tertiary-container': rgb(87 62 92),
+        'on-tertiary-container': rgb(250 216 253),
+        'error': rgb(255 180 171),
+        'on-error': rgb(105 0 5),
+        'error-container': rgb(147 0 10),
+        'on-error-container': rgb(255 218 214),
+        'background': rgb(17 19 24),
+        'on-background': rgb(226 226 233),
+        'surface': rgb(17 19 24),
+        'on-surface': rgb(226 226 233),
+        'surface-variant': rgb(68 71 78),
+        'on-surface-variant': rgb(196 198 208),
+        'outline': rgb(142 144 153),
+        'outline-variant': rgb(68 71 78),
+        'inverse-surface': rgb(226 226 233),
+        'inverse-on-surface': rgb(46 48 54),
+        'inverse-primary': rgb(65 95 145),
+        'primary-fixed': rgb(214 227 255),
+        'on-primary-fixed': rgb(0 27 62),
+        'primary-fixed-dim': rgb(170 199 255),
+        'on-primary-fixed-variant': rgb(40 71 119),
+        'secondary-fixed': rgb(218 226 249),
+        'on-secondary-fixed': rgb(19 28 43),
+        'secondary-fixed-dim': rgb(190 198 220),
+        'on-secondary-fixed-variant': rgb(62 71 89),
+        'tertiary-fixed': rgb(250 216 253),
+        'on-tertiary-fixed': rgb(40 19 46),
+        'tertiary-fixed-dim': rgb(221 188 224),
+        'on-tertiary-fixed-variant': rgb(87 62 92),
+        'surface-dim': rgb(17 19 24),
+        'surface-bright': rgb(55 57 62),
+        'surface-container-lowest': rgb(12 14 19),
+        'surface-container-low': rgb(25 28 32),
+        'surface-container': rgb(29 32 36),
+        'surface-container-high': rgb(40 42 47),
+        'surface-container-highest': rgb(51 53 58),
       ),
     )
 );
 
 // ─────────────────────────────────────────────────────────────
-// RESOLVE ACTIVE PALETTE
-// ─────────────────────────────────────────────────────────────
-
-// ─────────────────────────────────────────────────────────────
 // EMIT CSS CUSTOM PROPERTIES PER MODE
 // Le $ Sass qui sotto puntano a var(--*): il mode cambia a runtime
 // switchando l'attributo `data-theme` su <html>.
+// Per ogni tema emettiamo sia le variabili Material (--md-sys-color-*)
+// sia alias legacy (--bg-base, --accent, ecc) per retro-compatibilità.
 // ─────────────────────────────────────────────────────────────
+
+@function _get($palette, $key, $fallback: null) {
+  @if map.has-key($palette, $key) {
+    @return map.get($palette, $key);
+  }
+  @return $fallback;
+}
 
 @mixin _emit-palette($mode) {
   $p: map.get(map.get($palettes, $theme), $mode);
-  $accent-value: map.get($p, 'accent');
-  $accent-hover-value: if(
-    $mode == 'dark',
-    color.adjust($accent-value, $lightness: 8%),
-    color.adjust($accent-value, $lightness: -10%)
-  );
 
-  --bg-base: #{map.get($p, 'bg-base')};
-  --bg-subtle: #{map.get($p, 'bg-subtle')};
-  --bg-muted: #{map.get($p, 'bg-muted')};
-  --nav-bg: #{rgba(map.get($p, 'bg-subtle'), 0.5)};
+  $primary: map.get($p, 'primary');
+  $on-primary: map.get($p, 'on-primary');
+  $primary-container: map.get($p, 'primary-container');
+  $on-primary-container: map.get($p, 'on-primary-container');
+  $secondary: map.get($p, 'secondary');
+  $on-secondary: map.get($p, 'on-secondary');
+  $secondary-container: map.get($p, 'secondary-container');
+  $on-secondary-container: map.get($p, 'on-secondary-container');
+  $tertiary: map.get($p, 'tertiary');
+  $on-tertiary: map.get($p, 'on-tertiary');
+  $tertiary-container: map.get($p, 'tertiary-container');
+  $on-tertiary-container: map.get($p, 'on-tertiary-container');
+  $error: map.get($p, 'error');
+  $on-error: map.get($p, 'on-error');
+  $error-container: map.get($p, 'error-container');
+  $on-error-container: map.get($p, 'on-error-container');
+  $background: map.get($p, 'background');
+  $on-background: map.get($p, 'on-background');
+  $surface: map.get($p, 'surface');
+  $on-surface: map.get($p, 'on-surface');
+  $surface-variant: map.get($p, 'surface-variant');
+  $on-surface-variant: map.get($p, 'on-surface-variant');
+  $outline: map.get($p, 'outline');
+  $outline-variant: map.get($p, 'outline-variant');
+  $inverse-surface: map.get($p, 'inverse-surface');
+  $inverse-on-surface: map.get($p, 'inverse-on-surface');
+  $inverse-primary: map.get($p, 'inverse-primary');
+  $surface-dim: map.get($p, 'surface-dim');
+  $surface-bright: map.get($p, 'surface-bright');
+  $surface-container-lowest: map.get($p, 'surface-container-lowest');
+  $surface-container-low: map.get($p, 'surface-container-low');
+  $surface-container: map.get($p, 'surface-container');
+  $surface-container-high: map.get($p, 'surface-container-high');
+  $surface-container-highest: map.get($p, 'surface-container-highest');
 
-  --border: #{map.get($p, 'border')};
-  --border-strong: #{map.get($p, 'border-strong')};
+  $surface-tint: _get($p, 'surface-tint', $primary);
+  $primary-fixed: _get($p, 'primary-fixed', $primary-container);
+  $on-primary-fixed: _get($p, 'on-primary-fixed', $on-primary-container);
+  $primary-fixed-dim: _get($p, 'primary-fixed-dim', $primary);
+  $on-primary-fixed-variant: _get($p, 'on-primary-fixed-variant', $on-primary-container);
+  $secondary-fixed: _get($p, 'secondary-fixed', $secondary-container);
+  $on-secondary-fixed: _get($p, 'on-secondary-fixed', $on-secondary-container);
+  $secondary-fixed-dim: _get($p, 'secondary-fixed-dim', $secondary);
+  $on-secondary-fixed-variant: _get($p, 'on-secondary-fixed-variant', $on-secondary-container);
+  $tertiary-fixed: _get($p, 'tertiary-fixed', $tertiary-container);
+  $on-tertiary-fixed: _get($p, 'on-tertiary-fixed', $on-tertiary-container);
+  $tertiary-fixed-dim: _get($p, 'tertiary-fixed-dim', $tertiary);
+  $on-tertiary-fixed-variant: _get($p, 'on-tertiary-fixed-variant', $on-tertiary-container);
 
-  --accent: #{$accent-value};
-  --accent-hover: #{$accent-hover-value};
-  --accent-subtle: #{rgba($accent-value, 0.08)};
-  --text-on-accent: #{map.get($p, 'text-on-accent')};
-
-  --text-primary: #{map.get($p, 'text-primary')};
-  --text-muted: #{map.get($p, 'text-muted')};
-  --text-placeholder: #{map.get($p, 'text-placeholder')};
-
-  --color-success: #{map.get($p, 'success')};
-  --color-warning: #{map.get($p, 'warning')};
-  --color-error: #{map.get($p, 'error')};
-
-  --focus-ring: #{rgba($accent-value, 0.4)};
-  --shadow-focus: 0 0 0 3px #{rgba($accent-value, 0.4)};
+  // ── Material System Color Tokens ─────────────────────────────
+  --md-sys-color-primary: #{$primary};
+  --md-sys-color-surface-tint: #{$surface-tint};
+  --md-sys-color-on-primary: #{$on-primary};
+  --md-sys-color-primary-container: #{$primary-container};
+  --md-sys-color-on-primary-container: #{$on-primary-container};
+  --md-sys-color-secondary: #{$secondary};
+  --md-sys-color-on-secondary: #{$on-secondary};
+  --md-sys-color-secondary-container: #{$secondary-container};
+  --md-sys-color-on-secondary-container: #{$on-secondary-container};
+  --md-sys-color-tertiary: #{$tertiary};
+  --md-sys-color-on-tertiary: #{$on-tertiary};
+  --md-sys-color-tertiary-container: #{$tertiary-container};
+  --md-sys-color-on-tertiary-container: #{$on-tertiary-container};
+  --md-sys-color-error: #{$error};
+  --md-sys-color-on-error: #{$on-error};
+  --md-sys-color-error-container: #{$error-container};
+  --md-sys-color-on-error-container: #{$on-error-container};
+  --md-sys-color-background: #{$background};
+  --md-sys-color-on-background: #{$on-background};
+  --md-sys-color-surface: #{$surface};
+  --md-sys-color-on-surface: #{$on-surface};
+  --md-sys-color-surface-variant: #{$surface-variant};
+  --md-sys-color-on-surface-variant: #{$on-surface-variant};
+  --md-sys-color-outline: #{$outline};
+  --md-sys-color-outline-variant: #{$outline-variant};
+  --md-sys-color-shadow: rgb(0 0 0);
+  --md-sys-color-scrim: rgb(0 0 0);
+  --md-sys-color-inverse-surface: #{$inverse-surface};
+  --md-sys-color-inverse-on-surface: #{$inverse-on-surface};
+  --md-sys-color-inverse-primary: #{$inverse-primary};
+  --md-sys-color-primary-fixed: #{$primary-fixed};
+  --md-sys-color-on-primary-fixed: #{$on-primary-fixed};
+  --md-sys-color-primary-fixed-dim: #{$primary-fixed-dim};
+  --md-sys-color-on-primary-fixed-variant: #{$on-primary-fixed-variant};
+  --md-sys-color-secondary-fixed: #{$secondary-fixed};
+  --md-sys-color-on-secondary-fixed: #{$on-secondary-fixed};
+  --md-sys-color-secondary-fixed-dim: #{$secondary-fixed-dim};
+  --md-sys-color-on-secondary-fixed-variant: #{$on-secondary-fixed-variant};
+  --md-sys-color-tertiary-fixed: #{$tertiary-fixed};
+  --md-sys-color-on-tertiary-fixed: #{$on-tertiary-fixed};
+  --md-sys-color-tertiary-fixed-dim: #{$tertiary-fixed-dim};
+  --md-sys-color-on-tertiary-fixed-variant: #{$on-tertiary-fixed-variant};
+  --md-sys-color-surface-dim: #{$surface-dim};
+  --md-sys-color-surface-bright: #{$surface-bright};
+  --md-sys-color-surface-container-lowest: #{$surface-container-lowest};
+  --md-sys-color-surface-container-low: #{$surface-container-low};
+  --md-sys-color-surface-container: #{$surface-container};
+  --md-sys-color-surface-container-high: #{$surface-container-high};
+  --md-sys-color-surface-container-highest: #{$surface-container-highest};
 
   color-scheme: #{$mode};
 }
 
 :root {
   @include _emit-palette($default-mode);
-  --overlay: rgba(0, 0, 0, 0.5);
 }
 
 [data-theme='light'] {
@@ -248,36 +634,73 @@ $palettes: (
   @include _emit-palette('dark');
 }
 
-// Surfaces
-$bg-base: var(--bg-base);
-$bg-subtle: var(--bg-subtle);
-$bg-muted: var(--bg-muted);
-$nav-bg: var(--nav-bg);
+// ─────────────────────────────────────────────────────────────
+// SASS ALIASES (Material) — puntano alle CSS variables,
+// quindi cambiano con data-theme.
+// ─────────────────────────────────────────────────────────────
 
-// Borders
-$border: var(--border);
-$border-strong: var(--border-strong);
+// Primary
+$primary: var(--md-sys-color-primary);
+$on-primary: var(--md-sys-color-on-primary);
+$primary-container: var(--md-sys-color-primary-container);
+$on-primary-container: var(--md-sys-color-on-primary-container);
+$primary-fixed: var(--md-sys-color-primary-fixed);
+$primary-fixed-dim: var(--md-sys-color-primary-fixed-dim);
+$on-primary-fixed: var(--md-sys-color-on-primary-fixed);
+$on-primary-fixed-variant: var(--md-sys-color-on-primary-fixed-variant);
+$inverse-primary: var(--md-sys-color-inverse-primary);
 
-// Accent
-$accent: var(--accent);
-$accent-hover: var(--accent-hover);
-$accent-subtle: var(--accent-subtle);
-$text-on-accent: var(--text-on-accent);
+// Secondary
+$secondary: var(--md-sys-color-secondary);
+$on-secondary: var(--md-sys-color-on-secondary);
+$secondary-container: var(--md-sys-color-secondary-container);
+$on-secondary-container: var(--md-sys-color-on-secondary-container);
+$secondary-fixed: var(--md-sys-color-secondary-fixed);
+$secondary-fixed-dim: var(--md-sys-color-secondary-fixed-dim);
+$on-secondary-fixed: var(--md-sys-color-on-secondary-fixed);
+$on-secondary-fixed-variant: var(--md-sys-color-on-secondary-fixed-variant);
 
-// Text
-$text-primary: var(--text-primary);
-$text-muted: var(--text-muted);
-$text-placeholder: var(--text-placeholder);
+// Tertiary
+$tertiary: var(--md-sys-color-tertiary);
+$on-tertiary: var(--md-sys-color-on-tertiary);
+$tertiary-container: var(--md-sys-color-tertiary-container);
+$on-tertiary-container: var(--md-sys-color-on-tertiary-container);
+$tertiary-fixed: var(--md-sys-color-tertiary-fixed);
+$tertiary-fixed-dim: var(--md-sys-color-tertiary-fixed-dim);
+$on-tertiary-fixed: var(--md-sys-color-on-tertiary-fixed);
+$on-tertiary-fixed-variant: var(--md-sys-color-on-tertiary-fixed-variant);
 
-// Semantic
-$color-success: var(--color-success);
-$color-warning: var(--color-warning);
-$color-error: var(--color-error);
+// Error
+$error: var(--md-sys-color-error);
+$on-error: var(--md-sys-color-on-error);
+$error-container: var(--md-sys-color-error-container);
+$on-error-container: var(--md-sys-color-on-error-container);
 
-// Interaction
-$focus-ring: var(--focus-ring);
-$shadow-focus: var(--shadow-focus);
-$overlay: var(--overlay);
+// Background & Surface
+$background: var(--md-sys-color-background);
+$on-background: var(--md-sys-color-on-background);
+$surface: var(--md-sys-color-surface);
+$on-surface: var(--md-sys-color-on-surface);
+$surface-tint: var(--md-sys-color-surface-tint);
+$surface-variant: var(--md-sys-color-surface-variant);
+$on-surface-variant: var(--md-sys-color-on-surface-variant);
+$surface-dim: var(--md-sys-color-surface-dim);
+$surface-bright: var(--md-sys-color-surface-bright);
+$surface-container-lowest: var(--md-sys-color-surface-container-lowest);
+$surface-container-low: var(--md-sys-color-surface-container-low);
+$surface-container: var(--md-sys-color-surface-container);
+$surface-container-high: var(--md-sys-color-surface-container-high);
+$surface-container-highest: var(--md-sys-color-surface-container-highest);
+$inverse-surface: var(--md-sys-color-inverse-surface);
+$inverse-on-surface: var(--md-sys-color-inverse-on-surface);
+
+// Outline
+$outline: var(--md-sys-color-outline);
+$outline-variant: var(--md-sys-color-outline-variant);
+
+// Shadow & Scrim
+$shadow: var(--md-sys-color-shadow);
+$scrim: var(--md-sys-color-scrim);
 
 // ─────────────────────────────────────────────────────────────
 // TYPOGRAPHY

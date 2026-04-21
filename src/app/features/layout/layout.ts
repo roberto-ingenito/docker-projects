@@ -68,7 +68,6 @@ export class Layout implements OnInit {
     { initialValue: this.route.firstChild?.snapshot },
   );
 
-  protected pageTitle = computed(() => this.activeChild()?.data['title'] ?? '');
   private currentSegment = computed(() => this.activeChild()?.url[0]?.path ?? '');
 
   isLoading = signal(true);

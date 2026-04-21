@@ -16,7 +16,7 @@ header {
   text-align: center;
 
   h1 {
-    color: $accent;
+    color: $primary;
   }
 }
 
@@ -43,11 +43,11 @@ footer {
   a {
     font-weight: bold;
     text-decoration: none;
-    color: $accent;
-    transition: color $transition;
+    color: $primary;
+    transition: opacity $transition;
 
     &:hover {
-      color: $accent-hover;
+      opacity: 0.7;
     }
   }
 
