@@ -52,6 +52,9 @@ mat-sidenav {
 mat-sidenav-content {
   overflow-y: auto;
 
+  display: flex;
+  justify-content: center;
+
   // Nasconde la scrollbar ma mantiene lo scroll
   scrollbar-width: none;
   &::-webkit-scrollbar {
@@ -80,14 +83,13 @@ nav {
   display: flex;
   justify-content: center;
 
-  padding: 0 $layout-padding-x;
-
   .nav-inner {
     position: relative;
 
     height: 100%;
     width: 100%;
-    max-width: 80rem;
+    max-width: $max-width;
+    margin: 0 $layout-padding-x;
 
     display: flex;
     flex-direction: row;
@@ -190,10 +192,10 @@ nav {
 }
 
 main {
-  margin: 0 auto;
-
   min-height: calc(100% - $nav-height);
-  max-width: 82rem;
+  max-width: $max-width;
+  width: 100%;
+  margin: 0 $layout-padding-x;
 
-  padding: calc($nav-height + 1rem) $layout-padding-x $layout-padding-x $layout-padding-x;
+  padding-top: calc($nav-height + 1rem);
 }
