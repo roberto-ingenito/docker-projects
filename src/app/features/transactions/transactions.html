@@ -10,6 +10,38 @@
   </div>
 </header>
 
+<div class="statistic-cards">
+  <div class="income-card">
+    <div class="card-details">
+      <p>Entrate</p>
+      <p>VALORE</p>
+    </div>
+    <div class="statistic-icon statistic-icon--income">
+      <app-icon [weight]="600">north_east</app-icon>
+    </div>
+  </div>
+
+  <div class="expense-card">
+    <div class="card-details">
+      <p>Uscite</p>
+      <p>VALORE</p>
+    </div>
+    <div class="statistic-icon statistic-icon--expense">
+      <app-icon [weight]="600">south_east</app-icon>
+    </div>
+  </div>
+
+  <div class="balance-card">
+    <div class="card-details">
+      <p>Bilancio</p>
+      <p>VALORE</p>
+    </div>
+    <div class="statistic-icon statistic-icon--balance">
+      <app-icon [weight]="600">leaderboard</app-icon>
+    </div>
+  </div>
+</div>
+
 <main>
   <p>{{ transactionsStore.state()?.length ?? 0 }} transazioni</p>
   <div class="transaction-list">

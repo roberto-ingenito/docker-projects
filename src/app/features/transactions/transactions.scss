@@ -1,6 +1,21 @@
 @use 'variables' as *;
 @use 'breakpoints' as *;
 
+@mixin statistic-card {
+  display: flex;
+  align-items: center;
+
+  gap: $space-2;
+
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+
+  padding: $space-4;
+
+  border-radius: $radius-md;
+}
+
 :host {
   display: flex;
   flex-direction: column;
@@ -50,6 +65,48 @@ header {
   }
 }
 
+.statistic-cards {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-3;
+
+  @include breakpoint('md') {
+    flex-direction: row;
+  }
+
+  .card-details {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  .income-card {
+    @include statistic-card;
+
+    background-color: $success-100;
+    border: 2px solid $success-400;
+    color: $success-600;
+  }
+
+  .expense-card {
+    @include statistic-card;
+
+    background-color: $danger-100;
+    border: 2px solid $danger-400;
+    color: $danger-700;
+  }
+
+  .balance-card {
+    @include statistic-card;
+
+    background-color: $primary-100;
+    border: 2px solid $primary-400;
+    color: $primary-700;
+  }
+}
+
 main {
   display: flex;
   flex-direction: column;
@@ -60,4 +117,33 @@ main {
   display: flex;
   flex-direction: column;
   gap: $space-3;
+}
+
+.statistic-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 3rem;
+  min-width: 3rem;
+
+  height: 3rem;
+  min-height: 3rem;
+
+  border-radius: 3rem;
+
+  &--expense {
+    background-color: color-mix(in srgb, $danger-300, transparent 50%);
+    color: $danger-700;
+  }
+
+  &--income {
+    background-color: color-mix(in srgb, $success-300, transparent 50%);
+    color: $success-600;
+  }
+
+  &--balance {
+    background-color: color-mix(in srgb, $primary-300, transparent 50%);
+    color: $primary-700;
+  }
 }
