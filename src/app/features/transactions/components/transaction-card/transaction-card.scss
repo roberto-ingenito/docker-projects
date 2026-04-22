@@ -1,9 +1,9 @@
 @use 'variables' as *;
 
 .card {
-  background-color: $secondary-container;
+  background-color: $content1;
   width: auto;
-  // border: 1px solid $outline;
+  border: 1px solid $default-200;
   border-radius: $radius-md;
 
   display: flex;
@@ -48,6 +48,8 @@
       align-items: center;
       gap: $space-1;
 
+      color: $default-500;
+
       & > p {
         font-size: $font-size-sm;
       }
@@ -57,6 +59,8 @@
       display: flex;
       align-items: center;
       gap: $space-1;
+
+      color: $default-500;
 
       & > p {
         font-size: $font-size-xs;
@@ -77,11 +81,11 @@
     font-size: $font-size-xl;
 
     &--expense {
-      color: $error;
+      color: $danger-600;
     }
 
     &--income {
-      color: $success;
+      color: $success-600;
     }
   }
 
@@ -97,13 +101,13 @@
     border-radius: $radius-lg;
 
     &--expense {
-      background-color: color-mix(in srgb, #{$error}, transparent 75%);
-      color: color-mix(in srgb, #{$error}, var(--mix-color) 25%);
+      background-color: $danger-100;
+      color: $danger-700;
     }
 
     &--income {
-      background-color: color-mix(in srgb, #{$success}, transparent 75%);
-      color: color-mix(in srgb, #{$success}, var(--mix-color) 25%);
+      background-color: $success-100;
+      color: $success-600;
     }
   }
 }
@@ -122,12 +126,12 @@
   border-radius: 3rem;
 
   &--expense {
-    background-color: color-mix(in srgb, red, transparent 65%);
-    color: color-mix(in srgb, red, var(--mix-color) 40%);
+    background-color: $danger-100;
+    color: $danger-600;
   }
 
   &--income {
-    background-color: color-mix(in srgb, #{$success}, transparent 75%);
-    color: color-mix(in srgb, #{$success}, var(--mix-color) 40%);
+    background-color: $success-100;
+    color: $success-600;
   }
 }

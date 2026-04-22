@@ -23,11 +23,12 @@
   }
 
   &--primary {
-    color: $on-primary;
+    color: $primary-foreground;
     background: $primary;
 
     &:hover:not(:disabled) {
       scale: 1.03;
+      background: $primary-600;
     }
 
     &:active:not(:disabled) {
@@ -36,11 +37,12 @@
   }
 
   &--secondary {
-    color: $on-secondary;
-    background: $secondary;
+    color: $foreground;
+    background: color-mix(in srgb, $primary, transparent 70%);
 
     &:hover:not(:disabled) {
       scale: 1.03;
+      background: $primary-300;
     }
 
     &:active:not(:disabled) {
@@ -49,9 +51,9 @@
   }
 
   &--outlined {
-    color: $on-surface;
+    color: $foreground;
     background: transparent;
-    border-color: $outline;
+    border-color: $default-300;
 
     &:hover:not(:disabled) {
       scale: 1.03;
@@ -63,8 +65,8 @@
   }
 
   &--danger {
-    background: rgba($color: red, $alpha: 0.25);
-    color: color-mix(in srgb, red 75%, white 15%);
+    background: $danger-200;
+    color: $danger-700;
 
     &:hover:not(:disabled) {
       scale: 1.03;

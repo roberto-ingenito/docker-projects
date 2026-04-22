@@ -17,7 +17,7 @@ mat-sidenav-container {
 
 mat-sidenav {
   width: 16rem;
-  background-color: $surface-container-low;
+  background-color: $content1;
   padding: $sidenav-padding;
 
   border-top-right-radius: $sidenav-outer-radius;
@@ -31,7 +31,7 @@ mat-sidenav {
     padding: 0;
 
     a {
-      --mat-list-list-item-label-text-color: #{$on-surface};
+      --mat-list-list-item-label-text-color: #{$foreground};
 
       text-decoration: none;
 
@@ -42,8 +42,8 @@ mat-sidenav {
         color $transition;
 
       &.active {
-        --mat-list-list-item-label-text-color: #{$on-secondary-container};
-        background-color: $secondary-container;
+        --mat-list-list-item-label-text-color: #{$secondary-800};
+        background-color: $secondary-100;
       }
     }
   }
@@ -68,11 +68,11 @@ nav {
   height: $nav-height;
   z-index: $z-sticky;
 
-  background-color: color-mix(in srgb, #{$surface-container-low} 50%, transparent);
+  background-color: color-mix(in srgb, #{$background}, transparent 70%);
   backdrop-filter: blur(1rem);
   -webkit-backdrop-filter: blur(1rem);
 
-  border-bottom: 1px solid $outline-variant;
+  border-bottom: 1px solid $default-200;
 
   display: flex;
   justify-content: center;
@@ -102,7 +102,7 @@ nav {
   }
 
   .menu-button {
-    color: $on-surface;
+    color: $foreground;
 
     @include breakpoint('sm') {
       display: none;
@@ -111,7 +111,6 @@ nav {
 
   .page-title {
     font-size: $font-size-lg;
-    color: $on-surface;
     flex: 1;
 
     @include breakpoint('sm') {
@@ -142,7 +141,7 @@ nav {
     gap: $space-1;
 
     button {
-      color: $on-surface;
+      color: $foreground;
     }
   }
 
@@ -151,7 +150,7 @@ nav {
     transition: all $transition;
     cursor: pointer;
     text-decoration: none;
-    color: $on-surface;
+    color: $foreground;
   }
 
   .links a::after {
