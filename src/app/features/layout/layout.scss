@@ -50,16 +50,10 @@ mat-sidenav {
 }
 
 mat-sidenav-content {
-  overflow-y: auto;
+  overflow-y: hidden;
 
   display: flex;
   justify-content: center;
-
-  // Nasconde la scrollbar ma mantiene lo scroll
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
 }
 
 nav {
@@ -190,11 +184,20 @@ nav {
   }
 }
 
-main {
-  min-height: calc(100% - $nav-height);
-  max-width: $max-width;
+.scroll-container {
   width: 100%;
-  margin: 0 $layout-padding-x;
+  height: 100vh; /* Altezza di tutto lo schermo */
+  overflow-y: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
 
-  padding-top: calc($nav-height + 1rem);
+main {
+  max-width: calc($max-width + ($layout-padding-x * 2));
+  margin: 0 auto;
+
+  padding: $layout-padding-x; // Imposta la base uguale per tutti i lati
+  padding-top: calc($nav-height + $layout-padding-x); // Sovrascrive solo il lato superiore
 }

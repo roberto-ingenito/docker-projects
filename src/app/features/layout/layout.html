@@ -50,12 +50,14 @@
       </div>
     </nav>
 
-    <main>
-      @if (isLoading()) {
-        <mat-spinner diameter="50" />
-      } @else {
-        <router-outlet />
-      }
-    </main>
+    <div class="scroll-container">
+      <main>
+        @if (isLoading()) {
+          <mat-spinner diameter="50" />
+        } @else {
+          <router-outlet />
+        }
+      </main>
+    </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
