@@ -13,7 +13,12 @@ export class CategoriesStore {
 
   async init() {
     const categories = await this.api.getCategories();
-    this._state.set(categories);
+
+    this._state.set(
+      categories.sort((a, b) =>
+        a.categoryName.toLowerCase().localeCompare(b.categoryName.toLocaleLowerCase()),
+      ),
+    );
   }
 
   reset = () => this._state.set(null);

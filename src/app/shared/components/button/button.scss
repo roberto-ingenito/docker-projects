@@ -15,7 +15,10 @@
   border: 1px solid transparent;
   box-shadow: none;
   cursor: pointer;
-  transition: all $transition;
+  transition:
+    background-color $transition,
+    scale $transition,
+    opacity $transition;
 
   &:disabled {
     opacity: 0.5;

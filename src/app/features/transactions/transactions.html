@@ -5,7 +5,9 @@
   </div>
 
   <div class="actions">
-    <app-button variant="secondary" icon="filter_alt">Filtri</app-button>
+    <app-button variant="secondary" icon="filter_alt" (clicked)="openFilters()">
+      Filtri{{ hasActiveFilters() ? ' •' : '' }}
+    </app-button>
     <app-button variant="primary" icon="add_2">Nuova transazione</app-button>
   </div>
 </header>
@@ -64,9 +66,9 @@
 </div>
 
 <main>
-  <p>{{ transactionsStore.state()?.length ?? 0 }} transazioni</p>
+  <p>{{ filteredTransactions()?.length ?? 0 }} transazioni</p>
   <div class="transaction-list">
-    @for (item of transactionsStore.state(); track $index) {
+    @for (item of filteredTransactions(); track item.transactionId) {
       <app-transaction-card [transaction]="item" />
     }
   </div>
