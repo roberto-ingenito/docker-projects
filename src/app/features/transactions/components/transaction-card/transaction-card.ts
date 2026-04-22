@@ -8,6 +8,7 @@ import {
   ConfirmDialog,
   ConfirmDialogData,
 } from '../../../../shared/components/confirm-dialog/confirm-dialog';
+import { TransactionsStore } from '../../../../core/services/transactions.store';
 
 @Component({
   selector: 'app-transaction-card',
@@ -19,6 +20,7 @@ export class TransactionCard {
   private dialog = inject(MatDialog);
 
   categoriesStore = inject(CategoriesStore);
+  transactionsStore = inject(TransactionsStore);
 
   transaction = input.required<Transaction>();
 
@@ -51,7 +53,7 @@ export class TransactionCard {
 
     ref.afterClosed().subscribe((confirmed) => {
       if (confirmed) {
-        alert('CANCELLATA: ' + this.transaction().transactionId);
+        this.transactionsStore.deleteTransaction(this.transaction().transactionId);
       }
     });
   }
