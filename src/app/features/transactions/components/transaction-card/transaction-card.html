@@ -40,6 +40,6 @@
 
   <div>
     <app-button variant="primary" icon="edit" [iconOnly]="true" />
-    <app-button variant="primary" icon="delete" [iconOnly]="true" />
+    <app-button variant="primary" icon="delete" [iconOnly]="true" (clicked)="onDelete()" />
   </div>
 </div>

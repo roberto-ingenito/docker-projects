@@ -55,6 +55,11 @@ body {
   animation: none !important;
 }
 
+// colore dello sfondo dietro ai dialog material
+.cdk-overlay-dark-backdrop {
+  background: rgba(63, 63, 63, 0.4);
+}
+
 .material-symbols-rounded {
   font-family: 'Material Symbols Rounded Variable';
   visibility: hidden;

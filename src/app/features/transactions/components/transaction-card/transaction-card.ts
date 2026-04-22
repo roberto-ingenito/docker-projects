@@ -3,6 +3,11 @@ import { Transaction, TransactionType } from '../../../../../lib/types/transacti
 import { Button } from '../../../../shared/components/button/button';
 import { Icon } from '../../../../shared/components/icon/icon';
 import { CategoriesStore } from '../../../../core/services/categories.store';
+import { MatDialog } from '@angular/material/dialog';
+import {
+  ConfirmDialog,
+  ConfirmDialogData,
+} from '../../../../shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-transaction-card',
@@ -11,6 +16,8 @@ import { CategoriesStore } from '../../../../core/services/categories.store';
   styleUrl: './transaction-card.scss',
 })
 export class TransactionCard {
+  private dialog = inject(MatDialog);
+
   categoriesStore = inject(CategoriesStore);
 
   transaction = input.required<Transaction>();
@@ -29,6 +36,23 @@ export class TransactionCard {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
+    });
+  }
+
+  onDelete() {
+    const ref = this.dialog.open<ConfirmDialog, ConfirmDialogData, boolean>(ConfirmDialog, {
+      data: {
+        title: 'Eliminare transazione?',
+        message: 'Questa azione non può essere annullata.',
+        confirmLabel: 'Elimina',
+        variant: 'danger',
+      },
+    });
+
+    ref.afterClosed().subscribe((confirmed) => {
+      if (confirmed) {
+        alert('CANCELLATA: ' + this.transaction().transactionId);
+      }
     });
   }
 }
