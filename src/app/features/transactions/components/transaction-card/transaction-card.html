@@ -1,17 +1,23 @@
 <div class="card">
-  <div>
+  <div class="icon-and-details">
     <div [class]="'arrow arrow--' + (isIncome() ? 'income' : 'expense')">
       <app-icon [weight]="600">{{ isIncome() ? 'north_east' : 'south_east' }}</app-icon>
     </div>
-    <div style="flex: 1; min-width: 0">
-      <p>
+    <div class="details">
+      <p class="description">
         {{ transaction().description || (isIncome() ? 'Entrata' : 'Uscita') }}
       </p>
-      <div>
-        <p>{{ transaction().categoryId }}</p>
-      </div>
-      <div>
-        <p>{{ transaction().transactionDate }}</p>
+
+      @if (category(); as c) {
+        <div class="category">
+          <app-icon [size]="16">{{ c.iconName ?? 'local_offer' }}</app-icon>
+          <p>{{ c.categoryName }}</p>
+        </div>
+      }
+
+      <div class="date">
+        <app-icon [size]="16">calendar_today</app-icon>
+        <p>{{ formatDate(transaction().transactionDate) }}</p>
       </div>
     </div>
   </div>
