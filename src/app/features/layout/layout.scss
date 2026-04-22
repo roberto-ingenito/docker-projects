@@ -42,8 +42,8 @@ mat-sidenav {
         color $transition;
 
       &.active {
-        --mat-list-list-item-label-text-color: #{$secondary-800};
-        background-color: $secondary-100;
+        --mat-list-list-item-label-text-color: #{$primary-900};
+        background-color: $primary-200;
       }
     }
   }
