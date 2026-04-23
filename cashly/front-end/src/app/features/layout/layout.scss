@@ -1,0 +1,202 @@
+@use 'variables' as *;
+@use 'breakpoints' as *;
+
+$sidenav-padding: $space-1;
+$sidenav-outer-radius: $radius-md;
+$sidenav-inner-radius: calc($sidenav-outer-radius - $sidenav-padding);
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+mat-sidenav-container {
+  height: 100%;
+  background-color: transparent;
+}
+
+mat-sidenav {
+  width: 16rem;
+  background-color: $content1;
+  padding: $sidenav-padding;
+
+  border-top-right-radius: $sidenav-outer-radius;
+  border-bottom-right-radius: $sidenav-outer-radius;
+
+  mat-nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+
+    padding: 0;
+
+    a {
+      --mat-list-list-item-label-text-color: #{$foreground};
+
+      text-decoration: none;
+
+      border-radius: $sidenav-inner-radius;
+
+      transition:
+        background-color $transition,
+        color $transition;
+
+      &.active {
+        --mat-list-list-item-label-text-color: #{$primary-900};
+        background-color: $primary-200;
+      }
+    }
+  }
+}
+
+mat-sidenav-content {
+  overflow-y: hidden;
+
+  display: flex;
+  justify-content: center;
+}
+
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  justify-content: center;
+
+  height: $nav-height;
+  z-index: $z-sticky;
+
+  background-color: color-mix(in srgb, #{$background}, transparent 70%);
+  backdrop-filter: blur(1rem);
+  -webkit-backdrop-filter: blur(1rem);
+
+  border-bottom: 1px solid $default-200;
+
+  display: flex;
+  justify-content: center;
+
+  .nav-inner {
+    position: relative;
+
+    height: 100%;
+    width: 100%;
+    max-width: $max-width;
+    margin: 0 $layout-padding-x;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: $space-4;
+  }
+
+  .cashly-label {
+    display: none;
+    @include breakpoint('sm') {
+      display: block;
+    }
+  }
+
+  .menu-button {
+    color: $foreground;
+
+    @include breakpoint('sm') {
+      display: none;
+    }
+  }
+
+  .page-title {
+    font-size: $font-size-lg;
+    flex: 1;
+
+    @include breakpoint('sm') {
+      display: none;
+    }
+  }
+
+  .links {
+    display: none;
+
+    @include breakpoint('sm') {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      transform: translateX(-50%);
+
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: $space-8;
+    }
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: $space-1;
+
+    button {
+      color: $foreground;
+    }
+  }
+
+  a {
+    position: relative;
+    transition: all $transition;
+    cursor: pointer;
+    text-decoration: none;
+    color: $foreground;
+  }
+
+  .links a::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -0.25rem;
+    width: 100%;
+    height: 2px;
+    background: $primary;
+
+    transform: translateX(-50%) scaleX(0);
+    transform-origin: center;
+    transition:
+      transform $transition,
+      color $transition;
+
+    will-change: transform;
+  }
+
+  .links a:hover,
+  .links a.active {
+    transform: scale(1.1);
+    color: $primary;
+  }
+
+  .links a:hover::after,
+  .links a.active::after {
+    transform: translateX(-50%) scaleX(1);
+  }
+}
+
+.scroll-container {
+  width: 100%;
+  height: 100vh; /* Altezza di tutto lo schermo */
+  overflow-y: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+main {
+  max-width: calc($max-width + ($layout-padding-x * 2));
+  margin: 0 auto;
+
+  padding: $layout-padding-x; // Imposta la base uguale per tutti i lati
+  padding-top: calc($nav-height + $layout-padding-x); // Sovrascrive solo il lato superiore
+}

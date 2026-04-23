@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx ng:*)",
+      "Bash(find /c/Users/ingen/Desktop/cash/src -name styles.scss -o -name *.scss)",
+      "Bash(npm install:*)"
+    ]
+  }
+}
