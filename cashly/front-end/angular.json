@@ -32,7 +32,8 @@
             "styles": ["src/styles.scss"],
             "stylePreprocessorOptions": {
               "includePaths": ["src/styles"]
-            }
+            },
+            "baseHref": "/cashly/"
           },
           "configurations": {
             "production": {
@@ -68,7 +69,8 @@
           "builder": "@angular/build:dev-server",
           "options": {
             "hmr": false,
-            "proxyConfig": "proxy.conf.json"
+            "proxyConfig": "proxy.conf.json",
+            "servePath": "/cashly/"
           },
           "configurations": {
             "production": {

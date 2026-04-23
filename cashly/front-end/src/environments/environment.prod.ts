@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://roberto-ingenito.ddns.net/cashly-api',
+  apiUrl: 'CASHLY_API_URL_PLACEHOLDER',
 };

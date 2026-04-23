@@ -1,6 +1,7 @@
 # Build stage
 FROM node:24-slim AS builder
 
+ARG CASHLY_API_URL
 WORKDIR /app
 
 # Copy package files
@@ -10,8 +11,12 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Inject API URL into environment file
+RUN sed -i "s|CASHLY_API_URL_PLACEHOLDER|${CASHLY_API_URL}|g" src/environments/environment.prod.ts
+
+
 # Build the application
-RUN npm run build -- --configuration=production --base-href=/cashly/
+RUN npm run build --configuration=production
 
 # Production stage
 FROM nginx:alpine AS runner
