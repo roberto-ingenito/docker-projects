@@ -8,7 +8,9 @@
     <app-button variant="secondary" icon="filter_alt" (clicked)="openFilters()">
       Filtri{{ hasActiveFilters() ? ' •' : '' }}
     </app-button>
-    <app-button variant="primary" icon="add_2">Nuova transazione</app-button>
+    <app-button variant="primary" icon="add_2" (clicked)="openTransactionDialog()">
+      Nuova transazione
+    </app-button>
   </div>
 </header>
 

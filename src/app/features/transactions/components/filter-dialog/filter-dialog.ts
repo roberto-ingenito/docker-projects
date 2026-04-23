@@ -10,6 +10,7 @@ import {
 import { TransactionType } from '../../../../../lib/types/transaction';
 import { CategoriesStore } from '../../../../core/services/categories.store';
 import { Button } from '../../../../shared/components/button/button';
+import { Input } from '../../../../shared/components/input/input';
 
 export interface TransactionFilters {
   type: TransactionType | null;
@@ -20,7 +21,14 @@ export interface TransactionFilters {
 
 @Component({
   selector: 'app-filter-dialog',
-  imports: [ReactiveFormsModule, MatDialogTitle, MatDialogContent, MatDialogActions, Button],
+  imports: [
+    ReactiveFormsModule,
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+    Button,
+    Input,
+  ],
   templateUrl: './filter-dialog.html',
   styleUrl: './filter-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

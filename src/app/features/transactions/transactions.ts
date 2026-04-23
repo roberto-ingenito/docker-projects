@@ -7,6 +7,10 @@ import { Icon } from '../../shared/components/icon/icon';
 import { TransactionType } from '../../../lib/types/transaction';
 import { AuthStore } from '../../core/services/auth.store';
 import { FilterDialog, TransactionFilters } from './components/filter-dialog/filter-dialog';
+import {
+  TransactionDialog,
+  TransactionDialogData,
+} from './components/transaction-dialog/transaction-dialog';
 
 @Component({
   selector: 'app-transactions',
@@ -79,6 +83,14 @@ export class Transactions {
 
     ref.afterClosed().subscribe((result) => {
       if (result) this.filters.set(result);
+    });
+  }
+
+  openTransactionDialog() {
+    this.dialog.open<TransactionDialog, TransactionDialogData, boolean>(TransactionDialog, {
+      data: {},
+      width: '480px',
+      maxWidth: '95vw',
     });
   }
 }

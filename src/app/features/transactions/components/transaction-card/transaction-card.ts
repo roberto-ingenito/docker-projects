@@ -9,6 +9,10 @@ import {
   ConfirmDialogData,
 } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 import { TransactionsStore } from '../../../../core/services/transactions.store';
+import {
+  TransactionDialog,
+  TransactionDialogData,
+} from '../transaction-dialog/transaction-dialog';
 
 @Component({
   selector: 'app-transaction-card',
@@ -38,6 +42,14 @@ export class TransactionCard {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
+    });
+  }
+
+  onEdit() {
+    this.dialog.open<TransactionDialog, TransactionDialogData, boolean>(TransactionDialog, {
+      data: { transaction: this.transaction() },
+      width: '480px',
+      maxWidth: '95vw',
     });
   }
 
