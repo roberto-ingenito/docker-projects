@@ -125,19 +125,15 @@ services:
       retries: 5
       start_period: 30s
 
-  # Frontend Next.js
+  # Frontend Angular (nginx)
   cashly-front-end:
     build:
       context: ./cashly/front-end
       dockerfile: Dockerfile
-      args:
-        - NEXT_PUBLIC_API_URL=${CASHLY_API_URL}
     image: cashly-front-end
     container_name: cashly-front-end
     expose:
-      - "3000"
-    environment:
-      - NODE_ENV=${NODE_ENV}
+      - "80"
     networks:
       - common-network
     restart: always
@@ -160,7 +156,7 @@ services:
       - "traefik.http.routers.cashly.middlewares=security-headers@file"
       - "traefik.http.routers.cashly.service=cashly-front-end"
       # Service definition (condivisa dai due router sopra)
-      - "traefik.http.services.cashly-front-end.loadbalancer.server.port=3000"
+      - "traefik.http.services.cashly-front-end.loadbalancer.server.port=80"
 
   # --- ADDITIONAL APPS ---
   # Servizio Timesheet

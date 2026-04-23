@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "cash": {
+    "cashly": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -50,8 +50,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "16kB",
+                  "maximumError": "32kB"
                 }
               ],
               "outputHashing": "all"
@@ -72,10 +72,10 @@
           },
           "configurations": {
             "production": {
-              "buildTarget": "cash:build:production"
+              "buildTarget": "cashly:build:production"
             },
             "development": {
-              "buildTarget": "cash:build:development"
+              "buildTarget": "cashly:build:development"
             }
           },
           "defaultConfiguration": "development"
