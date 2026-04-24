@@ -1,8 +1,41 @@
-node_modules
-.next
-.git
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.angular/
+
+# Git
+.git/
 .gitignore
-*.md
-.env*
+
+# Docker
+Dockerfile
+.dockerignore
+
+# IDE / Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test & coverage
+coverage/
+.nyc_output/
+
+# Env files
+.env
+.env.*
+
+# README
+README.md

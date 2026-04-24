@@ -1,0 +1,63 @@
+<mat-sidenav-container>
+  <mat-sidenav #sidenav mode="over" autoFocus="dialog">
+    <mat-nav-list>
+      @for (item of navItems; track item.route) {
+        <a
+          mat-list-item
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          (click)="sidenav.close()"
+        >
+          {{ item.label }}
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <nav>
+      <div class="nav-inner">
+        <p class="cashly-label">Cashly</p>
+
+        <button mat-icon-button type="button" class="menu-button" (click)="sidenav.toggle()">
+          <app-icon>menu</app-icon>
+        </button>
+
+        <span class="page-title">Cashly</span>
+
+        <div class="links">
+          @for (item of navItems; track item.route) {
+            <a [routerLink]="item.route" routerLinkActive="active">
+              {{ item.label }}
+            </a>
+          }
+        </div>
+
+        <div class="actions">
+          <button
+            mat-icon-button
+            type="button"
+            [matTooltip]="isDark() ? 'Tema chiaro' : 'Tema scuro'"
+            (click)="toggleTheme()"
+          >
+            <app-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</app-icon>
+          </button>
+
+          <button mat-icon-button type="button" matTooltip="Logout" (click)="logout()">
+            <app-icon>move_item</app-icon>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="scroll-container">
+      <main>
+        @if (isLoading()) {
+          <mat-spinner diameter="50" />
+        } @else {
+          <router-outlet />
+        }
+      </main>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

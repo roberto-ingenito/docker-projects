@@ -1,9 +1,7 @@
 # Build stage
 FROM node:24-slim AS builder
 
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-
+ARG CASHLY_API_URL
 WORKDIR /app
 
 # Copy package files
@@ -13,30 +11,22 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Inject API URL into environment file
+RUN sed -i "s|CASHLY_API_URL_PLACEHOLDER|${CASHLY_API_URL}|g" src/environments/environment.prod.ts
+
+
 # Build the application
-ENV NEXT_TELEMETRY_DISABLED 1
 RUN npm run build
 
 # Production stage
-FROM node:24-slim AS runner
-
-WORKDIR /app
-
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+FROM nginx:alpine AS runner
 
 # Copy built application
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/dist/cashly/browser /usr/share/nginx/html/cashly
 
-USER nextjs
+# Custom nginx config for Angular routing
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 3000
+EXPOSE 80
 
-ENV PORT 3000
-
-CMD ["node", "server.js"]
+CMD ["nginx", "-g", "daemon off;"]

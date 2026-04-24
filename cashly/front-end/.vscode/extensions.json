@@ -1,8 +1,11 @@
 {
-    "recommendations": [
-        "dbaeumer.vscode-eslint",
-        "bradlc.vscode-tailwindcss",
-        "yoavbls.pretty-ts-errors",
-        "esbenp.prettier-vscode"
-    ]
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=827846
+  "recommendations": [
+    "angular.ng-template",
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "usernamehw.errorlens",
+    "yoavbls.pretty-ts-errors",
+    "mrmlnc.vscode-scss"
+  ]
 }
