@@ -20,7 +20,9 @@
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
     "@fontsource-variable/material-symbols-rounded": "^5.2.42",
+    "apexcharts": "^5.10.6",
     "axios": "^1.14.0",
+    "ng-apexcharts": "^2.4.0",
     "ngx-sonner": "^3.1.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"

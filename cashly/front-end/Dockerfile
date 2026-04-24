@@ -16,7 +16,7 @@ RUN sed -i "s|CASHLY_API_URL_PLACEHOLDER|${CASHLY_API_URL}|g" src/environments/e
 
 
 # Build the application
-RUN npm run build --configuration=production
+RUN npm run build
 
 # Production stage
 FROM nginx:alpine AS runner

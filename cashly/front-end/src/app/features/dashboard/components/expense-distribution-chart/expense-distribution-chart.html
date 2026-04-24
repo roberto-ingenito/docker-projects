@@ -1,0 +1,30 @@
+@if (hasData()) {
+  <div class="donut-and-legend">
+    <div class="donut">
+      <apx-chart
+        [chart]="chart()"
+        [series]="series()"
+        [labels]="labels()"
+        [colors]="chartColors()"
+        [plotOptions]="plotOptions()"
+        [stroke]="stroke"
+        [dataLabels]="dataLabels"
+        [legend]="legend"
+        [tooltip]="tooltip()"
+      />
+    </div>
+
+    <ul class="legend">
+      @for (slice of slices(); track slice.key) {
+        <li>
+          <span class="dot" [style.background-color]="slice.color"></span>
+          <span class="label">{{ slice.label }}</span>
+          <span class="pct">{{ (slice.percent * 100).toFixed(1) }}%</span>
+          <span class="amt">{{ formatAmount(slice.amount) }}</span>
+        </li>
+      }
+    </ul>
+  </div>
+} @else {
+  <div class="empty">Nessuna uscita in questo mese</div>
+}

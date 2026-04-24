@@ -60,6 +60,21 @@ body {
   background: rgba(63, 63, 63, 0.4);
 }
 
+// Tooltip dei grafici ApexCharts: usa i colori del tema corrente
+// dell'app (CSS custom properties) invece della palette di default.
+.apexcharts-tooltip {
+  background: var(--color-content1) !important;
+  border-color: var(--color-default-200) !important;
+  color: var(--color-foreground) !important;
+  box-shadow: 0px 0px 12px 0px color-mix(in srgb, var(--mat-sys-on-surface), transparent 60%) !important;
+}
+
+.apexcharts-tooltip-title {
+  background: var(--color-content2) !important;
+  border-bottom-color: var(--color-default-200) !important;
+  color: var(--color-foreground) !important;
+}
+
 .material-symbols-rounded {
   font-family: 'Material Symbols Rounded Variable';
   visibility: hidden;
