@@ -1,10 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import {
   ApexChart,
   ApexDataLabels,
   ApexLegend,
   ApexNonAxisChartSeries,
   ApexPlotOptions,
+  ApexStates,
   ApexStroke,
   ApexTooltip,
   ChartComponent,
@@ -33,21 +42,29 @@ const FALLBACK_COLORS = [
 
 const OTHER_COLOR = { bg: '#a8a29e', fg: '#000000' };
 
+const FADED_ALPHA = '33';
+
 @Component({
   selector: 'app-expense-distribution-chart',
   imports: [ChartComponent],
   templateUrl: './expense-distribution-chart.html',
   styleUrl: './expense-distribution-chart.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(document:click)': 'handleDocumentClick($event)',
+  },
 })
 export class ExpenseDistributionChart {
   private categoriesStore = inject(CategoriesStore);
+  private hostRef: ElementRef<HTMLElement> = inject(ElementRef);
   private colors = useChartColors();
 
   transactions = input.required<Transaction[]>();
   year = input.required<number>();
   month = input.required<number>();
   currency = input.required<string>();
+
+  selectedKey = signal<string | null>(null);
 
   private monthlyExpenses = computed(() => {
     const y = this.year();
@@ -130,9 +147,22 @@ export class ExpenseDistributionChart {
 
   hasData = computed(() => this.slices().length > 0);
 
+  selectedSlice = computed<Slice | null>(() => {
+    const key = this.selectedKey();
+    if (!key) return null;
+    return this.slices().find((s) => s.key === key) ?? null;
+  });
+
   series = computed<ApexNonAxisChartSeries>(() => this.slices().map((s) => s.amount));
   labels = computed<string[]>(() => this.slices().map((s) => s.label));
-  chartColors = computed<string[]>(() => this.slices().map((s) => s.color));
+
+  chartColors = computed<string[]>(() => {
+    const selected = this.selectedKey();
+    return this.slices().map((s) => {
+      if (!selected || s.key === selected) return s.color;
+      return s.color + FADED_ALPHA;
+    });
+  });
 
   chart = computed<ApexChart>(() => ({
     type: 'donut',
@@ -141,10 +171,24 @@ export class ExpenseDistributionChart {
     background: 'transparent',
     animations: { enabled: true, speed: 400 },
     toolbar: { show: false },
+    events: {
+      dataPointSelection: (_event, _ctx, config?: { dataPointIndex?: number }) => {
+        const idx = config?.dataPointIndex;
+        if (idx == null) return;
+        const slice = this.slices()[idx];
+        if (slice) this.toggleSelection(slice.key);
+      },
+    },
   }));
+
+  states: ApexStates = {
+    hover: { filter: { type: 'none' } },
+    active: { filter: { type: 'none' } },
+  };
 
   plotOptions = computed<ApexPlotOptions>(() => {
     const c = this.colors();
+    const selected = this.selectedSlice();
     const formatAmount = (value: number) => this.formatAmount(value);
     return {
       pie: {
@@ -170,11 +214,11 @@ export class ExpenseDistributionChart {
             total: {
               show: true,
               showAlways: true,
-              label: 'Totale',
+              label: selected?.label ?? 'Totale',
               fontSize: '12px',
               fontWeight: 500,
               color: c.default500,
-              formatter: () => formatAmount(this.total()),
+              formatter: () => formatAmount(selected ? selected.amount : this.total()),
             },
           },
         },
@@ -185,15 +229,19 @@ export class ExpenseDistributionChart {
   stroke: ApexStroke = { width: 0 };
   dataLabels: ApexDataLabels = { enabled: false };
   legend: ApexLegend = { show: false };
+  tooltip: ApexTooltip = { enabled: false };
 
-  tooltip = computed<ApexTooltip>(() => ({
-    custom: ({ seriesIndex }: { seriesIndex: number }) => {
-      const slice = this.slices()[seriesIndex];
-      return `<div style="background:${slice.color};color:${slice.onColor};padding:6px 12px;border-radius:4px;font-size:13px;line-height:1.5;">
-        <strong>${slice.label}</strong><br/>${this.formatAmount(slice.amount)}
-      </div>`;
-    },
-  }));
+  toggleSelection(key: string) {
+    this.selectedKey.update((current) => (current === key ? null : key));
+  }
+
+  handleDocumentClick(event: MouseEvent) {
+    if (this.selectedKey() === null) return;
+    const path = event.composedPath();
+    if (!path.includes(this.hostRef.nativeElement)) {
+      this.selectedKey.set(null);
+    }
+  }
 
   formatAmount(value: number) {
     return value.toLocaleString('it-IT', {

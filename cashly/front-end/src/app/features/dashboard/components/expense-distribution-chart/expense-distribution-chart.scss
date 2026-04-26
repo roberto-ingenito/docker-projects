@@ -12,7 +12,7 @@
   gap: $space-6;
   align-items: center;
 
-  @include breakpoint('md') {
+  @include breakpoint('sm') {
     flex-direction: row;
     align-items: center;
   }
@@ -33,16 +33,42 @@
   flex-direction: column;
   gap: $space-2;
 
-  li {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  .legend-item {
     display: grid;
-    grid-template-columns: auto 1fr auto auto;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: $space-2;
 
+    width: 100%;
     padding: $space-2 $space-3;
 
+    border: 0;
     border-radius: $radius-sm;
     background: color-mix(in srgb, $content2, transparent 40%);
+    color: inherit;
+
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+
+    transition: background-color 150ms ease;
+
+    &:hover {
+      background: color-mix(in srgb, $content2, transparent 20%);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $focus;
+      outline-offset: 2px;
+    }
+
+    &.is-selected {
+      background: $content2;
+    }
 
     .dot {
       width: 10px;
@@ -54,22 +80,12 @@
     .label {
       font-size: $font-size-sm;
       font-weight: 500;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
     .pct {
       font-size: $font-size-xs;
       color: $default-500;
       min-width: 3rem;
-      text-align: right;
-    }
-
-    .amt {
-      font-size: $font-size-sm;
-      font-weight: 600;
-      min-width: 5rem;
       text-align: right;
     }
   }
