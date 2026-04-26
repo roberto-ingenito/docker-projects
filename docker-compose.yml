@@ -130,8 +130,6 @@ services:
     build:
       context: ./cashly/front-end
       dockerfile: Dockerfile
-      args:
-        - CASHLY_API_URL=${CASHLY_API_URL}
     image: cashly-front-end
     container_name: cashly-front-end
     expose:
