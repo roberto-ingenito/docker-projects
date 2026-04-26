@@ -6,13 +6,22 @@
         [series]="series()"
         [labels]="labels()"
         [colors]="chartColors()"
-        [plotOptions]="plotOptions()"
+        [plotOptions]="plotOptions"
         [stroke]="stroke"
         [dataLabels]="dataLabels"
         [legend]="legend"
         [tooltip]="tooltip"
         [states]="states"
       />
+      <div class="donut-center">
+        @if (selectedSlice(); as s) {
+          <span class="donut-label">{{ s.label }}</span>
+          <span class="donut-value">{{ formatAmount(s.amount) }}</span>
+        } @else {
+          <span class="donut-label">Totale</span>
+          <span class="donut-value">{{ formatAmount(total()) }}</span>
+        }
+      </div>
     </div>
 
     <ul class="legend">

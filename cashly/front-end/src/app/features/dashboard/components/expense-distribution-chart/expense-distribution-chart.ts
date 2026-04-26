@@ -20,7 +20,6 @@ import {
 } from 'ng-apexcharts';
 import { Transaction, TransactionType } from '../../../../../lib/types/transaction';
 import { CategoriesStore } from '../../../../core/services/categories.store';
-import { useChartColors } from '../chart-theme';
 
 interface Slice {
   key: string;
@@ -42,8 +41,6 @@ const FALLBACK_COLORS = [
 
 const OTHER_COLOR = { bg: '#a8a29e', fg: '#000000' };
 
-const FADED_ALPHA = '33';
-
 @Component({
   selector: 'app-expense-distribution-chart',
   imports: [ChartComponent],
@@ -51,13 +48,13 @@ const FADED_ALPHA = '33';
   styleUrl: './expense-distribution-chart.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
+    '[attr.data-selected-rel]': 'selectedRel()',
     '(document:click)': 'handleDocumentClick($event)',
   },
 })
 export class ExpenseDistributionChart {
   private categoriesStore = inject(CategoriesStore);
   private hostRef: ElementRef<HTMLElement> = inject(ElementRef);
-  private colors = useChartColors();
 
   transactions = input.required<Transaction[]>();
   year = input.required<number>();
@@ -153,16 +150,16 @@ export class ExpenseDistributionChart {
     return this.slices().find((s) => s.key === key) ?? null;
   });
 
+  selectedRel = computed<string | null>(() => {
+    const slice = this.selectedSlice();
+    if (!slice) return null;
+    const idx = this.slices().findIndex((s) => s.key === slice.key);
+    return idx >= 0 ? String(idx + 1) : null;
+  });
+
   series = computed<ApexNonAxisChartSeries>(() => this.slices().map((s) => s.amount));
   labels = computed<string[]>(() => this.slices().map((s) => s.label));
-
-  chartColors = computed<string[]>(() => {
-    const selected = this.selectedKey();
-    return this.slices().map((s) => {
-      if (!selected || s.key === selected) return s.color;
-      return s.color + FADED_ALPHA;
-    });
-  });
+  chartColors = computed<string[]>(() => this.slices().map((s) => s.color));
 
   chart = computed<ApexChart>(() => ({
     type: 'donut',
@@ -186,45 +183,14 @@ export class ExpenseDistributionChart {
     active: { filter: { type: 'none' } },
   };
 
-  plotOptions = computed<ApexPlotOptions>(() => {
-    const c = this.colors();
-    const selected = this.selectedSlice();
-    const formatAmount = (value: number) => this.formatAmount(value);
-    return {
-      pie: {
-        donut: {
-          size: '70%',
-          labels: {
-            show: true,
-            name: {
-              show: true,
-              fontSize: '12px',
-              fontWeight: 500,
-              color: c.default500,
-              offsetY: -10,
-            },
-            value: {
-              show: true,
-              fontSize: '18px',
-              fontWeight: 700,
-              color: c.foreground,
-              offsetY: 0,
-              formatter: formatAmount,
-            },
-            total: {
-              show: true,
-              showAlways: true,
-              label: selected?.label ?? 'Totale',
-              fontSize: '12px',
-              fontWeight: 500,
-              color: c.default500,
-              formatter: () => formatAmount(selected ? selected.amount : this.total()),
-            },
-          },
-        },
+  plotOptions: ApexPlotOptions = {
+    pie: {
+      donut: {
+        size: '70%',
+        labels: { show: false },
       },
-    };
-  });
+    },
+  };
 
   stroke: ApexStroke = { width: 0 };
   dataLabels: ApexDataLabels = { enabled: false };
