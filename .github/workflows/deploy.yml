@@ -84,6 +84,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Load Environment
+        run: |
+          cat /mnt/storage/projects/docker-projects/.env >> $GITHUB_ENV
+
       - name: Deploy cashly-frontend
         run: |
           docker compose build --no-cache cashly-front-end
