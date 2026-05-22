@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using WarehouseApi.Hubs;
 using WarehouseApi.Services;
 
@@ -59,11 +60,11 @@ app.UsePathBase("/lafa-magazzino-api");
 // ── FORWARDED HEADERS ────────────────────────────────────────────────────
 // Necessario per gestire correttamente HTTPS dietro Traefik
 app.UseForwardedHeaders(
-    new Microsoft.AspNetCore.HttpOverrides.ForwardedHeadersOptions
+    new ForwardedHeadersOptions
     {
-        ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor
-            | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
-            | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedHost,
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor
+            | ForwardedHeaders.XForwardedProto
+            | ForwardedHeaders.XForwardedHost,
     }
 );
 
