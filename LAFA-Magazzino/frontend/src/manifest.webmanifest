@@ -5,8 +5,8 @@
   "theme_color": "#1e3a8a",
   "background_color": "#f8fafc",
   "display": "standalone",
-  "scope": "/",
-  "start_url": "/",
+  "scope": "/lafa-magazzino/",
+  "start_url": "/lafa-magazzino/",
   "orientation": "portrait-primary",
   "icons": [
     {

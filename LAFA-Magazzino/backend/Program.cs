@@ -50,7 +50,23 @@ DotNetEnv.Env.Load(); // carica il .env dalla root del progetto
 
 var app = builder.Build();
 
-// ── Middleware pipeline ───────────────────────────────────────────────────────
+// ── Middleware pipeline ───────────────────────────────────────────────────
+
+// ── PATH BASE: /lafa-magazzino-api ───────────────────────────────────────
+// Tutte le route vengono prefissate con /lafa-magazzino-api
+app.UsePathBase("/lafa-magazzino-api");
+
+// ── FORWARDED HEADERS ────────────────────────────────────────────────────
+// Necessario per gestire correttamente HTTPS dietro Traefik
+app.UseForwardedHeaders(
+    new Microsoft.AspNetCore.HttpOverrides.ForwardedHeadersOptions
+    {
+        ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor
+            | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
+            | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedHost,
+    }
+);
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

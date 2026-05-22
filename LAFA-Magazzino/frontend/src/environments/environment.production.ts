@@ -2,6 +2,6 @@
 // See frontend/Dockerfile and docker-compose.yml
 export const environment = {
   production: true,
-  apiUrl: '/api',
-  signalrUrl: '/hubs/warehouse',
+  apiUrl: '/lafa-magazzino-api/api',
+  signalrUrl: '/lafa-magazzino-api/hubs/warehouse',
 };
