@@ -1,0 +1,73 @@
+<div class="page-content">
+  <div class="page-header">
+    <h1>Articoli</h1>
+    <button mat-fab extended color="primary" (click)="openAddDialog()">
+      <mat-icon>add</mat-icon>
+      Nuovo
+    </button>
+  </div>
+
+  <div class="search-bar">
+    <mat-form-field class="full-width">
+      <mat-label>Cerca articolo...</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput [ngModel]="searchQuery()" (ngModelChange)="onSearch($event)" placeholder="Cerca per nome..." />
+      @if (searchQuery()) {
+        <button mat-icon-button matSuffix (click)="clearSearch()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+  </div>
+
+  <div class="compact-list">
+    @for (article of displayArticles(); track article) {
+      <div class="compact-row">
+        <a [routerLink]="['/articles', article.id]" class="compact-row__body">
+          <div class="compact-photo">
+            @if (article.photoUrl) {
+              <img [src]="article.photoUrl" [alt]="article.name" />
+            }
+            @if (!article.photoUrl) {
+              <mat-icon>inventory_2</mat-icon>
+            }
+          </div>
+          <div class="compact-info">
+            <div class="compact-name">{{ article.name }}</div>
+            <div class="compact-meta">
+              <span class="meta-item">
+                <mat-icon>inventory_2</mat-icon>
+                {{ article.stock.length }} {{ article.stock.length === 1 ? 'pos.' : 'pos.' }}
+              </span>
+              <span class="meta-item">
+                <mat-icon>dns</mat-icon>
+                {{ article.stock[0]?.shelfLabel || 'N/A' }}{{ article.stock.length > 1 ? '...' : '' }}
+              </span>
+            </div>
+          </div>
+          <div class="compact-qty" [class]="getQtyClass(article.quantity)">{{ article.quantity }} pz</div>
+        </a>
+        <div class="compact-row__actions">
+          <button mat-icon-button matTooltip="Vedi foto" (click)="openPhoto(article.photoUrl, $event)" [disabled]="!article.photoUrl">
+            <mat-icon>photo</mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Modifica" (click)="openEditDialog(article)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Elimina" color="warn" (click)="confirmDelete(article)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    }
+    @if (displayArticles().length === 0) {
+      <div class="empty-state">
+        <mat-icon>inventory_2</mat-icon>
+        <p>Nessun articolo trovato</p>
+        <button mat-flat-button color="primary" (click)="openAddDialog()">
+          <mat-icon>add</mat-icon> Aggiungi Articolo
+        </button>
+      </div>
+    }
+  </div>
+</div>

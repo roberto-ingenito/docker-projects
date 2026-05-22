@@ -1,0 +1,22 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - FRONTEND_ORIGIN=${FRONTEND_ORIGIN}
+      - ASPNETCORE_ENVIRONMENT=Production
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "50443:443"
+    depends_on:
+      - backend
+    restart: unless-stopped

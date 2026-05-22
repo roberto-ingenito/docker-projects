@@ -1,0 +1,62 @@
+<mat-sidenav-container class="app-container" [hasBackdrop]="isMobile()">
+  @if (showNav()) {
+    <mat-sidenav
+      #sidenav
+      [mode]="isMobile() ? 'over' : 'side'"
+      [opened]="!isMobile() || sidenavOpen()"
+      (closedStart)="sidenavOpen.set(false)"
+      class="app-sidenav"
+    >
+      <div class="sidenav-header">
+        <div class="logo-box">
+          <img src="assets/lafa-logo.png" alt="LAFA Logo" class="side-logo" />
+        </div>
+        <div class="header-info">
+          <span class="app-name">Magazzino</span>
+        </div>
+      </div>
+
+      <div class="nav-list">
+        <a routerLink="/dashboard" routerLinkActive="active" class="nav-item" (click)="closeSidenavOnMobile()">
+          <mat-icon>dashboard</mat-icon>
+          <span>Dashboard</span>
+        </a>
+        <a routerLink="/articles" routerLinkActive="active" class="nav-item" (click)="closeSidenavOnMobile()">
+          <mat-icon>inventory_2</mat-icon>
+          <span>Articoli</span>
+        </a>
+        <a routerLink="/shelves" routerLinkActive="active" class="nav-item" (click)="closeSidenavOnMobile()">
+          <mat-icon>dns</mat-icon>
+          <span>Scaffali</span>
+        </a>
+        <a routerLink="/containers" routerLinkActive="active" class="nav-item" (click)="closeSidenavOnMobile()">
+          <mat-icon>inventory</mat-icon>
+          <span>Contenitori</span>
+        </a>
+        <a routerLink="/movements" routerLinkActive="active" class="nav-item" (click)="closeSidenavOnMobile()">
+          <mat-icon>history</mat-icon>
+          <span>Movimenti</span>
+        </a>
+      </div>
+    </mat-sidenav>
+  }
+
+  <mat-sidenav-content class="app-content">
+    @if (showNav() && isMobile()) {
+      <header class="mobile-header">
+        <button mat-icon-button (click)="toggleSidenav()" class="menu-btn">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <span class="title">Magazzino</span>
+        <div class="spacer"></div>
+        <button mat-icon-button (click)="openScanner()">
+          <mat-icon>qr_code_scanner</mat-icon>
+        </button>
+      </header>
+    }
+
+    <main class="page-container" [class.no-padding]="!showNav()">
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

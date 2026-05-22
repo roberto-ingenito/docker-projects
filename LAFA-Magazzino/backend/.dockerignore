@@ -1,0 +1,14 @@
+# Exclude solution file so dotnet doesn't pick it up instead of the project
+*.sln
+
+# Exclude local build output
+bin/
+obj/
+
+# Exclude VS/IDE folders
+.vs/
+.vscode/
+
+# Exclude user-specific files
+*.user
+*.suo

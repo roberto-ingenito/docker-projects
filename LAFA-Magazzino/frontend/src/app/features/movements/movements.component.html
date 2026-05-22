@@ -1,0 +1,93 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Movimenti</h1>
+    <div class="header-actions">
+      <div class="live-indicator">
+        <span class="live-dot"></span>
+        <span>Live</span>
+      </div>
+      <button mat-icon-button (click)="clearFilters()" title="Reset filtri" class="reset-button">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-panel">
+    <div class="filters-row">
+      <mat-form-field class="filter-field search-field">
+        <mat-label>Articolo</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput [(ngModel)]="filters.articleName" (ngModelChange)="applyFilters()" placeholder="Nome articolo" />
+      </mat-form-field>
+
+      <mat-form-field class="filter-field type-field">
+        <mat-label>Tipo</mat-label>
+        <mat-select [(ngModel)]="filters.type" (ngModelChange)="applyFilters()">
+          <mat-option value="">Tutti</mat-option>
+          <mat-option value="LOAD">Carico</mat-option>
+          <mat-option value="UNLOAD">Scarico</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="filters-row">
+      <mat-form-field class="filter-field">
+        <mat-label>Dal</mat-label>
+        <mat-icon matPrefix>event</mat-icon>
+        <input matInput [matDatepicker]="fromPicker" [(ngModel)]="filters.from" (ngModelChange)="applyFilters()" readonly />
+        <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field class="filter-field">
+        <mat-label>Al</mat-label>
+        <mat-icon matPrefix>event</mat-icon>
+        <input matInput [matDatepicker]="toPicker" [(ngModel)]="filters.to" (ngModelChange)="applyFilters()" readonly />
+        <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+        <mat-datepicker #toPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="loading-center">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  }
+
+  <!-- List -->
+  @if (!loading()) {
+    <div class="movements-list">
+      @for (m of movements(); track m) {
+        <div class="movement-row">
+          <div class="movement-time">
+            <div class="time-date">{{ m.createdAt | date: 'dd/MM/yy' }}</div>
+            <div class="time-hour">{{ m.createdAt | date: 'HH:mm' }}</div>
+          </div>
+          <div class="movement-badge" [class.load]="m.type === 'LOAD'" [class.unload]="m.type === 'UNLOAD'">
+            <mat-icon>{{ m.type === 'LOAD' ? 'add_circle' : 'remove_circle' }}</mat-icon>
+            <span>{{ m.type === 'LOAD' ? 'CARICO' : 'SCARICO' }}</span>
+          </div>
+          <div class="movement-article">
+            <div class="art-id">{{ m.articleId }}</div>
+            <div class="art-name">{{ m.articleName }}</div>
+            @if (m.notes) {
+              <div class="art-notes">{{ m.notes }}</div>
+            }
+          </div>
+          <div class="movement-qty" [class.load]="m.type === 'LOAD'" [class.unload]="m.type === 'UNLOAD'">
+            {{ m.type === 'LOAD' ? '+' : '-' }}{{ m.quantity }}
+          </div>
+        </div>
+      }
+      @if (movements().length === 0) {
+        <div class="empty-state">
+          <mat-icon>history</mat-icon>
+          <p>Nessun movimento trovato</p>
+        </div>
+      }
+    </div>
+  }
+</div>

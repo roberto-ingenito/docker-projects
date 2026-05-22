@@ -1,0 +1,124 @@
+<div class="detail-page-container">
+  <!-- Back Bar -->
+  <div class="back-bar">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span>Dettaglio Scaffale</span>
+    <div class="spacer"></div>
+    <button mat-icon-button (click)="openEdit()" matTooltip="Modifica">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button mat-icon-button color="warn" (click)="confirmDelete()" matTooltip="Elimina">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-center">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  }
+
+  @if (!loading() && shelf()) {
+    <!-- Hero Card -->
+    <div class="hero-card">
+      <div class="hero-icon-header">
+        <mat-icon>dns</mat-icon>
+      </div>
+      <div class="hero-info compact">
+        <div class="hero-id-row">
+          <div class="hero-id">ID: {{ shelf()!.id }}</div>
+          <button mat-icon-button class="copy-id-btn" (click)="copyId()" matTooltip="Copia ID">
+            <mat-icon>content_copy</mat-icon>
+          </button>
+        </div>
+        <h1>{{ shelf()!.label }}</h1>
+
+        @if (shelf()!.notes) {
+          <div class="hero-notes">
+            <mat-icon>notes</mat-icon>
+            <span>{{ shelf()!.notes }}</span>
+          </div>
+        }
+
+        <div class="stats-row">
+          <div class="stat-item">
+            <span class="stat-value">{{ shelf()!.containers.length }}</span>
+            <span class="stat-label">Contenitori</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QR Card -->
+    <mat-card class="qr-card">
+      <mat-card-header>
+        <mat-card-title>QR Code Scaffale</mat-card-title>
+        <div class="header-actions">
+          <button mat-icon-button [matMenuTriggerFor]="printMenu" matTooltip="Stampa etichetta">
+            <mat-icon>print</mat-icon>
+          </button>
+          <mat-menu #printMenu="matMenu">
+            <button mat-menu-item (click)="printLabel('inline')">
+              <mat-icon>horizontal_distribute</mat-icon>
+              <span>Etichetta in linea</span>
+            </button>
+            <button mat-menu-item (click)="printLabel('stacked')">
+              <mat-icon>vertical_align_center</mat-icon>
+              <span>Etichetta sopra/sotto</span>
+            </button>
+          </mat-menu>
+        </div>
+      </mat-card-header>
+      <mat-card-content class="qr-container">
+        @if (qrCodeUrl()) {
+          <div class="qr-display">
+            <img [src]="qrCodeUrl()" alt="QR Code" class="qr-image" (click)="openQrLightbox()" style="cursor: zoom-in;" />
+            <p class="qr-hint">Clicca per ingrandire · Scannerizza per identificare lo scaffale</p>
+          </div>
+        } @else {
+          <div class="qr-placeholder">
+            <mat-spinner strokeWidth="2" diameter="40"></mat-spinner>
+            <p>Generazione QR Code...</p>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Content Section -->
+    <div class="section-header">
+      <h2>Contenitori su questo scaffale</h2>
+    </div>
+
+    <div class="items-list">
+      @for (cont of shelf()!.containers; track cont.id) {
+        <div class="item-row clickable" [routerLink]="['/containers', cont.id]">
+          <div class="item-icon">
+            <mat-icon>inventory_2</mat-icon>
+          </div>
+          <div class="item-details">
+            <div class="item-title">{{ cont.label }}</div>
+            <div class="item-subtitle">ID: {{ cont.id }}</div>
+          </div>
+          <mat-icon class="chevron">chevron_right</mat-icon>
+        </div>
+      }
+      @if (shelf()!.containers.length === 0) {
+        <div class="empty-state">
+          <mat-icon>inventory_2</mat-icon>
+          <p>Nessun contenitore su questo scaffale</p>
+        </div>
+      }
+    </div>
+  }
+
+  @if (!loading() && !shelf()) {
+    <div class="error-card">
+      <mat-icon>search_off</mat-icon>
+      <p>Scaffale non trovato</p>
+      <button mat-flat-button color="primary" routerLink="/shelves">Torna agli Scaffali</button>
+    </div>
+  }
+</div>
+
