@@ -129,6 +129,13 @@ main {
   gap: $space-3;
 }
 
+.transaction-placeholder {
+  height: 122px;
+  border-radius: $radius-md;
+  background-color: $content1;
+  border: 1px solid $default-200;
+}
+
 .statistic-icon {
   display: flex;
   justify-content: center;

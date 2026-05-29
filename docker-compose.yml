@@ -114,7 +114,7 @@ services:
       - POSTGRES_PASSWORD=${CASHLY_POSTGRES_PASSWORD}
       - POSTGRES_DB=${CASHLY_POSTGRES_DB}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     networks:
       - common-network
     restart: always
@@ -248,7 +248,7 @@ services:
       - POSTGRES_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
       - POSTGRES_DB=nextcloud
     volumes:
-      - nextcloud_db_data:/var/lib/postgresql/data
+      - nextcloud_db_data:/var/lib/postgresql
     networks:
       - common-network
     restart: always

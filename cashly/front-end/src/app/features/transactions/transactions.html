@@ -71,7 +71,11 @@
   <p>{{ filteredTransactions()?.length ?? 0 }} transazioni</p>
   <div class="transaction-list">
     @for (item of filteredTransactions(); track item.transactionId) {
-      <app-transaction-card [transaction]="item" />
+      @defer (on viewport) {
+        <app-transaction-card [transaction]="item" />
+      } @placeholder {
+        <div class="transaction-placeholder"></div>
+      }
     }
   </div>
 </main>
