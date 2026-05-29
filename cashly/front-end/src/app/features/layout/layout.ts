@@ -20,6 +20,8 @@ import { AuthStore } from '../../core/services/auth.store';
 import { CategoriesStore } from '../../core/services/categories.store';
 import { TransactionsStore } from '../../core/services/transactions.store';
 import { Icon } from '../../shared/components/icon/icon';
+import { SwUpdate } from '@angular/service-worker';
+import { toast } from 'ngx-sonner';
 
 @Component({
   selector: 'app-layout',
@@ -42,6 +44,7 @@ export class Layout implements OnInit {
   private categoriesStore = inject(CategoriesStore);
   private transactionsStore = inject(TransactionsStore);
   protected themeService = inject(ThemeService);
+  private updates = inject(SwUpdate);
 
   protected readonly navItems = [
     { route: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
@@ -64,6 +67,37 @@ export class Layout implements OnInit {
 
   toggleTheme() {
     this.themeService.toggle();
+  }
+
+  async refreshPage() {
+    if (!this.updates.isEnabled) {
+      toast.success('Ricarico la pagina...');
+      setTimeout(() => {
+        document.location.reload();
+      }, 500);
+      return;
+    }
+
+    toast.info('Verifica aggiornamenti in corso...');
+    try {
+      const updateAvailable = await this.updates.checkForUpdate();
+      if (updateAvailable) {
+        toast.success('Nuova versione trovata! Aggiornamento in corso...');
+        await this.updates.activateUpdate();
+        document.location.reload();
+      } else {
+        toast.success('Applicazione aggiornata. Ricarico la pagina...');
+        setTimeout(() => {
+          document.location.reload();
+        }, 800);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Errore durante la verifica degli aggiornamenti. Ricarico comunque...');
+      setTimeout(() => {
+        document.location.reload();
+      }, 1500);
+    }
   }
 
   logout() {
