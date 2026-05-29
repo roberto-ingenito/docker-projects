@@ -1,9 +1,10 @@
-import { afterNextRender, Component, effect, inject, OnInit } from '@angular/core';
+import { afterNextRender, Component, effect, inject, OnInit, ApplicationRef } from '@angular/core';
 import { NavigationEnd, NavigationStart, Router, RouterOutlet } from '@angular/router';
-import { filter } from 'rxjs';
+import { filter, first } from 'rxjs';
 import { ThemeService } from './core/services/theme.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NgxSonnerToaster } from 'ngx-sonner';
+import { NgxSonnerToaster, toast } from 'ngx-sonner';
+import { SwUpdate } from '@angular/service-worker';
 
 @Component({
   selector: 'app-root',
@@ -13,6 +14,8 @@ import { NgxSonnerToaster } from 'ngx-sonner';
 export class App implements OnInit {
   private theme = inject(ThemeService);
   private router = inject(Router);
+  private appRef = inject(ApplicationRef);
+  private updates = inject(SwUpdate);
 
   constructor() {
     // Primo caricamento: rimuove la classe dopo che Angular ha renderizzato
@@ -38,11 +41,51 @@ export class App implements OnInit {
       .subscribe(() => {
         this.removeNoTransitions();
       });
+
+    this.setupUpdateChecks();
   }
 
   ngOnInit() {
     this.theme.init();
     this.markIconsReadyWhenFontLoaded();
+  }
+
+  private setupUpdateChecks(): void {
+    if (!this.updates.isEnabled) {
+      return;
+    }
+
+    this.appRef.isStable
+      .pipe(
+        filter((stable) => stable),
+        first(),
+      )
+      .subscribe(() => {
+        this.checkForUpdate();
+      });
+
+    this.updates.versionUpdates.subscribe((evt) => {
+      if (evt.type === 'VERSION_READY') {
+        toast.info('Nuova versione disponibile!', {
+          description: 'Clicca su "Aggiorna" per caricare l\'ultima versione.',
+          action: {
+            label: 'Aggiorna',
+            onClick: () => {
+              this.updates.activateUpdate().then(() => {
+                document.location.reload();
+              });
+            },
+          },
+          duration: Infinity,
+        });
+      }
+    });
+  }
+
+  private checkForUpdate(): void {
+    this.updates.checkForUpdate().catch((err) => {
+      console.error('Errore durante la ricerca di aggiornamenti:', err);
+    });
   }
 
   private markIconsReadyWhenFontLoaded(): void {

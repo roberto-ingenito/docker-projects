@@ -17,6 +17,15 @@
         <button
           mat-icon-button
           type="button"
+          matTooltip="Ricarica"
+          (click)="refreshPage()"
+        >
+          <app-icon>refresh</app-icon>
+        </button>
+
+        <button
+          mat-icon-button
+          type="button"
           [matTooltip]="isDark() ? 'Tema chiaro' : 'Tema scuro'"
           (click)="toggleTheme()"
         >
