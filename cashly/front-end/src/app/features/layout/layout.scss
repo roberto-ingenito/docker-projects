@@ -1,55 +1,14 @@
 @use 'variables' as *;
 @use 'breakpoints' as *;
 
-$sidenav-padding: $space-1;
-$sidenav-outer-radius: $radius-md;
-$sidenav-inner-radius: calc($sidenav-outer-radius - $sidenav-padding);
-
 :host {
   display: block;
   height: 100%;
 }
 
-mat-sidenav-container {
+.layout-container {
   height: 100%;
-  background-color: transparent;
-}
-
-mat-sidenav {
-  width: 16rem;
-  background-color: $content1;
-  padding: $sidenav-padding;
-
-  border-top-right-radius: $sidenav-outer-radius;
-  border-bottom-right-radius: $sidenav-outer-radius;
-
-  mat-nav-list {
-    display: flex;
-    flex-direction: column;
-    gap: $space-1;
-
-    padding: 0;
-
-    a {
-      --mat-list-list-item-label-text-color: #{$foreground};
-
-      text-decoration: none;
-
-      border-radius: $sidenav-inner-radius;
-
-      transition:
-        background-color $transition,
-        color $transition;
-
-      &.active {
-        --mat-list-list-item-label-text-color: #{$primary-900};
-        background-color: $primary-200;
-      }
-    }
-  }
-}
-
-mat-sidenav-content {
+  width: 100%;
   overflow-y: hidden;
 
   display: flex;
@@ -74,9 +33,6 @@ nav {
 
   border-bottom: 1px solid $default-200;
 
-  display: flex;
-  justify-content: center;
-
   .nav-inner {
     position: relative;
 
@@ -98,14 +54,6 @@ nav {
     display: none;
     @include breakpoint('sm') {
       display: block;
-    }
-  }
-
-  .menu-button {
-    color: $foreground;
-
-    @include breakpoint('sm') {
-      display: none;
     }
   }
 
@@ -199,4 +147,80 @@ main {
 
   padding: $layout-padding-x; // Imposta la base uguale per tutti i lati
   padding-top: calc($nav-height + $layout-padding-x); // Sovrascrive solo il lato superiore
+  padding-bottom: calc($layout-padding-x + 4.5rem); // Aggiunge spazio per la bottom nav in mobile
+
+  @include breakpoint('sm') {
+    padding-bottom: $layout-padding-x;
+  }
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4.5rem;
+  z-index: $z-sticky;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  background-color: color-mix(in srgb, #{$content1}, transparent 10%);
+  backdrop-filter: blur(1.5rem);
+  -webkit-backdrop-filter: blur(1.5rem);
+  border-top: 1px solid $default-200;
+
+  // Modern subtle shadow
+  box-shadow: 0 -4px 20px -5px rgba(0, 0, 0, 0.08);
+
+  // Transitions
+  transition: background-color $transition;
+
+  @include breakpoint('sm') {
+    display: none;
+  }
+
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+
+    flex: 1;
+    height: 100%;
+    text-decoration: none;
+    color: $foreground;
+    opacity: 0.6;
+
+    transition:
+      color $transition,
+      opacity $transition,
+      transform $transition;
+
+    app-icon {
+      font-size: 1.5rem;
+      transition: transform $transition;
+    }
+
+    .bottom-nav-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    &.active {
+      color: $primary;
+      opacity: 1;
+
+      app-icon {
+        transform: translateY(-2px) scale(1.1);
+      }
+    }
+
+    &:hover:not(.active) {
+      opacity: 0.85;
+      transform: translateY(-1px);
+    }
+  }
 }
