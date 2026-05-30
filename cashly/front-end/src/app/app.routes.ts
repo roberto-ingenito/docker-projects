@@ -3,6 +3,8 @@ import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { Login } from './features/login/login';
 import { Signup } from './features/signup/signup';
+import { ForgotPassword } from './features/forgot-password/forgot-password';
+import { ResetPassword } from './features/reset-password/reset-password';
 import { Dashboard } from './features/dashboard/dashboard';
 import { Categories } from './features/categories/categories';
 import { Transactions } from './features/transactions/transactions';
@@ -18,6 +20,16 @@ export const routes: Routes = [
     path: 'signup',
     canActivate: [guestGuard],
     component: Signup,
+  },
+  {
+    path: 'forgot-password',
+    canActivate: [guestGuard],
+    component: ForgotPassword,
+  },
+  {
+    path: 'reset-password',
+    canActivate: [guestGuard],
+    component: ResetPassword,
   },
   {
     path: '',

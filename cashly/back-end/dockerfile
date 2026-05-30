@@ -1,5 +1,5 @@
 # Stage 1: build
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copia il file di soluzione (.sln) e i file di progetto (.csproj)
@@ -23,7 +23,7 @@ WORKDIR "/src/cashly"
 RUN dotnet publish "cashly.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Stage 2: final
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 
 # Copia i file pubblicati dal primo stage.

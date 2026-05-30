@@ -79,7 +79,7 @@ Interfaccia web per PostgreSQL → porta `5050` (accesso diretto)
 ### 2. Configurazione ambiente
 
 ```bash
-cp .env-template .env
+cp .env.template .env
 nano .env
 ```
 
