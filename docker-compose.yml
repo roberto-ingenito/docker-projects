@@ -79,6 +79,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Host=cashly-database;Database=${CASHLY_POSTGRES_DB};Username=${CASHLY_POSTGRES_USER};Password=${CASHLY_POSTGRES_PASSWORD}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM_EMAIL=${SMTP_FROM_EMAIL}
+      - SMTP_FROM_NAME=${SMTP_FROM_NAME}
     networks:
       - common-network
     restart: always

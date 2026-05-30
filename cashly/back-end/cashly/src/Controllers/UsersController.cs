@@ -39,4 +39,29 @@ public class UsersController(IUserService userService) : ControllerBase
             return Unauthorized(new { message = "invalid-refresh-token" });
         }
     }
+
+    [HttpPost("forgot-password")]
+    public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto dto)
+    {
+        string? origin = Request.Headers.Referer.ToString();
+        if (string.IsNullOrEmpty(origin))
+        {
+            origin = Request.Headers.Origin.ToString();
+        }
+        if (string.IsNullOrEmpty(origin))
+        {
+            origin = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
+        }
+
+        await userService.ForgotPassword(dto, origin);
+        return Ok(new { message = "Se l'indirizzo email è registrato, riceverai a breve un link di ripristino." });
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequestDto dto)
+    {
+        await userService.ResetPassword(dto);
+        return Ok(new { message = "Password reimpostata con successo." });
+    }
 }
+

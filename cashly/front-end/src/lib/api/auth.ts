@@ -25,3 +25,14 @@ export const refreshToken = async (refreshTokenValue: string): Promise<UserLogin
   });
   return res.data;
 };
+
+export const forgotPassword = async (email: string): Promise<{ message: string }> => {
+  const res = await authAxios.post<{ message: string }>('/Users/forgot-password', { email });
+  return res.data;
+};
+
+export const resetPassword = async (token: string, newPassword: string): Promise<{ message: string }> => {
+  const res = await authAxios.post<{ message: string }>('/Users/reset-password', { token, newPassword });
+  return res.data;
+};
+

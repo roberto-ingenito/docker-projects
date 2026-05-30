@@ -14,7 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace cashly.src.Services.Implementations;
 
-public class UserService(AppDbContext dbContext, IConfiguration configuration) : IUserService
+public class UserService(AppDbContext dbContext, IConfiguration configuration, IEmailService emailService) : IUserService
 {
     public async Task Delete(int userId)
     {
@@ -130,5 +130,46 @@ public class UserService(AppDbContext dbContext, IConfiguration configuration) :
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         return Convert.ToBase64String(randomNumber);
+    }
+
+    public async Task ForgotPassword(ForgotPasswordRequestDto dto, string origin)
+    {
+        var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+        
+        if (user == null)
+        {
+            return;
+        }
+
+        var resetToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
+        
+        user.PasswordResetToken = resetToken;
+        user.PasswordResetTokenExpiry = DateTime.UtcNow.AddHours(1);
+        await dbContext.SaveChangesAsync();
+
+        string baseUrl = "http://localhost:3000";
+        if (Uri.TryCreate(origin, UriKind.Absolute, out var uri))
+        {
+            baseUrl = uri.GetLeftPart(UriPartial.Authority);
+        }
+        string resetLink = $"{baseUrl}/cashly/reset-password?token={resetToken}";
+
+        await emailService.SendPasswordResetEmail(user.Email, resetLink);
+    }
+
+    public async Task ResetPassword(ResetPasswordRequestDto dto)
+    {
+        var user = await dbContext.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == dto.Token);
+
+        if (user == null || user.PasswordResetTokenExpiry < DateTime.UtcNow)
+        {
+            throw new AppException("invalid-or-expired-token", HttpStatusCode.BadRequest);
+        }
+
+        user.HashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+        user.PasswordResetToken = null;
+        user.PasswordResetTokenExpiry = null;
+
+        await dbContext.SaveChangesAsync();
     }
 }
