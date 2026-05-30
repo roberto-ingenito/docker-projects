@@ -353,9 +353,9 @@ Dovresti ricevere un messaggio su Telegram! 🎉
 Dopo aver configurato una delle opzioni sopra:
 
 ```bash
-# Simula un guasto
+# Simula un guasto (sostituisci /dev/md/storage con il nome effettivo, es. /dev/md127 se necessario)
 # Dovresti ricevere la notifica
-sudo mdadm /dev/md127 --fail /dev/nvme0n1p1
+sudo mdadm /dev/md/storage --fail /dev/nvme0n1p1
 
 # Aspetta qualche secondo
 sleep 5
@@ -364,8 +364,8 @@ sleep 5
 sudo journalctl -u mdmonitor.service -n 20
 
 # Ripristina
-sudo mdadm /dev/md127 --remove /dev/nvme0n1p1
-sudo mdadm /dev/md127 --add /dev/nvme0n1p1
+sudo mdadm /dev/md/storage --remove /dev/nvme0n1p1
+sudo mdadm /dev/md/storage --add /dev/nvme0n1p1
 ```
 
 # Comandi Utili per Gestione RAID

@@ -93,18 +93,11 @@ cd /mnt/storage/projects
 ## Avvia i container
 
 ```bash
+# Costruisci le immagini personalizzate
 docker compose build
-```
 
-```bash
-docker compose up -d nginx
-```
-
-```bash
-./generate-certificate.sh
-```
-
-```bash
+# Avvia tutti i servizi in background
+# Traefik si occuperà del routing e della generazione automatica dei certificati SSL via Let's Encrypt
 docker compose up -d
 ```
 

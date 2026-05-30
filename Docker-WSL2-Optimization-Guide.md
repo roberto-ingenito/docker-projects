@@ -48,9 +48,9 @@ Anche dopo la pulizia, Windows non recupera lo spazio automaticamente. È necess
    wsl --shutdown
    ```
 3. Apri il terminale come Amministratore e digita `diskpart`.
-4. Esegui i seguenti comandi uno alla volta:
+4. Esegui i seguenti comandi uno alla volta (sostituisci `<username>` con il tuo nome utente di Windows):
    - ```bash
-     select vdisk file="C:\Users\ingen\AppData\Local\Docker\wsl\disk\docker_data.vhdx"
+     select vdisk file="C:\Users\<username>\AppData\Local\Docker\wsl\disk\docker_data.vhdx"
      ```
    - ```bash
      attach vdisk readonly

@@ -18,12 +18,18 @@ L'infrastruttura usa un reverse proxy centralizzato per routing, SSL e sicurezza
 
 ## 📱 Applicazioni
 
+### 💼 Portfolio
+
+Sito web di presentazione / portfolio personale.
+
+- **Frontend**: React (TypeScript) + Vite → `/`
+
 ### 💰 Cashly
 
 Gestione finanze personali.
 
 - **Backend**: .NET Core Web API → `/cashly-api/`
-- **Frontend**: Next.js → `/cashly/`
+- **Frontend**: Angular → `/cashly/`
 - **Database**: PostgreSQL
 
 ### 🎮 Mr. White Game
@@ -97,29 +103,6 @@ Traefik genera un certificato self-signed automatico. Il browser mostrerà un av
 
 ---
 
-## 📁 Struttura
-
-```
-.
-├── docker-compose.yml
-├── .env                        # Variabili produzione
-├── .env.dev                    # Variabili sviluppo
-├── .env-template               # Template per nuove installazioni
-├── traefik/
-│   ├── traefik.yml             # Configurazione statica (entrypoint, ACME, providers)
-│   └── dynamic/
-│       └── middlewares.yml     # Middleware condivisi (rate limit, headers, strip prefix)
-├── static-files/
-│   └── nginx.conf              # Server nginx per le SPA statiche
-├── cashly/
-├── mr-white-game/
-├── portfolio/
-├── fortil-excel-timesheet/
-├── calcolatore-finanze/
-└── calcolatore-tasse/
-```
-
----
 
 ## 🔀 Routing
 
@@ -166,3 +149,4 @@ docker compose up -d --build [service-name]
 - [💾 Backup & Restore Postgres](backup_and_restore_postgres.md)
 - [🗄️ Configurazione RAID](configurazione_raid.md)
 - [📝 Obsidian Sync](configurazione_obsidian_sync.md)
+- [🧹 Guida Pulizia e Ottimizzazione WSL2](Docker-WSL2-Optimization-Guide.md)
